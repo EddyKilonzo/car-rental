@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: { email: string }) {
     const user = await this.usersService.findByEmail(payload.email);
 
     if (!user || !user.isActive) {

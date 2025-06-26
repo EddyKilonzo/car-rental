@@ -104,7 +104,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getProfile(@Request() req) {
+  async getProfile(@Request() req: { user: { id: string } }) {
     return this.usersService.getProfile(req.user.id);
   }
 
@@ -145,7 +145,10 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
-  async updateProfile(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+  async updateProfile(
+    @Request() req: { user: { id: string } },
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.update(req.user.id, updateUserDto);
   }
 
@@ -165,7 +168,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   async completeProfile(
-    @Request() req,
+    @Request() req: { user: { id: string } },
     @Body() completeProfileDto: CompleteProfileDto,
   ) {
     return this.usersService.completeProfile(req.user.id, completeProfileDto);
@@ -184,7 +187,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Profile deactivated successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async deactivateProfile(@Request() req) {
+  async deactivateProfile(@Request() req: { user: { id: string } }) {
     return this.usersService.remove(req.user.id);
   }
 
@@ -196,12 +199,13 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Permanently delete user profile',
-    description: 'Permanently delete the current user account (cannot be undone)',
+    description:
+      'Permanently delete the current user account (cannot be undone)',
   })
   @ApiResponse({ status: 200, description: 'Profile permanently deleted' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async deleteProfilePermanently(@Request() req) {
+  async deleteProfilePermanently(@Request() req: { user: { id: string } }) {
     return this.usersService.deletePermanently(req.user.id);
   }
 

@@ -4,7 +4,7 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 /* Toastr Styles */
-@import 'ngx-toastr/toastr.css';
+@import 'ngx-toastr/toastr';
 
 /* Global Styles */
 * {

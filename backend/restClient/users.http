@@ -1,0 +1,191 @@
+
+###
+@baseUrl = http://localhost:3000
+@token = 
+@customerToken = 
+@agentToken = 
+@adminToken = 
+@userId = 
+
+### ========================================
+### AUTHENTICATION
+### ========================================
+
+# Login as Customer
+# @name customerLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@example.com",
+  "password": "password123"
+}
+
+###
+
+# Login as Agent
+# @name agentLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "agent@example.com",
+  "password": "password123"
+}
+
+###
+
+# Login as Admin
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+###
+
+### ========================================
+### USER REGISTRATION 
+
+# Register a new customer
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "password123",
+  "phone": "+1234567890"
+}
+
+###
+
+# Register another customer
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+  "name": "Jane Smith",
+  "email": "jane.smith@example.com",
+  "password": "password123",
+  "phone": "+1987654321"
+}
+
+###
+
+### ========================================
+### PROFILE MANAGEMENT (AUTHENTICATED USERS)
+
+
+# Get my profile
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{customerToken}}
+
+###
+
+# Update my profile
+PATCH {{baseUrl}}/users/profile
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "name": "John Doe Updated",
+  "phone": "+1234567899"
+}
+
+###
+
+# Complete profile for car rental
+PATCH {{baseUrl}}/users/profile/complete
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "licenseNumber": "DL123456789",
+  "dateOfBirth": "1990-01-15",
+  "address": "123 Main Street",
+  "city": "New York",
+  "state": "NY",
+  "zipCode": "10001",
+  "country": "USA"
+}
+
+###
+
+# Update profile with more details
+PATCH {{baseUrl}}/users/profile
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "phone": "+1234567890",
+  "address": "456 Oak Avenue",
+  "city": "Los Angeles",
+  "state": "CA",
+  "zipCode": "90210"
+}
+
+###
+
+### ========================================
+### ADMIN USER MANAGEMENT
+
+
+# Admin gets all users
+GET {{baseUrl}}/users?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin gets users with pagination
+GET {{baseUrl}}/users?page=2&limit=5
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin gets specific user by ID
+GET {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin updates user
+PATCH {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
+  "phone": "+1111111111",
+  "isVerified": true
+}
+
+###
+
+# Admin deletes user (soft delete)
+DELETE {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ========================================
+### PROFILE DELETION (AUTHENTICATED USERS)
+
+# Deactivate my profile (soft delete)
+DELETE {{baseUrl}}/users/profile
+Authorization: Bearer {{customerToken}}
+
+###
+
+# Permanently delete my profile (cannot be undone)
+DELETE {{baseUrl}}/users/profile/permanent
+Authorization: Bearer {{customerToken}}
+
+###
+
+
+ 

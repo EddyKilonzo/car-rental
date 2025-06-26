@@ -82,7 +82,7 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized',
   })
-  async getProfile(@Request() req) {
+  getProfile(@Request() req: { user: any }): any {
     return req.user;
   }
 }

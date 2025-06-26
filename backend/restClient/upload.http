@@ -1,0 +1,129 @@
+### Upload API Tests
+###
+@baseUrl = http://localhost:3000
+@customerToken = 
+@agentToken = 
+@adminToken = 
+
+### ========================================
+### USER PROFILE UPLOADS
+### ========================================
+
+# Upload profile photo
+POST {{baseUrl}}/upload/profile-photo
+Authorization: Bearer {{customerToken}}
+Content-Type: multipart/form-data
+
+< ./sample-images/profile.jpg
+
+###
+
+# Upload avatar (circular profile picture)
+POST {{baseUrl}}/upload/avatar
+Authorization: Bearer {{customerToken}}
+Content-Type: multipart/form-data
+
+< ./sample-images/avatar.jpg
+
+###
+
+# Upload license document
+POST {{baseUrl}}/upload/license-document
+Authorization: Bearer {{customerToken}}
+Content-Type: multipart/form-data
+
+< ./sample-documents/license.pdf
+
+###
+
+### ========================================
+### VEHICLE UPLOADS (AGENT/ADMIN ONLY)
+### ========================================
+
+# Upload main vehicle image
+POST {{baseUrl}}/upload/vehicle/main-image
+Authorization: Bearer {{agentToken}}
+Content-Type: multipart/form-data
+
+< ./sample-images/car-main.jpg
+
+###
+
+# Upload vehicle gallery images (multiple files)
+POST {{baseUrl}}/upload/vehicle/gallery
+Authorization: Bearer {{agentToken}}
+Content-Type: multipart/form-data
+
+< ./sample-images/car-gallery-1.jpg
+< ./sample-images/car-gallery-2.jpg
+< ./sample-images/car-gallery-3.jpg
+
+###
+
+# Upload vehicle interior images
+POST {{baseUrl}}/upload/vehicle/interior
+Authorization: Bearer {{agentToken}}
+Content-Type: multipart/form-data
+
+< ./sample-images/car-interior-1.jpg
+< ./sample-images/car-interior-2.jpg
+
+###
+
+# Upload vehicle exterior images
+POST {{baseUrl}}/upload/vehicle/exterior
+Authorization: Bearer {{agentToken}}
+Content-Type: multipart/form-data
+
+< ./sample-images/car-exterior-1.jpg
+< ./sample-images/car-exterior-2.jpg
+< ./sample-images/car-exterior-3.jpg
+
+###
+
+# Upload vehicle documents
+POST {{baseUrl}}/upload/vehicle/documents
+Authorization: Bearer {{agentToken}}
+Content-Type: multipart/form-data
+
+< ./sample-documents/registration.pdf
+< ./sample-documents/insurance.pdf
+
+###
+
+### ========================================
+### ERROR TESTING
+### ========================================
+
+# Try to upload without authentication (should fail)
+POST {{baseUrl}}/upload/profile-photo
+Content-Type: multipart/form-data
+
+< ./sample-images/profile.jpg
+
+###
+
+# Try to upload vehicle image as customer (should fail)
+POST {{baseUrl}}/upload/vehicle/main-image
+Authorization: Bearer {{customerToken}}
+Content-Type: multipart/form-data
+
+< ./sample-images/car-main.jpg
+
+###
+
+# Try to upload without file (should fail)
+POST {{baseUrl}}/upload/profile-photo
+Authorization: Bearer {{customerToken}}
+Content-Type: multipart/form-data
+
+###
+
+# Try to upload too large file (should fail based on file size limits)
+POST {{baseUrl}}/upload/avatar
+Authorization: Bearer {{customerToken}}
+Content-Type: multipart/form-data
+
+< ./sample-images/large-file.jpg
+
+###

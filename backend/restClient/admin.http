@@ -1,0 +1,165 @@
+### Admin Management API Tests
+###
+@baseUrl = http://localhost:3000
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwic3ViIjoiNDM1NjUxOGUtNjQxMi00MTMyLWI4NDktMTJlNDQ4YTY3MjQ3Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUwOTQzMDIxLCJleHAiOjE3NTEwMjk0MjF9.QQdrlh9SuJ4vFoiAVFxfFTIoezNbgkoi9s1jZ49BJRg
+@userId = 
+@vehicleId = 
+@reviewId = 
+
+### ========================================
+### AUTHENTICATION
+
+
+# Login as Admin
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+###
+
+### SYSTEM STATISTICS
+
+
+# Get system statistics
+GET {{baseUrl}}/admin/stats
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ========================================
+### USER MANAGEMENT
+
+
+# Get all users with pagination
+GET {{baseUrl}}/admin/users?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get users filtered by role
+GET {{baseUrl}}/admin/users?role=CUSTOMER&page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get users filtered by role
+GET {{baseUrl}}/admin/users?role=AGENT&page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Search users by name or email
+GET {{baseUrl}}/admin/users?search=customer&page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get user details by ID
+GET {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Update user role
+PUT {{baseUrl}}/admin/users/{{userId}}/role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "role": "AGENT"
+}
+
+###
+
+# Toggle user active status
+PUT {{baseUrl}}/admin/users/{{userId}}/toggle-status
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ========================================
+### VEHICLE MANAGEMENT
+
+
+# Get all vehicles with pagination
+GET {{baseUrl}}/admin/vehicles?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get vehicles filtered by status
+GET {{baseUrl}}/admin/vehicles?status=AVAILABLE&page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get vehicles filtered by status
+GET {{baseUrl}}/admin/vehicles?status=RENTED&page=1&limit=5
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Search vehicles by make, model, or license plate
+GET {{baseUrl}}/admin/vehicles?search=HONDA&page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get vehicle details by ID
+GET {{baseUrl}}/admin/vehicles/{{vehicleId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Toggle vehicle active status
+PUT {{baseUrl}}/admin/vehicles/{{vehicleId}}/toggle-status
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ========================================
+### REVIEW MANAGEMENT
+
+
+# Get all reviews with pagination
+GET {{baseUrl}}/admin/reviews?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get reviews filtered by rating range
+GET {{baseUrl}}/admin/reviews?minRating=3&maxRating=5&page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get reviews with minimum rating
+GET {{baseUrl}}/admin/reviews?minRating=4&page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get reviews with maximum rating
+GET {{baseUrl}}/admin/reviews?maxRating=3&page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get review statistics
+GET {{baseUrl}}/admin/reviews/stats
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Delete a review
+DELETE {{baseUrl}}/admin/reviews/{{reviewId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ========================================

@@ -79,13 +79,10 @@ model User {
   country       String?
   isVerified    Boolean  @default(false)
 
-  // Agent specific fields
-  employeeId    String?
-  department    String?
-
   // Relations
   bookings      Booking[]
   reviews       Review[]
+  vehicles      Vehicle[] @relation("UserVehicles")
 
   @@map("users")
 }
@@ -118,6 +115,8 @@ model Vehicle {
   updatedAt       DateTime       @updatedAt
 
   // Relations
+  user            User           @relation("UserVehicles", fields: [userId], references: [id])
+  userId          String
   bookings        Booking[]
   maintenance     Maintenance[]
 

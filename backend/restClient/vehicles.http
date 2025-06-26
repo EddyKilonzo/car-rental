@@ -1,0 +1,348 @@
+### Vehicle Management API Tests
+###
+@baseUrl = http://localhost:3000
+@token = 
+@customerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmUuZG9lQGV4YW1wbGUuY29tIiwic3ViIjoiNDVmYjdlYmMtZTNkOS00YTQ1LWI1OTMtYTdjOWY3MGExYWM0Iiwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzUwOTQwNjM5LCJleHAiOjE3NTEwMjcwMzl9.Nypp_V-m2Gooo3ZcWwryQmtN_sgMn_QnKwuNyC4vqCk
+@agentToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN1c3RvbWVyQGV4YW1wbGUuY29tIiwic3ViIjoiMGM0ZmQ3NzItYjVkMC00M2I3LWE3OGQtZDE0ZTVlNWQ1MGUwIiwicm9sZSI6IkFHRU5UIiwiaWF0IjoxNzUwOTQwNTE2LCJleHAiOjE3NTEwMjY5MTZ9.0vVonpYFB7MMmfCjo7mFOq1rll2KTYlxNtAFA2ciZuw
+@adminToken = 
+@vehicleId = 308744e4-ccde-40a2-9a29-15c25af3da76
+@bookingId = e5c2db4b-c6ed-4358-9596-839b7b6e4d39
+@agentUserId = 
+
+### ========================================
+### AUTHENTICATION
+### ========================================
+
+# Login as Customer (for booking and reviews)
+# @name customerLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane.doe@example.com",
+  "password": "password123"
+}
+
+###
+
+# Login as Agent
+# @name agentLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@example.com",
+  "password": "password123"
+}
+
+###
+
+# Login as Admin
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+###
+
+### ========================================
+### VEHICLE BROWSING (PUBLIC)
+### ========================================
+
+# Get all vehicles
+GET {{baseUrl}}/vehicles
+
+###
+
+# Search vehicles by type
+GET {{baseUrl}}/vehicles/search?vehicleType=SEDAN
+
+###
+
+# Search vehicles by fuel type
+GET {{baseUrl}}/vehicles/search?fuelType=PETROL
+
+###
+
+# Search vehicles by price range
+GET {{baseUrl}}/vehicles/search?minPrice=50&maxPrice=500
+
+###
+
+# Search vehicles by seats
+GET {{baseUrl}}/vehicles/search?seats=50
+
+###
+
+# Get vehicle details by ID
+GET {{baseUrl}}/vehicles/{{vehicleId}}
+
+###
+
+# Get reviews for a vehicle
+GET {{baseUrl}}/vehicles/{{vehicleId}}/reviews
+
+###
+
+### ========================================
+### BOOKING MANAGEMENT (CUSTOMER)
+### ========================================
+
+# Create a booking
+POST {{baseUrl}}/vehicles/bookings
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "vehicleId": "{{vehicleId}}",
+  "startDate": "2025-07-01T10:00:00Z",
+  "endDate": "2025-07-05T10:00:00Z",
+  "pickupLocation": "Downtown Location",
+  "returnLocation": "Airport Location",
+  "deposit": 100.00,
+  "notes": "Need GPS navigation system"
+}
+
+###
+
+# Get user's bookings
+GET {{baseUrl}}/vehicles/bookings/my
+Authorization: Bearer {{customerToken}}
+
+###
+
+# Get specific booking details
+GET {{baseUrl}}/vehicles/bookings/{{bookingId}}
+Authorization: Bearer {{customerToken}}
+
+###
+
+# Cancel a booking
+PUT {{baseUrl}}/vehicles/bookings/{{bookingId}}/cancel
+Authorization: Bearer {{customerToken}}
+
+###
+
+### ========================================
+### AGENT BOOKING MANAGEMENT
+### ========================================
+
+# Agent creates booking for customer
+POST {{baseUrl}}/vehicles/bookings/agent
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "customerId": "customer-user-id-here",
+  "vehicleId": "{{vehicleId}}",
+  "startDate": "2025-07-10T10:00:00Z",
+  "endDate": "2025-07-15T10:00:00Z",
+  "pickupLocation": "Hotel Pickup",
+  "returnLocation": "Airport Return",
+  "deposit": 150.00,
+  "notes": "Business client booking"
+}
+
+###
+
+# Agent confirms a booking
+PUT {{baseUrl}}/vehicles/bookings/{{bookingId}}/confirm
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Agent activates a booking (when customer picks up vehicle)
+PUT {{baseUrl}}/vehicles/bookings/{{bookingId}}/activate
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Agent completes a booking (when customer returns vehicle)
+PUT {{baseUrl}}/vehicles/bookings/{{bookingId}}/complete
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Agent gets bookings by status
+GET {{baseUrl}}/vehicles/bookings/status/PENDING
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Agent gets confirmed bookings
+GET {{baseUrl}}/vehicles/bookings/status/CONFIRMED
+Authorization: Bearer {{agentToken}}
+
+###
+
+### ========================================
+### ADMIN BOOKING MANAGEMENT
+### ========================================
+
+# Admin confirms a booking
+PUT {{baseUrl}}/vehicles/bookings/{{bookingId}}/confirm
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin activates a booking
+PUT {{baseUrl}}/vehicles/bookings/{{bookingId}}/activate
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin completes a booking
+PUT {{baseUrl}}/vehicles/bookings/{{bookingId}}/complete
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin gets all bookings with pagination
+GET {{baseUrl}}/vehicles/bookings/all?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin gets all bookings (second page)
+GET {{baseUrl}}/vehicles/bookings/all?page=2&limit=5
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin gets bookings by status
+GET {{baseUrl}}/vehicles/bookings/status/ACTIVE
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin gets completed bookings
+GET {{baseUrl}}/vehicles/bookings/status/COMPLETED
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin gets cancelled bookings
+GET {{baseUrl}}/vehicles/bookings/status/CANCELLED
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ========================================
+### REVIEW MANAGEMENT (CUSTOMER)
+### ========================================
+
+# Create a review for completed booking
+POST {{baseUrl}}/vehicles/reviews
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "bookingId": "{{bookingId}}",
+  "rating": 5,
+  "comment": "Excellent vehicle! Clean, well-maintained, and great fuel efficiency. Highly recommended!"
+}
+
+###
+
+# Create another review
+POST {{baseUrl}}/vehicles/reviews
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "bookingId": "another-booking-id",
+  "rating": 4,
+  "comment": "Good vehicle overall. Minor wear and tear but nothing major. Would rent again."
+}
+
+###
+
+### ========================================
+### ERROR TESTING
+### ========================================
+
+# Try to book without authentication (should fail)
+POST {{baseUrl}}/vehicles/bookings
+Content-Type: application/json
+
+{
+  "vehicleId": "{{vehicleId}}",
+  "startDate": "2025-07-01T10:00:00Z",
+  "endDate": "2025-07-05T10:00:00Z"
+}
+
+###
+
+# Try to book with past dates (should fail)
+POST {{baseUrl}}/vehicles/bookings
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "vehicleId": "{{vehicleId}}",
+  "startDate": "2025-01-01T10:00:00Z",
+  "endDate": "2025-01-05T10:00:00Z"
+}
+
+###
+
+# Try to book with end date before start date (should fail)
+POST {{baseUrl}}/vehicles/bookings
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "vehicleId": "{{vehicleId}}",
+  "startDate": "2025-07-05T10:00:00Z",
+  "endDate": "2025-07-01T10:00:00Z"
+}
+
+###
+
+# Try to review a non-existent booking (should fail)
+POST {{baseUrl}}/vehicles/reviews
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "bookingId": "non-existent-booking-id",
+  "rating": 5,
+  "comment": "This should fail"
+}
+
+###
+
+# Try to review with invalid rating (should fail)
+POST {{baseUrl}}/vehicles/reviews
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "bookingId": "{{bookingId}}",
+  "rating": 6,
+  "comment": "Rating should be between 1-5"
+}
+
+###
+
+# Customer trying to confirm booking (should fail - only agents/admins can)
+PUT {{baseUrl}}/vehicles/bookings/{{bookingId}}/confirm
+Authorization: Bearer {{customerToken}}
+
+###
+
+# Customer trying to access admin endpoint (should fail)
+GET {{baseUrl}}/vehicles/bookings/all
+Authorization: Bearer {{customerToken}}
+
+###
+
+# Agent trying to access admin-only endpoint (should fail)
+GET {{baseUrl}}/vehicles/bookings/all
+Authorization: Bearer {{agentToken}}
+
+###

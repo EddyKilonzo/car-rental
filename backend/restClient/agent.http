@@ -1,0 +1,260 @@
+### Agent Management API Tests
+### 
+@baseUrl = http://localhost:3000
+
+### ========================================
+### VARIABLES
+### ========================================
+@token = 
+@adminToken = 
+@agentToken = 
+@customerToken = 
+@customerUserId = 
+@agentUserId = 
+@vehicleId = 
+
+### ========================================
+### AUTHENTICATION
+### ========================================
+
+# Login as Customer
+# @name customerLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@example.com",
+  "password": "password123"
+}
+
+###
+
+# Login as Admin
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+###
+
+# Login as Agent
+# @name agentLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@example.com",
+  "password": "password123"
+}
+
+###
+
+### ========================================
+### AGENT APPLICATION MANAGEMENT
+### ========================================
+
+# Customer applies to become an agent
+POST {{baseUrl}}/agent/apply
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+# Admin gets pending applications
+GET {{baseUrl}}/agent/applications/pending
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin approves application
+PUT {{baseUrl}}/agent/applications/{{customerUserId}}/approve
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+###
+
+# Admin rejects application
+PUT {{baseUrl}}/agent/applications/{{customerUserId}}/reject
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+###
+
+# Admin removes agent role
+PUT {{baseUrl}}/agent/applications/{{agentUserId}}/remove
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+###
+
+# Admin gets all agents
+GET {{baseUrl}}/agent/all
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ========================================
+### VEHICLE MANAGEMENT
+### ========================================
+
+# Agent posts vehicle
+POST {{baseUrl}}/agent/vehicles
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "make": "Toyota",
+  "model": "Camry",
+  "year": 2022,
+  "licensePlate": "ABC123",
+  "vin": "1HGBH41JXMN109186",
+  "mileage": 15000,
+  "fuelType": "PETROL",
+  "transmission": "AUTOMATIC",
+  "vehicleType": "SEDAN",
+  "seats": 5,
+  "doors": 4,
+  "color": "Silver",
+  "description": "Well-maintained Toyota Camry",
+  "features": ["Bluetooth", "Backup Camera", "Cruise Control"],
+  "images": ["https://example.com/camry1.jpg"],
+  "pricePerDay": 75.00,
+  "pricePerWeek": 450.00,
+  "pricePerMonth": 1800.00
+}
+
+###
+
+# Agent posts another vehicle
+POST {{baseUrl}}/agent/vehicles
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "make": "Honda",
+  "model": "CR-V",
+  "year": 2021,
+  "licensePlate": "XYZ789",
+  "vin": "2T1BURHE0JC123456",
+  "mileage": 25000,
+  "fuelType": "PETROL",
+  "transmission": "AUTOMATIC",
+  "vehicleType": "SUV",
+  "seats": 5,
+  "doors": 5,
+  "color": "Blue",
+  "description": "Spacious SUV for family trips",
+  "features": ["AWD", "Apple CarPlay"],
+  "images": ["https://example.com/crv1.jpg"],
+  "pricePerDay": 85.00,
+  "pricePerWeek": 500.00,
+  "pricePerMonth": 2000.00
+}
+
+###
+
+# Agent gets their vehicles
+GET {{baseUrl}}/agent/vehicles
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Admin gets all agent vehicles
+GET {{baseUrl}}/agent/vehicles/all
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Get vehicle details
+GET {{baseUrl}}/agent/vehicles/{{vehicleId}}
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Agent updates vehicle
+PUT {{baseUrl}}/agent/vehicles/{{vehicleId}}
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+{
+  "make": "Toyota",
+  "model": "Camry",
+  "year": 2022,
+  "licensePlate": "ABC123",
+  "vin": "1HGBH41JXMN109186",
+  "mileage": 16000,
+  "fuelType": "PETROL",
+  "transmission": "AUTOMATIC",
+  "vehicleType": "SEDAN",
+  "seats": 5,
+  "doors": 4,
+  "color": "Silver",
+  "description": "Updated: Well-maintained Toyota Camry with new tires",
+  "features": ["Bluetooth", "Backup Camera", "Cruise Control", "Lane Departure Warning"],
+  "images": ["https://example.com/camry1.jpg", "https://example.com/camry2.jpg"],
+  "pricePerDay": 80.00,
+  "pricePerWeek": 480.00,
+  "pricePerMonth": 1900.00
+}
+
+###
+
+# Agent deletes vehicle
+DELETE {{baseUrl}}/agent/vehicles/{{vehicleId}}
+Authorization: Bearer {{agentToken}}
+
+###
+
+### ========================================
+### ERROR TESTING
+### ========================================
+
+# Customer trying to access admin endpoint (should fail)
+GET {{baseUrl}}/agent/applications/pending
+Authorization: Bearer {{customerToken}}
+
+###
+
+# Agent trying to approve applications (should fail)
+PUT {{baseUrl}}/agent/applications/{{customerUserId}}/approve
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+###
+
+# Customer trying to post vehicle (should fail)
+POST {{baseUrl}}/agent/vehicles
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "make": "Test",
+  "model": "Car",
+  "year": 2020,
+  "licensePlate": "TEST123",
+  "vin": "TEST123456789",
+  "mileage": 10000,
+  "fuelType": "PETROL",
+  "transmission": "AUTOMATIC",
+  "vehicleType": "SEDAN",
+  "seats": 5,
+  "doors": 4,
+  "color": "Red",
+  "description": "Test vehicle",
+  "features": [],
+  "images": [],
+  "pricePerDay": 50.00
+}
+
+###
+
+# Invalid token (should fail)
+GET {{baseUrl}}/agent/vehicles
+Authorization: Bearer invalid_token
+
+###
+
