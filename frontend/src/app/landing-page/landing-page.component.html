@@ -1,0 +1,39 @@
+<div class="hero-section">
+  <div class="hero-content">
+    <h1>Welcome to Car Rental System</h1>
+    <p>Find the perfect vehicle for your journey</p>
+    <div class="hero-actions">
+      <button mat-raised-button color="primary" routerLink="/vehicles">
+        Browse Vehicles
+      </button>
+      <button mat-stroked-button routerLink="/sign-up">
+        Get Started
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="features-section">
+  <div class="container">
+    <h2>Why Choose Us?</h2>
+    <div class="features-grid">
+      <mat-card *ngFor="let feature of features" class="feature-card">
+        <mat-card-content>
+          <mat-icon class="feature-icon">{{ feature.icon }}</mat-icon>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
+
+<div class="cta-section">
+  <div class="container">
+    <h2>Ready to Hit the Road?</h2>
+    <p>Join thousands of satisfied customers</p>
+    <button mat-raised-button color="accent" routerLink="/sign-up">
+      Sign Up Now
+    </button>
+  </div>
+</div>
