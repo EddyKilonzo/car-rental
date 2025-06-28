@@ -1,3 +1,140 @@
-<h2>Vehicles works!</h2>
+<div class="vehicles-page">
+  <div class="vehicles-container">
+    <div class="header" *ngIf="!isAgent || isMyVehiclesRoute">
+      <h1>{{ getPageTitle() }}</h1>
+      <p>{{ getPageSubtitle() }}</p>
+      
+      <!-- Add Vehicle Button for Agents - only on My Vehicles page -->
+      <div *ngIf="isAgent && isMyVehiclesRoute" class="add-vehicle-section">
+        <button class="add-vehicle-btn" (click)="addNewVehicle()">
+          <i class="fas fa-plus"></i>
+          Add New Vehicle
+        </button>
+      </div>
+    </div>
 
-<p>vehicles works!</p>
+    <!-- Filters Section -->
+    <div *ngIf="!isMyVehiclesRoute && !isLoading" class="filters-section">
+      <div class="filters-header">
+        <h3><i class="fas fa-filter"></i> Filters</h3>
+        <button class="clear-filters-btn" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+          <i class="fas fa-times"></i> Clear All
+        </button>
+      </div>
+      
+      <div class="filters-grid">
+        <!-- Search -->
+        <div class="filter-group">
+          <label>Search</label>
+          <input 
+            type="text" 
+            placeholder="Search by make, model..."
+            [(ngModel)]="filters.search"
+            (input)="applyFilters()"
+            class="filter-input"
+          >
+        </div>
+
+        <!-- Vehicle Type -->
+        <div class="filter-group">
+          <label>Vehicle Type</label>
+          <select [(ngModel)]="filters.vehicleType" (change)="applyFilters()" class="filter-select">
+            <option value="">All Types</option>
+            <option value="SEDAN">Sedan</option>
+            <option value="SUV">SUV</option>
+            <option value="HATCHBACK">Hatchback</option>
+            <option value="COUPE">Coupe</option>
+            <option value="CONVERTIBLE">Convertible</option>
+            <option value="WAGON">Wagon</option>
+            <option value="PICKUP">Pickup</option>
+            <option value="VAN">Van</option>
+          </select>
+        </div>
+
+        <!-- Fuel Type -->
+        <div class="filter-group">
+          <label>Fuel Type</label>
+          <select [(ngModel)]="filters.fuelType" (change)="applyFilters()" class="filter-select">
+            <option value="">All Fuels</option>
+            <option value="GASOLINE">Gasoline</option>
+            <option value="DIESEL">Diesel</option>
+            <option value="ELECTRIC">Electric</option>
+            <option value="HYBRID">Hybrid</option>
+            <option value="PLUGIN_HYBRID">Plugin Hybrid</option>
+          </select>
+        </div>
+
+        <!-- Price Range -->
+        <div class="filter-group price-range">
+          <label>Price Range (per day)</label>
+          <div class="price-inputs">
+            <input 
+              type="number" 
+              placeholder="Min"
+              [(ngModel)]="filters.minPrice"
+              (input)="applyFilters()"
+              class="price-input"
+            >
+            <span class="price-separator">-</span>
+            <input 
+              type="number" 
+              placeholder="Max"
+              [(ngModel)]="filters.maxPrice"
+              (input)="applyFilters()"
+              class="price-input"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading vehicles...</p>
+    </div>
+    
+    <!-- All Vehicles Section -->
+    <div *ngIf="!isLoading && filteredVehicles.length > 0" class="vehicles-section">
+      <div class="results-info">
+        <p>Showing {{ filteredVehicles.length }} of {{ vehicles.length }} vehicles</p>
+      </div>
+      <div class="vehicles-grid">
+        <div class="vehicle-card" *ngFor="let vehicle of filteredVehicles" [style.background-image]="'url(' + vehicle.imageUrl + ')'">
+          <div class="vehicle-badge top">Top Vehicle</div>
+          <div class="vehicle-overlay minimal">
+            <div class="vehicle-info minimal">
+              <h3>{{ vehicle.make }} {{ vehicle.model }}</h3>
+              <div class="vehicle-ministats">
+                <span class="vehicle-price"><i class="fas fa-dollar-sign"></i> {{ vehicle.pricePerDay }}/day</span>
+              </div>
+              <div class="vehicle-btn-group">
+                <button class="vehicle-btn minimal" (click)="viewVehicleDetails(vehicle.id)">View</button>
+                <button *ngIf="isAgent && isMyVehiclesRoute" class="vehicle-btn minimal edit" (click)="editVehicle(vehicle.id)">Edit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredVehicles.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-car"></i>
+      </div>
+      <h3>No vehicles found</h3>
+      <p *ngIf="hasActiveFilters()">No vehicles match your current filters. Try adjusting your search criteria.</p>
+      <p *ngIf="!hasActiveFilters() && isAgent && isMyVehiclesRoute">You haven't added any vehicles yet. Start by adding your first vehicle to the platform.</p>
+      <p *ngIf="!hasActiveFilters() && !isMyVehiclesRoute">No vehicles found in the market. Check back later for new vehicle listings.</p>
+      <button *ngIf="hasActiveFilters()" class="clear-filters-btn" (click)="clearFilters()">
+        <i class="fas fa-times"></i> Clear Filters
+      </button>
+      <button *ngIf="!hasActiveFilters() && isAgent && isMyVehiclesRoute" class="add-vehicle-btn" (click)="addNewVehicle()">
+        <i class="fas fa-plus"></i>
+        Add Your First Vehicle
+      </button>
+    </div>
+  </div>
+</div>
+

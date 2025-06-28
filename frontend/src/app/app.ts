@@ -8,6 +8,7 @@ import { MatListModule } from '@angular/material/list';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { FooterComponent } from './shared/footer/footer.component';
+import { ToastComponent } from './shared/toast/toast.component';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,8 @@ import { FooterComponent } from './shared/footer/footer.component';
     MatSidenavModule,
     MatListModule,
     NavbarComponent,
-    FooterComponent
+    FooterComponent,
+    ToastComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

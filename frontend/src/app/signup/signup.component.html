@@ -1,1 +1,79 @@
-<p>signup works!</p> 
+<div class="signup-page-bg">
+  <div class="signup-card">
+    <div class="signup-form-section">
+      <h1 class="signup-title">CREATE ACCOUNT</h1>
+      
+      <form (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input 
+            id="name" 
+            type="text" 
+            placeholder="Enter your full name"
+            [(ngModel)]="userData.name"
+            name="name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input 
+            id="email" 
+            type="email" 
+            placeholder="Enter your email"
+            [(ngModel)]="userData.email"
+            name="email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input 
+            id="phone" 
+            type="tel" 
+            placeholder="Enter your phone number (optional)"
+            [(ngModel)]="userData.phone"
+            name="phone"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input 
+            id="password" 
+            type="password" 
+            placeholder="Create a password"
+            [(ngModel)]="userData.password"
+            name="password"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password *</label>
+          <input 
+            id="confirmPassword" 
+            type="password" 
+            placeholder="Confirm your password"
+            [(ngModel)]="userData.confirmPassword"
+            name="confirmPassword"
+            required
+          />
+        </div>
+
+        <button type="submit" class="signup-btn" [disabled]="isLoading">
+          {{ isLoading ? 'Creating Account...' : 'Create Account' }}
+        </button>
+      </form>
+      
+      <div class="signup-footer">
+        Already have an account? <a href="/login">Sign in here</a>
+      </div>
+    </div>
+    <div class="signup-image-section">
+      <!-- Background image will be set via CSS -->
+    </div>
+  </div>
+</div> 

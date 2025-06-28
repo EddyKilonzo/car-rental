@@ -25,14 +25,22 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/auth/login`, data);
   }
 
-  getCurrentUser(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/users/profile`, {
-      headers: this.getAuthHeaders(),
-    });
+  getCurrentUser(): any {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        return null;
+      }
+    }
+    return null;
   }
 
   logout(): void {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
   }
 
   isLoggedIn(): boolean {

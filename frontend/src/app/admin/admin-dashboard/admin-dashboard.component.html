@@ -1,0 +1,135 @@
+<div class="admin-dashboard">
+  <div class="dashboard-container">
+    <h1 class="dashboard-title">Admin Dashboard</h1>
+    
+    <!-- Admin Navigation -->
+    <div class="admin-nav">
+      <a routerLink="/admin/agent-requests" class="nav-link">
+        <i class="fas fa-users"></i>
+        Agent Requests
+      </a>
+      <a routerLink="/admin/users" class="nav-link">
+        <i class="fas fa-user-cog"></i>
+        User Management
+      </a>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading system statistics...</p>
+    </div>
+    
+    <!-- System Statistics -->
+    <div *ngIf="!isLoading && stats" class="stats-grid">
+      <!-- Users Stats -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-title">Total Users</h3>
+          <i class="fas fa-users stat-icon"></i>
+        </div>
+        <p class="stat-value stat-blue">{{ stats.users.total }}</p>
+        <div class="stat-breakdown">
+          <span class="breakdown-item">Customers: {{ stats.users.customers }}</span>
+          <span class="breakdown-item">Agents: {{ stats.users.agents }}</span>
+          <span class="breakdown-item">Admins: {{ stats.users.admins }}</span>
+        </div>
+      </div>
+      
+      <!-- Vehicles Stats -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-title">Total Vehicles</h3>
+          <i class="fas fa-car stat-icon"></i>
+        </div>
+        <p class="stat-value stat-green">{{ stats.vehicles.total }}</p>
+        <div class="stat-breakdown">
+          <span class="breakdown-item">Available: {{ stats.vehicles.available }}</span>
+          <span class="breakdown-item">Rented: {{ stats.vehicles.rented }}</span>
+          <span class="breakdown-item">Maintenance: {{ stats.vehicles.maintenance }}</span>
+        </div>
+      </div>
+      
+      <!-- Bookings Stats -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-title">Total Bookings</h3>
+          <i class="fas fa-calendar-check stat-icon"></i>
+        </div>
+        <p class="stat-value stat-purple">{{ stats.bookings.total }}</p>
+        <div class="stat-breakdown">
+          <span class="breakdown-item">Active: {{ stats.bookings.active }}</span>
+          <span class="breakdown-item">Pending: {{ stats.bookings.pending }}</span>
+          <span class="breakdown-item">Completed: {{ stats.bookings.completed }}</span>
+        </div>
+      </div>
+      
+      <!-- Revenue Stats -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-title">Total Revenue</h3>
+          <i class="fas fa-dollar-sign stat-icon"></i>
+        </div>
+        <p class="stat-value stat-orange">{{ formatCurrency(stats.revenue.total) }}</p>
+        <div class="stat-breakdown">
+          <span class="breakdown-item">Avg/Booking: {{ formatCurrency(stats.revenue.averagePerBooking) }}</span>
+          <span class="breakdown-item">Completed: {{ stats.bookings.completed }}</span>
+        </div>
+      </div>
+
+      <!-- Reviews Stats -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-title">Reviews & Rating</h3>
+          <i class="fas fa-star stat-icon"></i>
+        </div>
+        <p class="stat-value stat-yellow">{{ stats.reviews.total }}</p>
+        <div class="stat-breakdown">
+          <span class="breakdown-item">Avg Rating: {{ formatRating(stats.reviews.averageRating) }}/5</span>
+        </div>
+      </div>
+
+      <!-- Pending Requests -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-title">Pending Requests</h3>
+          <i class="fas fa-clock stat-icon"></i>
+        </div>
+        <p class="stat-value stat-red">{{ stats.bookings.pending }}</p>
+        <div class="stat-breakdown">
+          <span class="breakdown-item">Bookings: {{ stats.bookings.pending }}</span>
+          <span class="breakdown-item">Cancelled: {{ stats.bookings.cancelled }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- System Overview -->
+    <div class="overview-card">
+      <h2 class="overview-title">
+        <i class="fas fa-chart-line"></i>
+        System Overview
+      </h2>
+      <div *ngIf="stats" class="overview-content">
+        <div class="overview-item">
+          <span class="overview-label">System Status</span>
+          <span class="overview-value status-active">Active</span>
+        </div>
+        <div class="overview-item">
+          <span class="overview-label">Total Revenue</span>
+          <span class="overview-value">{{ formatCurrency(stats.revenue.total) }}</span>
+        </div>
+        <div class="overview-item">
+          <span class="overview-label">Average Rating</span>
+          <span class="overview-value">{{ formatRating(stats.reviews.averageRating) }}/5</span>
+        </div>
+        <div class="overview-item">
+          <span class="overview-label">Vehicle Utilization</span>
+          <span class="overview-value">{{ stats.vehicles.total > 0 ? ((stats.vehicles.rented / stats.vehicles.total) * 100).toFixed(1) : 0 }}%</span>
+        </div>
+      </div>
+      <div *ngIf="!stats" class="overview-text">
+        No system data available.
+      </div>
+    </div>
+  </div>
+</div> 

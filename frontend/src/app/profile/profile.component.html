@@ -1,1 +1,260 @@
-<p>profile works!</p>
+<div class="profile-page">
+  <div class="profile-container">
+    <!-- Header Section -->
+    <div class="profile-header">
+      <h1>My Profile</h1>
+      <p class="profile-subtitle">Manage your account and personal information</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading profile...</p>
+    </div>
+
+    <!-- Profile Content -->
+    <div *ngIf="currentUser && !isLoading" class="profile-content">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <div class="profile-avatar-section">
+          <div class="profile-avatar big">
+            <img 
+              *ngIf="currentUser.profileImageUrl || profileImagePreview" 
+              [src]="profileImagePreview || currentUser.profileImageUrl" 
+              alt="Profile Picture"
+            />
+            <div *ngIf="!currentUser.profileImageUrl && !profileImagePreview" class="avatar-placeholder big">
+              {{ currentUser.name.charAt(0).toUpperCase() }}
+            </div>
+            <button 
+              class="avatar-upload-btn"
+              (click)="document.getElementById('profileImageInput')?.click()"
+              [disabled]="isUploadingImage"
+              title="Change Photo"
+            >
+              <i class="fas fa-camera"></i>
+            </button>
+          </div>
+          <input 
+            type="file" 
+            id="profileImageInput" 
+            accept="image/*" 
+            (change)="onProfileImageSelected($event)"
+            style="display: none;"
+          />
+        </div>
+
+        <div class="profile-info">
+          <div class="user-basic-info">
+            <h2>{{ currentUser.name }}</h2>
+            <p class="user-email">{{ currentUser.email }}</p>
+            <div class="user-meta">
+              <span class="role-badge">{{ getRoleDisplayName(currentUser.role) }}</span>
+              <span class="member-since">Member since {{ getMemberSince(currentUser.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Form -->
+      <div class="profile-form-card">
+        <div class="form-header">
+          <h3>Personal Information</h3>
+          <button 
+            *ngIf="!isEditing" 
+            class="edit-btn" 
+            (click)="toggleEdit()"
+            [disabled]="isLoading"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit
+          </button>
+        </div>
+
+        <form (ngSubmit)="updateProfile()" *ngIf="isEditing">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input 
+                id="name" 
+                type="text" 
+                [(ngModel)]="profileData.name" 
+                name="name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input 
+                id="phone" 
+                type="tel" 
+                [(ngModel)]="profileData.phone" 
+                name="phone"
+              />
+            </div>
+
+            <div class="form-group full-width">
+              <label for="address">Address</label>
+              <input 
+                id="address" 
+                type="text" 
+                [(ngModel)]="profileData.address" 
+                name="address"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="city">City</label>
+              <input 
+                id="city" 
+                type="text" 
+                [(ngModel)]="profileData.city" 
+                name="city"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="state">State</label>
+              <input 
+                id="state" 
+                type="text" 
+                [(ngModel)]="profileData.state" 
+                name="state"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="zipCode">ZIP Code</label>
+              <input 
+                id="zipCode" 
+                type="text" 
+                [(ngModel)]="profileData.zipCode" 
+                name="zipCode"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input 
+                id="country" 
+                type="text" 
+                [(ngModel)]="profileData.country" 
+                name="country"
+              />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" (click)="toggleEdit()">
+              Cancel
+            </button>
+            <button type="submit" class="save-btn" [disabled]="isLoading">
+              {{ isLoading ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+
+        <!-- Read-only view -->
+        <div *ngIf="!isEditing" class="profile-details">
+          <div class="detail-row">
+            <span class="detail-label">Full Name:</span>
+            <span class="detail-value">{{ currentUser.name }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Phone:</span>
+            <span class="detail-value">{{ currentUser.phone || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Address:</span>
+            <span class="detail-value">{{ currentUser.address || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">City:</span>
+            <span class="detail-value">{{ currentUser.city || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">State:</span>
+            <span class="detail-value">{{ currentUser.state || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">ZIP Code:</span>
+            <span class="detail-value">{{ currentUser.zipCode || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Country:</span>
+            <span class="detail-value">{{ currentUser.country || 'Not provided' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Actions -->
+      <div class="account-actions-card">
+        <h3>Account Actions</h3>
+        <div class="action-buttons">
+          <!-- Become Agent Button (only for customers) -->
+          <button 
+            *ngIf="currentUser.role === 'CUSTOMER'"
+            class="become-agent-btn" 
+            (click)="applyForAgent()"
+            [disabled]="isLoading || agentApplicationPending"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="m22 21-2-2"/>
+              <path d="M16 16l4 4 4-4"/>
+            </svg>
+            {{ agentApplicationPending ? 'Application Pending' : 'Become an Agent' }}
+          </button>
+          
+          <!-- Application Status Display -->
+          <div *ngIf="currentUser.role === 'CUSTOMER' && applicationStatus" class="application-status">
+            <div class="status-badge" [ngClass]="'status-' + applicationStatus.toLowerCase()">
+              <svg *ngIf="applicationStatus === 'PENDING'" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12,6 12,12 16,14"/>
+              </svg>
+              <svg *ngIf="applicationStatus === 'APPROVED'" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20,6 9,17 4,12"/>
+              </svg>
+              <svg *ngIf="applicationStatus === 'REJECTED'" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+              {{ applicationStatus }}
+            </div>
+            <p *ngIf="applicationMessage" class="status-message">{{ applicationMessage }}</p>
+          </div>
+          
+          <button 
+            class="deactivate-btn" 
+            (click)="deactivateAccount()"
+            [disabled]="isLoading"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            Deactivate Account
+          </button>
+          <button 
+            class="delete-btn" 
+            (click)="deleteAccount()"
+            [disabled]="isLoading"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3,6 5,6 21,6"/>
+              <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"/>
+            </svg>
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

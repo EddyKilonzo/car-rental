@@ -1,26 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth/auth.service';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -29,21 +17,48 @@ export class LoginComponent {
     email: '',
     password: ''
   };
-  
-  hidePassword = true;
   isLoading = false;
 
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toastService: ToastService
+  ) {}
+
   onSubmit() {
-    if (this.credentials.email && this.credentials.password) {
-      this.isLoading = true;
-      // TODO: Implement actual login logic
-      console.log('Login attempt:', this.credentials);
-      
-      // Simulate API call
-      setTimeout(() => {
-        this.isLoading = false;
-        // Handle success/error here
-      }, 2000);
+    if (!this.credentials.email || !this.credentials.password) {
+      this.toastService.showError('Please enter both email and password.');
+      return;
     }
+
+    this.isLoading = true;
+    this.authService.login(this.credentials).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (response.success) {
+          // Store the token and user data
+          localStorage.setItem('accessToken', response.data.accessToken);
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+          
+          this.toastService.showSuccess('Login successful! Welcome back.');
+          this.router.navigate(['/']);
+        } else {
+          this.toastService.showError(response.message || 'Login failed. Please try again.');
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        if (error.status === 401) {
+          this.toastService.showError('Invalid email or password. Please check your credentials.');
+        } else if (error.status === 400) {
+          this.toastService.showError('Please provide valid email and password.');
+        } else if (error.status === 0) {
+          this.toastService.showError('Unable to connect to server. Please check your internet connection.');
+        } else {
+          this.toastService.showError('Login failed. Please try again later.');
+        }
+        console.error('Login error:', error);
+      }
+    });
   }
 }

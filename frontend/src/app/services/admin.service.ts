@@ -2,6 +2,37 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+interface SystemStats {
+  users: {
+    total: number;
+    customers: number;
+    agents: number;
+    admins: number;
+  };
+  vehicles: {
+    total: number;
+    available: number;
+    rented: number;
+    maintenance: number;
+    outOfService: number;
+  };
+  bookings: {
+    total: number;
+    active: number;
+    pending: number;
+    completed: number;
+    cancelled: number;
+  };
+  reviews: {
+    total: number;
+    averageRating: number;
+  };
+  revenue: {
+    total: number;
+    averagePerBooking: number;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -17,8 +48,14 @@ export class AdminService {
     });
   }
 
+  getSystemStats(): Observable<SystemStats> {
+    return this.http.get<SystemStats>(`${this.baseUrl}/admin/stats`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
   getAllUsers(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/users`, {
+    return this.http.get(`${this.baseUrl}/admin/users`, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -37,6 +74,30 @@ export class AdminService {
 
   approveAgent(userId: string): Observable<any> {
     return this.http.put(`${this.baseUrl}/agent/applications/${userId}/approve`, {}, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  rejectAgent(userId: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/agent/applications/${userId}/reject`, {}, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  toggleUserStatus(userId: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/admin/users/${userId}/toggle-status`, {}, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  updateUserRole(userId: string, role: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/admin/users/${userId}/role`, { role }, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  deleteUser(userId: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/admin/users/${userId}`, {
       headers: this.getAuthHeaders(),
     });
   }

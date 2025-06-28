@@ -23,6 +23,12 @@ export class AgentService {
     });
   }
 
+  getApplicationStatus(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/agent/application/status`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
   getAgentVehicles(): Observable<any> {
     return this.http.get(`${this.baseUrl}/agent/vehicles`, {
       headers: this.getAuthHeaders(),
@@ -32,7 +38,7 @@ export class AgentService {
   uploadVehicleMainImage(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${this.baseUrl}/vehicles/upload/main-image`, formData, {
+    return this.http.post(`${this.baseUrl}/upload/vehicle/main-image`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -40,7 +46,7 @@ export class AgentService {
   uploadVehicleGallery(files: File[]): Observable<any> {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
-    return this.http.post(`${this.baseUrl}/vehicles/upload/gallery`, formData, {
+    return this.http.post(`${this.baseUrl}/upload/vehicle/gallery`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -48,7 +54,7 @@ export class AgentService {
   uploadVehicleInterior(files: File[]): Observable<any> {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
-    return this.http.post(`${this.baseUrl}/vehicles/upload/interior`, formData, {
+    return this.http.post(`${this.baseUrl}/upload/vehicle/interior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -56,7 +62,7 @@ export class AgentService {
   uploadVehicleExterior(files: File[]): Observable<any> {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
-    return this.http.post(`${this.baseUrl}/vehicles/upload/exterior`, formData, {
+    return this.http.post(`${this.baseUrl}/upload/vehicle/exterior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -64,7 +70,7 @@ export class AgentService {
   uploadVehicleDocuments(files: File[]): Observable<any> {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
-    return this.http.post(`${this.baseUrl}/vehicles/upload/documents`, formData, {
+    return this.http.post(`${this.baseUrl}/upload/vehicle/documents`, formData, {
       headers: this.getAuthHeaders(),
     });
   }

@@ -1,0 +1,73 @@
+<div class="agent-requests">
+  <div class="requests-container">
+    <h1 class="requests-title">Agent Requests</h1>
+    
+    <div class="requests-card">
+      <div class="requests-header">
+        <h2 class="requests-subtitle">Pending Agent Approvals</h2>
+        <div class="requests-count">Total: {{ applications.length }} requests</div>
+      </div>
+      
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading agent applications...</p>
+      </div>
+      
+      <!-- Applications Table -->
+      <div *ngIf="!isLoading" class="table-container">
+        <table class="requests-table">
+          <thead class="table-header">
+            <tr>
+              <th class="table-header-cell">Name</th>
+              <th class="table-header-cell">Email</th>
+              <th class="table-header-cell">Phone</th>
+              <th class="table-header-cell">Applied Date</th>
+              <th class="table-header-cell">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="table-body">
+            <tr *ngFor="let application of applications" class="table-row">
+              <td class="table-cell">{{ application.name }}</td>
+              <td class="table-cell">{{ application.email }}</td>
+              <td class="table-cell">{{ application.phone || 'Not provided' }}</td>
+              <td class="table-cell">{{ getFormattedDate(application.createdAt) }}</td>
+              <td class="table-cell actions-cell">
+                <div class="action-buttons">
+                  <button 
+                    class="approve-btn" 
+                    (click)="approveApplication(application.id)"
+                    [disabled]="processingUserId === application.id"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20,6 9,17 4,12"/>
+                    </svg>
+                    {{ processingUserId === application.id ? 'Processing...' : 'Approve' }}
+                  </button>
+                  <button 
+                    class="reject-btn" 
+                    (click)="rejectApplication(application.id)"
+                    [disabled]="processingUserId === application.id"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                    {{ processingUserId === application.id ? 'Processing...' : 'Reject' }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+            
+            <!-- Empty State -->
+            <tr *ngIf="applications.length === 0">
+              <td colspan="5" class="empty-message">
+                No pending agent requests found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div> 

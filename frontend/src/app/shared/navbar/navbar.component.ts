@@ -1,39 +1,101 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../services/auth/auth.service';
+import { ToastService } from '../../services/toast.service';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent {
-  title = 'Car Rental System';
+export class NavbarComponent implements OnInit {
+  isLoggedIn = false;
+  userRole = '';
+  userName = '';
+  currentUser: User | null = null;
+  currentRoute = '';
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {}
 
+  ngOnInit() {
+    this.updateAuthStatus();
+    this.router.events.subscribe(() => {
+      this.updateAuthStatus();
+      this.currentRoute = this.router.url;
+    });
+  }
+
+  updateAuthStatus() {
+    this.isLoggedIn = this.authService.isLoggedIn();
+    if (this.isLoggedIn) {
+      // Get user data from localStorage
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          this.currentUser = user;
+          this.userRole = user?.role || '';
+          this.userName = user?.name || '';
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          this.currentUser = null;
+          this.userRole = '';
+          this.userName = '';
+        }
+      }
+    } else {
+      this.currentUser = null;
+      this.userRole = '';
+      this.userName = '';
+    }
+  }
+
+  logout() {
+    this.authService.logout();
+    this.toastService.showSuccess('You have been logged out successfully.');
+    this.router.navigate(['/']);
+    this.updateAuthStatus();
+  }
+
   onProfileClick() {
-    if (this.authService.isLoggedIn()) {
+    if (this.isLoggedIn) {
       this.router.navigate(['/profile']);
     } else {
       this.router.navigate(['/login']);
     }
+  }
+
+  isAdmin(): boolean {
+    return this.userRole === 'ADMIN';
+  }
+
+  isAgent(): boolean {
+    return this.userRole === 'AGENT';
+  }
+
+  isCustomer(): boolean {
+    return this.userRole === 'CUSTOMER';
+  }
+
+  isAdminRoute(): boolean {
+    return this.currentRoute.startsWith('/admin');
+  }
+
+  isAgentRoute(): boolean {
+    return this.currentRoute.startsWith('/agent');
   }
 } 

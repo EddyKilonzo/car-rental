@@ -6,15 +6,15 @@
   width: 75%;
   z-index: 1000;
   margin: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.13);
+  background: rgba(255, 255, 255, 0.35);
   border-radius: 18px;
   padding: 1rem 2rem;
   display: flex;
   align-items: center;
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(32px) saturate(160%);
+  -webkit-backdrop-filter: blur(32px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .navbar-brand {
@@ -26,6 +26,18 @@
   cursor: pointer;
   text-decoration: none;
   color: inherit;
+}
+
+.navbar-brand-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-welcome {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 400;
 }
 
 .navbar-nav {
@@ -44,30 +56,108 @@
   padding: 8px 16px;
   border-radius: 4px;
   transition: background-color 0.3s ease;
+  border-bottom: 3px solid transparent;
+  transition: border-bottom 0.2s;
 }
 
 .navbar-nav a:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.navbar-nav a.active {
-  background-color: rgba(255, 255, 255, 0.2);
+.navbar-nav a.active,
+.navbar-nav a.router-link-active {
+  border-bottom: 3px solid var(--primary-color, #A11312);
+  color: var(--primary-color, #A11312);
   font-weight: 500;
+}
+
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.login-btn, .signup-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.login-btn {
+  color: #333;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.login-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.signup-btn {
+  color: #333;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.signup-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .profile-link {
   display: flex;
   align-items: center;
-  padding: 0 8px;
+  padding: 6px;
   cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.profile-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .person-icon {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: inline-block;
   vertical-align: middle;
   stroke: #333;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  color: #666;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #d32f2f;
+}
+
+.logout-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 @media (max-width: 768px) {
@@ -81,5 +171,13 @@
   
   .navbar-brand {
     font-size: 1rem;
+  }
+  
+  .user-welcome {
+    display: none;
+  }
+  
+  .auth-section {
+    margin-left: 8px;
   }
 } 

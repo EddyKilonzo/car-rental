@@ -8,6 +8,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  padding-top: 100px;
 }
 
 .app-container {
@@ -20,4 +21,27 @@ body {
 
 main {
   flex: 1;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+.landing-page,
+.profile-page,
+.vehicles-page,
+.vehicle-details-page,
+.vehicle-form-page,
+.admin-dashboard,
+.agent-requests,
+.users-management {
+  padding-top: 0 !important; 
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  body {
+    padding-top: 120px; 
+  }
 }

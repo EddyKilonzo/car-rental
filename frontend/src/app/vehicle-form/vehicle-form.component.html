@@ -1,1 +1,256 @@
-<p>vehicle-form works!</p>
+<div class="vehicle-form-page">
+  <div class="vehicle-form-container">
+    <div class="form-header">
+      <h1>{{ isEditMode ? 'Edit Vehicle' : 'Add New Vehicle' }}</h1>
+      <p>{{ isEditMode ? 'Update your vehicle listing' : 'Create a new vehicle listing for customers to rent' }}</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="vehicle-form">
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h3>Basic Information</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="make">Make *</label>
+            <input 
+              type="text" 
+              id="make" 
+              name="make" 
+              [(ngModel)]="vehicleForm.make" 
+              required 
+              placeholder="e.g., Toyota"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="model">Model *</label>
+            <input 
+              type="text" 
+              id="model" 
+              name="model" 
+              [(ngModel)]="vehicleForm.model" 
+              required 
+              placeholder="e.g., Camry"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="year">Year</label>
+            <input 
+              type="number" 
+              id="year" 
+              name="year" 
+              [(ngModel)]="vehicleForm.year" 
+              min="1900" 
+              max="2030"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="vehicleType">Vehicle Type</label>
+            <select id="vehicleType" name="vehicleType" [(ngModel)]="vehicleForm.vehicleType">
+              <option value="">Select type</option>
+              <option *ngFor="let type of vehicleTypes" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specifications -->
+      <div class="form-section">
+        <h3>Specifications</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fuelType">Fuel Type</label>
+            <select id="fuelType" name="fuelType" [(ngModel)]="vehicleForm.fuelType">
+              <option value="">Select fuel type</option>
+              <option *ngFor="let fuel of fuelTypes" [value]="fuel">{{ fuel }}</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="seats">Number of Seats</label>
+            <input 
+              type="number" 
+              id="seats" 
+              name="seats" 
+              [(ngModel)]="vehicleForm.seats" 
+              min="1" 
+              max="15"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="licensePlate">License Plate *</label>
+            <input 
+              type="text" 
+              id="licensePlate" 
+              name="licensePlate" 
+              [(ngModel)]="vehicleForm.licensePlate" 
+              required 
+              placeholder="e.g., ABC123"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="vin">VIN *</label>
+            <input 
+              type="text" 
+              id="vin" 
+              name="vin" 
+              [(ngModel)]="vehicleForm.vin" 
+              required 
+              placeholder="e.g., 1HGBH41JXMN109186"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="mileage">Mileage (km) *</label>
+            <input 
+              type="number" 
+              id="mileage" 
+              name="mileage" 
+              [(ngModel)]="vehicleForm.mileage" 
+              min="0" 
+              required 
+              placeholder="e.g., 50000"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="color">Color *</label>
+            <input 
+              type="text" 
+              id="color" 
+              name="color" 
+              [(ngModel)]="vehicleForm.color" 
+              required 
+              placeholder="e.g., Silver"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="transmission">Transmission *</label>
+            <select id="transmission" name="transmission" [(ngModel)]="vehicleForm.transmission" required>
+              <option value="">Select transmission</option>
+              <option value="MANUAL">Manual</option>
+              <option value="AUTOMATIC">Automatic</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="doors">Number of Doors *</label>
+            <input 
+              type="number" 
+              id="doors" 
+              name="doors" 
+              [(ngModel)]="vehicleForm.doors" 
+              min="2" 
+              max="5" 
+              required 
+              placeholder="e.g., 4"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pricePerDay">Price per Day ($) *</label>
+          <input 
+            type="number" 
+            id="pricePerDay" 
+            name="pricePerDay" 
+            [(ngModel)]="vehicleForm.pricePerDay" 
+            min="1" 
+            step="0.01"
+            placeholder="50.00"
+          >
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-section">
+        <h3>Description</h3>
+        <div class="form-group">
+          <label for="description">Vehicle Description</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            [(ngModel)]="vehicleForm.description" 
+            rows="4" 
+            placeholder="Describe the vehicle, its features, and any important details..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="form-section">
+        <h3>Features</h3>
+        <div class="features-container">
+          <div class="features-list">
+            <div *ngFor="let feature of vehicleForm.features; let i = index" class="feature-item">
+              <span>{{ feature }}</span>
+              <button type="button" class="remove-btn" (click)="removeFeature(i)">×</button>
+            </div>
+          </div>
+          <div class="add-feature-input">
+            <input 
+              type="text" 
+              placeholder="Enter a feature (e.g., GPS, Bluetooth, Backup Camera)" 
+              [(ngModel)]="newFeature"
+              [ngModelOptions]="{standalone: true}"
+              (keyup.enter)="addFeature()"
+              class="feature-input"
+            >
+            <button type="button" class="add-feature-btn" (click)="addFeature()">
+              <i class="icon-plus"></i> Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="form-section">
+        <h3>Vehicle Image</h3>
+        <div class="image-upload-container">
+          <div class="upload-area" (click)="fileInput.click()">
+            <div *ngIf="!previewUrl" class="upload-placeholder">
+              <i class="icon-upload"></i>
+              <p>Click to upload vehicle image</p>
+              <span>JPG, PNG up to 5MB</span>
+            </div>
+            <img *ngIf="previewUrl" [src]="previewUrl" alt="Vehicle preview" class="image-preview">
+          </div>
+          <input 
+            #fileInput
+            type="file" 
+            accept="image/*" 
+            (change)="onFileSelected($event)" 
+            style="display: none;"
+          >
+          <button type="button" class="upload-btn" (click)="fileInput.click()">
+            {{ isEditMode ? 'Change Image' : 'Choose Image' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
+        <button type="submit" class="submit-btn" [disabled]="isLoading">
+          <span *ngIf="!isLoading">{{ isEditMode ? 'Update Vehicle' : 'Add Vehicle' }}</span>
+          <span *ngIf="isLoading">{{ isEditMode ? 'Updating...' : 'Adding...' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

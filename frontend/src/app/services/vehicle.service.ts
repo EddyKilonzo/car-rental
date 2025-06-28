@@ -18,15 +18,11 @@ export class VehicleService {
   }
 
   getVehicleById(vehicleId: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/vehicles/${vehicleId}`, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http.get(`${this.baseUrl}/vehicles/${vehicleId}`);
   }
 
   getAllVehicles(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/admin/vehicles`, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http.get(`${this.baseUrl}/vehicles`);
   }
 
   searchVehicles(params: any): Observable<any> {
@@ -39,6 +35,18 @@ export class VehicleService {
     return this.http.get(`${this.baseUrl}/vehicles`, {
       headers: this.getAuthHeaders(),
       params: httpParams,
+    });
+  }
+
+  createVehicle(vehicleData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/agent/vehicles`, vehicleData, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  updateVehicle(vehicleId: string, vehicleData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/agent/vehicles/${vehicleId}`, vehicleData, {
+      headers: this.getAuthHeaders(),
     });
   }
 } 

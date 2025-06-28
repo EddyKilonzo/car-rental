@@ -1,1 +1,49 @@
-<p>vehicle-details works!</p>
+<div class="vehicle-details-minimal" *ngIf="vehicle && !isLoading">
+  <div class="vehicle-banner" [style.background-image]="'url(' + (vehicle.mainImageUrl || '') + ')'">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div class="vehicle-title">
+      <h2>{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</h2>
+      <span class="vehicle-type">{{ vehicle.vehicleType }}</span>
+    </div>
+    <div class="vehicle-price">
+      <span>${{ vehicle.pricePerDay }}</span><span class="period">/day</span>
+    </div>
+  </div>
+  <div class="vehicle-min-content">
+    <div class="vehicle-features" *ngIf="vehicle.features && vehicle.features.length">
+      <span *ngFor="let feature of vehicle.features" class="feature-pill">
+        <i class="fas fa-check"></i> {{ feature }}
+      </span>
+    </div>
+    <div class="vehicle-desc" *ngIf="vehicle.description">
+      {{ vehicle.description }}
+    </div>
+    <div class="vehicle-details-list">
+      <div class="detail-item"><span>Year:</span> <span>{{ vehicle.year }}</span></div>
+      <div class="detail-item"><span>Make:</span> <span>{{ vehicle.make }}</span></div>
+      <div class="detail-item"><span>Model:</span> <span>{{ vehicle.model }}</span></div>
+      <div class="detail-item"><span>Type:</span> <span>{{ vehicle.vehicleType }}</span></div>
+      <div class="detail-item"><span>Fuel:</span> <span>{{ vehicle.fuelType }}</span></div>
+      <div class="detail-item"><span>Transmission:</span> <span>{{ vehicle.transmission }}</span></div>
+      <div class="detail-item"><span>Seats:</span> <span>{{ vehicle.seats }}</span></div>
+      <div class="detail-item"><span>Doors:</span> <span>{{ vehicle.doors }}</span></div>
+      <div class="detail-item"><span>Color:</span> <span>{{ vehicle.color }}</span></div>
+    </div>
+    <div class="vehicle-actions">
+      <button class="vehicle-btn" (click)="onBookClick()" [disabled]="!canBookVehicle() || vehicle.status !== 'AVAILABLE'">
+        <i class="fas fa-calendar-check"></i> Book
+      </button>
+      <button class="vehicle-btn secondary" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
+    </div>
+  </div>
+</div>
+<div *ngIf="isLoading" class="loading"><div class="spinner"></div>Loading vehicle details...</div>
+<div *ngIf="error && !isLoading" class="error">
+  <h2>Error</h2>
+  <p>{{ error }}</p>
+  <button class="back-btn" (click)="goBack()">Back to Vehicles</button>
+</div>
