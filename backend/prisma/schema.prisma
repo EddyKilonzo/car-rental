@@ -79,6 +79,10 @@ model User {
   country       String?
   isVerified    Boolean  @default(false)
 
+  // Profile images (Cloudinary URLs)
+  profileImageUrl String?
+  licenseDocumentUrl String?
+
   // Relations
   bookings      Booking[]
   reviews       Review[]
@@ -103,7 +107,6 @@ model Vehicle {
   color           String
   description     String?
   features        String[]
-  images          String[]
   pricePerDay     Float
   pricePerWeek    Float?
   pricePerMonth   Float?
@@ -113,6 +116,13 @@ model Vehicle {
   nextMaintenance DateTime?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+
+  // Vehicle images (Cloudinary URLs)
+  mainImageUrl    String?
+  galleryImages   String[]       // Array of Cloudinary URLs
+  interiorImages  String[]       // Array of Cloudinary URLs
+  exteriorImages  String[]       // Array of Cloudinary URLs
+  documentUrls    String[]       // Array of Cloudinary URLs (registration, insurance, etc.)
 
   // Relations
   user            User           @relation("UserVehicles", fields: [userId], references: [id])

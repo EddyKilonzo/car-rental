@@ -1,39 +1,118 @@
-<div class="hero-section">
+<section class="hero seamless-hero">
   <div class="hero-content">
-    <h1>Welcome to Car Rental System</h1>
-    <p>Find the perfect vehicle for your journey</p>
-    <div class="hero-actions">
-      <button mat-raised-button color="primary" routerLink="/vehicles">
-        Browse Vehicles
-      </button>
-      <button mat-stroked-button routerLink="/sign-up">
-        Get Started
-      </button>
+    <div class="hero-text">
+      <h1 class="hero-title">
+        Experience the smooth drives of 
+        <span class="highlight">premium rentals</span>
+      </h1>
+      <p class="hero-subtitle">
+        Discover the freedom to travel on your terms with our reliable and affordable car rental services. 
+        Whether you're exploring the city or embarking on a road trip, we offer a wide range of vehicles to suit your needs.
+      </p>
+      <div class="hero-buttons">
+        <button class="btn-primary">See All Fleet</button>
+        <div class="promo">
+          <span class="promo-icon">🚗</span>
+          <span class="promo-text">Weekend Getaway: Rent for 3 days and get 1 day free!</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img src="/assets/hero.png" alt="Car Rental Hero" class="hero-img" />
     </div>
   </div>
-</div>
+</section>
 
-<div class="features-section">
-  <div class="container">
-    <h2>Why Choose Us?</h2>
+<section class="features">
+  <div class="features-content">
+    <div class="features-header">
+      <h2 class="features-title">Why Choose Our Car Rental Service?</h2>
+      <p class="features-subtitle">Experience premium service with modern convenience and unmatched reliability</p>
+    </div>
     <div class="features-grid">
-      <mat-card *ngFor="let feature of features" class="feature-card">
-        <mat-card-content>
-          <mat-icon class="feature-icon">{{ feature.icon }}</mat-icon>
-          <h3>{{ feature.title }}</h3>
-          <p>{{ feature.description }}</p>
-        </mat-card-content>
-      </mat-card>
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">🚗</div>
+        </div>
+        <div class="feature-content">
+          <h3>Premium Fleet Selection</h3>
+          <p>Choose from our carefully curated collection of modern vehicles, from compact cars to luxury SUVs, all maintained to the highest standards.</p>
+          <div class="feature-stats">
+            <span class="stat">500+ Vehicles</span>
+            <span class="stat">50+ Models</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">⚡</div>
+        </div>
+        <div class="feature-content">
+          <h3>Instant Booking & Pickup</h3>
+          <p>Book your vehicle in seconds with our streamlined process. Pick up your car at our convenient locations or opt for delivery to your doorstep.</p>
+          <div class="feature-stats">
+            <span class="stat">2 Min Booking</span>
+            <span class="stat">24/7 Service</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">🛡️</div>
+        </div>
+        <div class="feature-content">
+          <h3>Comprehensive Insurance</h3>
+          <p>Travel with peace of mind knowing you're fully covered. Our comprehensive insurance plans protect you and your rental vehicle.</p>
+          <div class="feature-stats">
+            <span class="stat">100% Coverage</span>
+            <span class="stat">Zero Deductible</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">💰</div>
+        </div>
+        <div class="feature-content">
+          <h3>Transparent Pricing</h3>
+          <p>No hidden fees or surprise charges. Our transparent pricing includes all taxes, insurance, and maintenance costs upfront.</p>
+          <div class="feature-stats">
+            <span class="stat">No Hidden Fees</span>
+            <span class="stat">Best Rates</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">🛣️</div>
+        </div>
+        <div class="feature-content">
+          <h3>24/7 Roadside Support</h3>
+          <p>Our dedicated support team is available round the clock to assist you with any issues, ensuring a worry-free journey.</p>
+          <div class="feature-stats">
+            <span class="stat">24/7 Support</span>
+            <span class="stat">Quick Response</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">🌱</div>
+        </div>
+        <div class="feature-content">
+          <h3>Eco-Friendly Options</h3>
+          <p>Choose from our selection of hybrid and electric vehicles to reduce your carbon footprint while enjoying modern technology.</p>
+          <div class="feature-stats">
+            <span class="stat">Hybrid Fleet</span>
+            <span class="stat">EV Options</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-
-<div class="cta-section">
-  <div class="container">
-    <h2>Ready to Hit the Road?</h2>
-    <p>Join thousands of satisfied customers</p>
-    <button mat-raised-button color="accent" routerLink="/sign-up">
-      Sign Up Now
-    </button>
-  </div>
-</div>
+</section>

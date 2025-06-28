@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
@@ -35,11 +33,10 @@ export interface CarRentalUploadConfig {
 }
 
 /**
- * Enum for defining all upload types for car rental system
+ * Enum for defining all upload types
  */
 export enum CarRentalUploadType {
   USER_PROFILE = 'user_profile',
-  USER_AVATAR = 'user_avatar',
   VEHICLE_MAIN = 'vehicle_main',
   VEHICLE_GALLERY = 'vehicle_gallery',
   VEHICLE_INTERIOR = 'vehicle_interior',
@@ -69,7 +66,7 @@ export class CloudinaryService {
     const configs: Record<CarRentalUploadType, CarRentalUploadConfig> = {
       [CarRentalUploadType.USER_PROFILE]: {
         uploadType,
-        maxSizeBytes: 3 * 1024 * 1024, // 3MB
+        maxSizeBytes: 5 * 1024 * 1024, // 5MB
         allowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
         folder: 'car-rental/users/profiles',
         transformation: {
@@ -79,21 +76,6 @@ export class CloudinaryService {
           quality: 'auto',
           format: 'auto',
           gravity: 'face',
-        },
-      },
-      [CarRentalUploadType.USER_AVATAR]: {
-        uploadType,
-        maxSizeBytes: 2 * 1024 * 1024, // 2MB
-        allowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
-        folder: 'car-rental/users/avatars',
-        transformation: {
-          width: 150,
-          height: 150,
-          crop: 'fill',
-          quality: 'auto',
-          format: 'auto',
-          gravity: 'face',
-          radius: 'max', // Make it circular
         },
       },
       [CarRentalUploadType.VEHICLE_MAIN]: {
@@ -231,12 +213,21 @@ export class CloudinaryService {
     this.validateFile(file, config);
 
     return new Promise<CloudinaryUploadResult>((resolve, reject) => {
+      // Determine resource type based on upload type
+      const resourceType =
+        uploadType === CarRentalUploadType.LICENSE_DOCUMENT ||
+        uploadType === CarRentalUploadType.VEHICLE_DOCUMENTS ||
+        uploadType === CarRentalUploadType.INSURANCE_DOCUMENT
+          ? 'raw'
+          : 'auto';
+
       const uploadOptions: Record<string, unknown> = {
         folder: config.folder,
-        resource_type: 'auto',
+        resource_type: resourceType,
         use_filename: true,
         unique_filename: true,
         overwrite: false,
+        access_mode: 'public', // Ensure public access for documents
         ...(config.transformation && { transformation: config.transformation }),
         ...(customOptions || {}),
       };
@@ -272,7 +263,6 @@ export class CloudinaryService {
             }
           },
         )
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         .end(file.buffer);
     });
   }
@@ -398,5 +388,46 @@ export class CloudinaryService {
     const parts = cloudinaryUrl.split('/');
     const filename = parts[parts.length - 1];
     return filename.split('.')[0];
+  }
+
+  /**
+   * Generate a signed URL for secure document access
+   * This is useful for sensitive documents that need authentication
+   */
+  generateSignedUrl(publicId: string, expiresInSeconds: number = 3600): string {
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const expiration = timestamp + expiresInSeconds;
+
+    return cloudinary.url(publicId, {
+      sign_url: true,
+      expires_at: expiration,
+      resource_type: 'auto',
+      type: 'upload',
+    });
+  }
+
+  /**
+   * Generate a secure download URL for documents
+   * This provides a direct download link with authentication
+   */
+  generateDownloadUrl(publicId: string, filename?: string): string {
+    return cloudinary.url(publicId, {
+      resource_type: 'raw',
+      type: 'upload',
+      attachment: filename || true,
+      flags: 'attachment',
+    });
+  }
+
+  /**
+   * Generate a public URL for documents (raw resources)
+   * This provides a direct link that should work without authentication
+   */
+  generatePublicDocumentUrl(publicId: string): string {
+    return cloudinary.url(publicId, {
+      resource_type: 'raw',
+      type: 'upload',
+      secure: true,
+    });
   }
 }

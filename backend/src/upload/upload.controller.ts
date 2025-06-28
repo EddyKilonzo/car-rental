@@ -10,6 +10,7 @@ import {
   BadRequestException,
   HttpException,
   HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
@@ -27,6 +28,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 interface RequestWithUser extends Request {
   user: {
@@ -38,7 +40,30 @@ interface RequestWithUser extends Request {
 @ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
-  constructor(private readonly cloudinaryService: CloudinaryService) {}
+  constructor(
+    private readonly cloudinaryService: CloudinaryService,
+    private readonly prismaService: PrismaService,
+  ) {}
+
+  /**
+   * Check if agent is approved for vehicle uploads
+   */
+  private async checkAgentApproval(userId: string): Promise<void> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: { role: true, isVerified: true },
+    });
+
+    if (!user) {
+      throw new ForbiddenException('User not found');
+    }
+
+    if (user.role === UserRole.AGENT && !user.isVerified) {
+      throw new ForbiddenException(
+        'Agent must be approved before uploading vehicle images',
+      );
+    }
+  }
 
   @Post('profile-photo')
   @UseGuards(JwtAuthGuard)
@@ -84,7 +109,7 @@ export class UploadController {
 
       return await this.cloudinaryService.uploadFile(
         file,
-        CarRentalUploadType.USER_AVATAR,
+        CarRentalUploadType.USER_PROFILE,
       );
     } catch (error) {
       throw new HttpException(
@@ -109,6 +134,9 @@ export class UploadController {
       if (!file) {
         throw new BadRequestException('No file provided');
       }
+
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
 
       return await this.cloudinaryService.uploadFile(
         file,
@@ -142,6 +170,9 @@ export class UploadController {
         throw new BadRequestException('Maximum 10 files allowed');
       }
 
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
+
       return await this.cloudinaryService.uploadMultipleFiles(
         files,
         CarRentalUploadType.VEHICLE_GALLERY,
@@ -170,6 +201,9 @@ export class UploadController {
         throw new BadRequestException('No files provided');
       }
 
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
+
       return await this.cloudinaryService.uploadMultipleFiles(
         files,
         CarRentalUploadType.VEHICLE_INTERIOR,
@@ -197,6 +231,9 @@ export class UploadController {
       if (!files || files.length === 0) {
         throw new BadRequestException('No files provided');
       }
+
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
 
       return await this.cloudinaryService.uploadMultipleFiles(
         files,
@@ -254,6 +291,9 @@ export class UploadController {
       if (!files || files.length === 0) {
         throw new BadRequestException('No files provided');
       }
+
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
 
       return await this.cloudinaryService.uploadMultipleFiles(
         files,

@@ -9,6 +9,8 @@ import {
   Query,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -17,19 +19,36 @@ import {
   ApiBearerAuth,
   ApiQuery,
   ApiParam,
+  ApiConsumes,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { CompleteProfileDto } from './dto/complete-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import {
+  CloudinaryService,
+  CarRentalUploadType,
+} from '../common/dto/cloudinary/cloudinary.service';
+
+interface RequestWithUser extends Request {
+  user: {
+    id: string;
+    role: string;
+  };
+}
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   /**
    * Register a new user (public endpoint)
@@ -139,7 +158,8 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update user profile',
-    description: "Update the current user's profile information",
+    description:
+      "Update the current user's profile information including image URLs",
   })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -147,9 +167,195 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   async updateProfile(
     @Request() req: { user: { id: string } },
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    return this.usersService.update(req.user.id, updateUserDto);
+    return this.usersService.updateProfile(req.user.id, updateProfileDto);
+  }
+
+  /**
+   * Upload profile photo (authenticated user)
+   */
+  @Post('profile/upload-photo')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Upload and set profile photo',
+    description:
+      'Upload a profile photo to Cloudinary and automatically update the user profile in one step',
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiResponse({
+    status: 200,
+    description: 'Profile photo uploaded and profile updated successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 400, description: 'Invalid file or upload failed' })
+  async uploadProfilePhoto(
+    @Request() req: RequestWithUser,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    // Upload to Cloudinary
+    const uploadResult = await this.cloudinaryService.uploadFile(
+      file,
+      CarRentalUploadType.USER_PROFILE,
+    );
+
+    // Update user profile with the new image URL
+    const updatedUser = await this.usersService.updateProfile(req.user.id, {
+      profileImageUrl: uploadResult.secure_url,
+    });
+
+    return {
+      message: 'Profile photo uploaded and profile updated successfully',
+      uploadResult: {
+        secure_url: uploadResult.secure_url,
+        public_id: uploadResult.public_id,
+        width: uploadResult.width,
+        height: uploadResult.height,
+      },
+      user: updatedUser.data,
+    };
+  }
+
+  /**
+   * Upload license document (authenticated user)
+   */
+  @Post('profile/upload-license')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Upload and set license document',
+    description:
+      'Upload a license document to Cloudinary and automatically update the user profile',
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiResponse({
+    status: 200,
+    description: 'License document uploaded and profile updated successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 400, description: 'Invalid file or upload failed' })
+  async uploadLicenseDocument(
+    @Request() req: RequestWithUser,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    // Upload to Cloudinary with public access
+    const uploadResult = await this.cloudinaryService.uploadFile(
+      file,
+      CarRentalUploadType.LICENSE_DOCUMENT,
+      { access_mode: 'public' },
+    );
+
+    // Update user profile with the new license document URL
+    const updatedUser = await this.usersService.updateProfile(req.user.id, {
+      licenseDocumentUrl: uploadResult.secure_url,
+    });
+
+    return {
+      message: 'License document uploaded and profile updated successfully',
+      uploadResult: {
+        secure_url: uploadResult.secure_url,
+        public_id: uploadResult.public_id,
+        public_url: this.cloudinaryService.generatePublicDocumentUrl(
+          uploadResult.public_id,
+        ),
+        download_url: this.cloudinaryService.generateDownloadUrl(
+          uploadResult.public_id,
+          uploadResult.original_filename,
+        ),
+      },
+      user: updatedUser.data,
+    };
+  }
+
+  /**
+   * Delete existing license document (authenticated user)
+   */
+  @Delete('profile/delete-license')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Delete existing license document',
+    description:
+      'Delete the current license document from Cloudinary and clear from user profile',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'License document deleted successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'No license document found' })
+  async deleteLicenseDocument(@Request() req: RequestWithUser) {
+    // Get current user profile
+    const userProfile = await this.usersService.getProfile(req.user.id);
+
+    if (!userProfile.data || !userProfile.data.licenseDocumentUrl) {
+      return {
+        message: 'No license document found to delete',
+        success: true,
+      };
+    }
+
+    // Extract public ID from the URL
+    const publicId = this.cloudinaryService.extractPublicId(
+      userProfile.data.licenseDocumentUrl,
+    );
+
+    try {
+      // Delete from Cloudinary
+      await this.cloudinaryService.deleteFile(publicId);
+    } catch (error) {
+      // Continue even if Cloudinary deletion fails (file might already be gone)
+      console.warn('Failed to delete from Cloudinary:', error);
+    }
+
+    // Clear the URL from user profile
+    const updatedUser = await this.usersService.updateProfile(req.user.id, {
+      licenseDocumentUrl: null,
+    });
+
+    return {
+      message: 'License document deleted successfully',
+      user: updatedUser.data,
+    };
+  }
+
+  /**
+   * Get alternative URLs for the current license document
+   */
+  @Get('profile/license-urls')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get alternative URLs for license document',
+    description:
+      'Generate different URL formats for the current license document',
+  })
+  async getLicenseDocumentUrls(@Request() req: RequestWithUser) {
+    const userProfile = await this.usersService.getProfile(req.user.id);
+
+    if (!userProfile.data || !userProfile.data.licenseDocumentUrl) {
+      return {
+        message: 'No license document found',
+        urls: null,
+      };
+    }
+
+    const publicId = this.cloudinaryService.extractPublicId(
+      userProfile.data.licenseDocumentUrl,
+    );
+
+    return {
+      message: 'Alternative URLs generated',
+      current_url: userProfile.data.licenseDocumentUrl,
+      alternative_urls: {
+        public_url: this.cloudinaryService.generatePublicDocumentUrl(publicId),
+        download_url: this.cloudinaryService.generateDownloadUrl(publicId),
+        signed_url: this.cloudinaryService.generateSignedUrl(publicId, 3600),
+      },
+    };
   }
 
   /**
@@ -210,15 +416,15 @@ export class UsersController {
   }
 
   /**
-   * Update a specific user (admin only)
+   * Update user (admin only)
    */
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Update user by ID',
-    description: 'Update a specific user by their ID. Admin access required.',
+    summary: 'Update user',
+    description: 'Update a specific user. Admin access required.',
   })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
@@ -234,19 +440,18 @@ export class UsersController {
   }
 
   /**
-   * Delete a user (soft delete - admin only)
+   * Remove user (admin only)
    */
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Delete user',
-    description:
-      'Soft delete a user by setting isActive to false. Admin access required.',
+    summary: 'Remove user',
+    description: 'Soft delete a specific user. Admin access required.',
   })
   @ApiParam({ name: 'id', description: 'User ID' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 200, description: 'User removed successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({
     status: 403,

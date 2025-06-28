@@ -1,7 +1,7 @@
 ### Admin Management API Tests
 ###
 @baseUrl = http://localhost:3000
-@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwic3ViIjoiNDM1NjUxOGUtNjQxMi00MTMyLWI4NDktMTJlNDQ4YTY3MjQ3Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUwOTQzMDIxLCJleHAiOjE3NTEwMjk0MjF9.QQdrlh9SuJ4vFoiAVFxfFTIoezNbgkoi9s1jZ49BJRg
+@adminToken = 
 @userId = 
 @vehicleId = 
 @reviewId = 

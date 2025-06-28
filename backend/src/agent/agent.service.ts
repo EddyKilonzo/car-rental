@@ -271,7 +271,6 @@ export class AgentService {
           ...vehicleData,
           userId: userId,
           features: vehicleData.features || [],
-          images: vehicleData.images || [],
         },
       });
     } catch (error) {

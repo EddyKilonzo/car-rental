@@ -1,4 +1,4 @@
-### Upload API Tests
+
 ###
 @baseUrl = http://localhost:3000
 @customerToken = 
@@ -6,124 +6,339 @@
 @adminToken = 
 
 ### ========================================
-### USER PROFILE UPLOADS
-### ========================================
+### AUTHENTICATION FIRST 
 
-# Upload profile photo
-POST {{baseUrl}}/upload/profile-photo
-Authorization: Bearer {{customerToken}}
-Content-Type: multipart/form-data
+# Register a customer user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
 
-< ./sample-images/profile.jpg
+{
+  "email": "edward@test.com",
+  "password": "password123",
+  "name": "Edward Customer",
+  "phone": "+1234567890",
+  "role": "CUSTOMER"
+}
 
 ###
 
-# Upload avatar (circular profile picture)
-POST {{baseUrl}}/upload/avatar
-Authorization: Bearer {{customerToken}}
-Content-Type: multipart/form-data
+# Login as customer
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
 
-< ./sample-images/avatar.jpg
+{
+  "email": "edward@test.com",
+  "password": "password123"
+}
+
+###
+
+# Register an agent user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "agent@test.com",
+  "password": "password123",
+  "name": "Jane Agent",
+  "phone": "+1234567891",
+  "role": "AGENT"
+}
+
+###
+
+# Login as agent
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "agent@test.com",
+  "password": "password123"
+}
+
+###
+
+### ========================================
+### USER PROFILE UPLOADS (Simplified - Profile Image + License Only)
+### ========================================
+
+# Upload profile photo 
+POST {{baseUrl}}/users/profile/upload-photo
+Authorization: Bearer {{customerToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="DSC_2418.JPG"
+Content-Type: image/jpeg
+
+< ./DSC_2418.JPG
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+# Get current user profile to see existing uploads
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{customerToken}}
+
+###
+
+# Delete existing license document (if any exists)
+DELETE {{baseUrl}}/users/profile/delete-license
+Authorization: Bearer {{customerToken}}
 
 ###
 
 # Upload license document
-POST {{baseUrl}}/upload/license-document
+POST {{baseUrl}}/users/profile/upload-license
 Authorization: Bearer {{customerToken}}
-Content-Type: multipart/form-data
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
-< ./sample-documents/license.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="EF SET Certificate.pdf"
+Content-Type: application/pdf
+
+< ./EF SET Certificate.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+# Get alternative URLs for license document 
+GET {{baseUrl}}/users/profile/license-urls
+Authorization: Bearer {{customerToken}}
 
 ###
 
 ### ========================================
-### VEHICLE UPLOADS (AGENT/ADMIN ONLY)
+### AGENT WORKFLOW (Apply + Approval + Vehicle Uploads)
+### ========================================
+
+# Apply to become an agent
+POST {{baseUrl}}/agent/apply
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Admin: Get pending agent applications
+GET {{baseUrl}}/agent/applications/pending
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin: Approve agent application 
+PUT {{baseUrl}}/agent/applications/USER_ID/approve
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ========================================
+### VEHICLE UPLOADS (Agent Only - After Approval)
 ### ========================================
 
 # Upload main vehicle image
-POST {{baseUrl}}/upload/vehicle/main-image
+POST {{baseUrl}}/vehicles/upload/main-image
 Authorization: Bearer {{agentToken}}
 Content-Type: multipart/form-data
 
+--boundary123
+Content-Disposition: form-data; name="file"; filename="car-main.jpg"
+Content-Type: image/jpeg
+
 < ./sample-images/car-main.jpg
+--boundary123--
 
 ###
 
-# Upload vehicle gallery images (multiple files)
-POST {{baseUrl}}/upload/vehicle/gallery
+# Upload vehicle gallery images (multiple files supported)
+POST {{baseUrl}}/vehicles/upload/gallery
 Authorization: Bearer {{agentToken}}
 Content-Type: multipart/form-data
 
+--boundary123
+Content-Disposition: form-data; name="files"; filename="car-gallery-1.jpg"
+Content-Type: image/jpeg
+
 < ./sample-images/car-gallery-1.jpg
+--boundary123
+Content-Disposition: form-data; name="files"; filename="car-gallery-2.jpg"
+Content-Type: image/jpeg
+
 < ./sample-images/car-gallery-2.jpg
-< ./sample-images/car-gallery-3.jpg
+--boundary123--
 
 ###
 
 # Upload vehicle interior images
-POST {{baseUrl}}/upload/vehicle/interior
+POST {{baseUrl}}/vehicles/upload/interior
 Authorization: Bearer {{agentToken}}
 Content-Type: multipart/form-data
 
+--boundary123
+Content-Disposition: form-data; name="files"; filename="car-interior-1.jpg"
+Content-Type: image/jpeg
+
 < ./sample-images/car-interior-1.jpg
+--boundary123
+Content-Disposition: form-data; name="files"; filename="car-interior-2.jpg"
+Content-Type: image/jpeg
+
 < ./sample-images/car-interior-2.jpg
+--boundary123--
 
 ###
 
 # Upload vehicle exterior images
-POST {{baseUrl}}/upload/vehicle/exterior
+POST {{baseUrl}}/vehicles/upload/exterior
 Authorization: Bearer {{agentToken}}
 Content-Type: multipart/form-data
+
+--boundary123
+Content-Disposition: form-data; name="files"; filename="car-exterior-1.jpg"
+Content-Type: image/jpeg
 
 < ./sample-images/car-exterior-1.jpg
+--boundary123
+Content-Disposition: form-data; name="files"; filename="car-exterior-2.jpg"
+Content-Type: image/jpeg
+
 < ./sample-images/car-exterior-2.jpg
-< ./sample-images/car-exterior-3.jpg
+--boundary123--
 
 ###
 
-# Upload vehicle documents
-POST {{baseUrl}}/upload/vehicle/documents
+# Upload vehicle documents (registration, insurance, etc.)
+POST {{baseUrl}}/vehicles/upload/documents
 Authorization: Bearer {{agentToken}}
 Content-Type: multipart/form-data
 
+--boundary123
+Content-Disposition: form-data; name="files"; filename="registration.pdf"
+Content-Type: application/pdf
+
 < ./sample-documents/registration.pdf
+--boundary123
+Content-Disposition: form-data; name="files"; filename="insurance.pdf"
+Content-Type: application/pdf
+
 < ./sample-documents/insurance.pdf
+--boundary123--
 
 ###
 
 ### ========================================
-### ERROR TESTING
+### ERROR TESTING & VALIDATION
 ### ========================================
 
-# Try to upload without authentication (should fail)
-POST {{baseUrl}}/upload/profile-photo
+# Try to upload without authentication (should return 401)
+POST {{baseUrl}}/users/profile/upload-photo
 Content-Type: multipart/form-data
+
+--boundary123
+Content-Disposition: form-data; name="file"; filename="profile.jpg"
+Content-Type: image/jpeg
 
 < ./sample-images/profile.jpg
+--boundary123--
 
 ###
 
-# Try to upload vehicle image as customer (should fail)
-POST {{baseUrl}}/upload/vehicle/main-image
-Authorization: Bearer {{customerToken}}
+# Try to upload vehicle image as unapproved agent (should return 403)
+POST {{baseUrl}}/vehicles/upload/main-image
+Authorization: Bearer {{agentToken}}
 Content-Type: multipart/form-data
+
+--boundary123
+Content-Disposition: form-data; name="file"; filename="car-main.jpg"
+Content-Type: image/jpeg
 
 < ./sample-images/car-main.jpg
+--boundary123--
 
 ###
 
-# Try to upload without file (should fail)
-POST {{baseUrl}}/upload/profile-photo
+# Try to upload vehicle image as customer (should return 403)
+POST {{baseUrl}}/vehicles/upload/main-image
+Authorization: Bearer {{customerToken}}
+Content-Type: multipart/form-data
+
+--boundary123
+Content-Disposition: form-data; name="file"; filename="car-main.jpg"
+Content-Type: image/jpeg
+
+< ./sample-images/car-main.jpg
+--boundary123--
+
+###
+
+# Try to upload without file (should return 400)
+POST {{baseUrl}}/users/profile/upload-photo
 Authorization: Bearer {{customerToken}}
 Content-Type: multipart/form-data
 
 ###
 
-# Try to upload too large file (should fail based on file size limits)
-POST {{baseUrl}}/upload/avatar
+# Try to upload invalid file format (should return 400)
+POST {{baseUrl}}/users/profile/upload-photo
 Authorization: Bearer {{customerToken}}
 Content-Type: multipart/form-data
+
+--boundary123
+Content-Disposition: form-data; name="file"; filename="invalid.txt"
+Content-Type: text/plain
+
+This is not an image file
+--boundary123--
+
+###
+
+# Try to upload oversized file (should return 400 based on size limits)
+
+POST {{baseUrl}}/users/profile/upload-photo
+Authorization: Bearer {{customerToken}}
+Content-Type: multipart/form-data
+
+--boundary123
+Content-Disposition: form-data; name="file"; filename="large-file.jpg"
+Content-Type: image/jpeg
 
 < ./sample-images/large-file.jpg
+--boundary123--
 
 ###
+
+### ========================================
+### VERIFICATION ENDPOINTS
+
+
+# Get user profile to see uploaded images
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{customerToken}}
+
+###
+
+# Get agent vehicles to see uploaded vehicle images
+GET {{baseUrl}}/agent/vehicles
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Get specific vehicle details
+GET {{baseUrl}}/vehicles/VEHICLE_ID
+Authorization: Bearer {{customerToken}}
+
+###
+
+### ==========================
+### ADMIN TESTING
+
+# Admin: Get all users (to see profile images)
+GET {{baseUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+###
+
+# Admin: Get all vehicles (to see vehicle images)
+GET {{baseUrl}}/admin/vehicles
+Authorization: Bearer {{adminToken}}
+
+###
+

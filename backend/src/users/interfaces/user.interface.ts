@@ -15,6 +15,8 @@ export interface UserResponse {
   zipCode?: string | null;
   country?: string | null;
   isVerified?: boolean;
+  profileImageUrl?: string | null;
+  licenseDocumentUrl?: string | null;
 }
 
 export interface UserProfileResponse extends UserResponse {

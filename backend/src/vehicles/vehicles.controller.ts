@@ -10,6 +10,10 @@ import {
   Request,
   HttpStatus,
   HttpException,
+  UseInterceptors,
+  UploadedFile,
+  UploadedFiles,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,7 +22,9 @@ import {
   ApiBearerAuth,
   ApiQuery,
   ApiBody,
+  ApiConsumes,
 } from '@nestjs/swagger';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { VehiclesService } from './vehicles.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { CreateBookingForCustomerDto } from './dto/create-booking-for-customer.dto';
@@ -28,6 +34,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole, BookingStatus } from '@prisma/client';
+import {
+  CloudinaryService,
+  CarRentalUploadType,
+} from '../common/dto/cloudinary/cloudinary.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 interface RequestWithUser extends Request {
   user: {
@@ -39,7 +50,31 @@ interface RequestWithUser extends Request {
 @ApiTags('vehicles')
 @Controller('vehicles')
 export class VehiclesController {
-  constructor(private readonly vehiclesService: VehiclesService) {}
+  constructor(
+    private readonly vehiclesService: VehiclesService,
+    private readonly cloudinaryService: CloudinaryService,
+    private readonly prismaService: PrismaService,
+  ) {}
+
+  /**
+   * Check if agent is approved for vehicle operations
+   */
+  private async checkAgentApproval(userId: string): Promise<void> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: { role: true, isVerified: true },
+    });
+
+    if (!user) {
+      throw new ForbiddenException('User not found');
+    }
+
+    if (user.role === UserRole.AGENT && !user.isVerified) {
+      throw new ForbiddenException(
+        'Agent must be approved before uploading vehicle images',
+      );
+    }
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all available vehicles' })
@@ -310,6 +345,14 @@ export class VehiclesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.AGENT, UserRole.ADMIN)
   @Get('bookings/status/:status')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get bookings by status (Admin only)' })
+  @ApiResponse({ status: 200, description: 'List of bookings by status' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin role required',
+  })
   async getBookingsByStatus(@Param('status') status: string) {
     try {
       return await this.vehiclesService.getBookingsByStatus(
@@ -318,6 +361,306 @@ export class VehiclesController {
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // ========================================
+  // VEHICLE IMAGE UPLOAD ENDPOINTS
+  // ========================================
+
+  /**
+   * Upload main vehicle image (approved agents/admins only)
+   */
+  @Post('upload/main-image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.AGENT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Upload main vehicle image',
+    description:
+      'Upload a main vehicle image to Cloudinary (approved agents/admins only)',
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiResponse({
+    status: 200,
+    description: 'Main vehicle image uploaded successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Agent must be approved',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid file or upload failed' })
+  async uploadMainImage(
+    @Request() req: RequestWithUser,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    try {
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
+
+      // Upload to Cloudinary
+      const uploadResult = await this.cloudinaryService.uploadFile(
+        file,
+        CarRentalUploadType.VEHICLE_MAIN,
+      );
+
+      return {
+        message: 'Main vehicle image uploaded successfully',
+        uploadResult: {
+          secure_url: uploadResult.secure_url,
+          public_id: uploadResult.public_id,
+          width: uploadResult.width,
+          height: uploadResult.height,
+        },
+      };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Upload failed',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  /**
+   * Upload vehicle gallery images (approved agents/admins only)
+   */
+  @Post('upload/gallery')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.AGENT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Upload vehicle gallery images',
+    description:
+      'Upload multiple vehicle gallery images to Cloudinary (approved agents/admins only)',
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('files', 10)) // Max 10 files
+  @ApiResponse({
+    status: 200,
+    description: 'Vehicle gallery images uploaded successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Agent must be approved',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid files or upload failed' })
+  async uploadGalleryImages(
+    @Request() req: RequestWithUser,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    try {
+      if (!files || files.length === 0) {
+        throw new HttpException('No files provided', HttpStatus.BAD_REQUEST);
+      }
+
+      if (files.length > 10) {
+        throw new HttpException(
+          'Maximum 10 files allowed',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
+
+      // Upload to Cloudinary
+      const uploadResults = await this.cloudinaryService.uploadMultipleFiles(
+        files,
+        CarRentalUploadType.VEHICLE_GALLERY,
+      );
+
+      return {
+        message: 'Vehicle gallery images uploaded successfully',
+        uploadResults: uploadResults.map((result) => ({
+          secure_url: result.secure_url,
+          public_id: result.public_id,
+          width: result.width,
+          height: result.height,
+        })),
+      };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Upload failed',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  /**
+   * Upload vehicle interior images (approved agents/admins only)
+   */
+  @Post('upload/interior')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.AGENT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Upload vehicle interior images',
+    description:
+      'Upload vehicle interior images to Cloudinary (approved agents/admins only)',
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('files', 5)) // Max 5 files
+  @ApiResponse({
+    status: 200,
+    description: 'Vehicle interior images uploaded successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Agent must be approved',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid files or upload failed' })
+  async uploadInteriorImages(
+    @Request() req: RequestWithUser,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    try {
+      if (!files || files.length === 0) {
+        throw new HttpException('No files provided', HttpStatus.BAD_REQUEST);
+      }
+
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
+
+      // Upload to Cloudinary
+      const uploadResults = await this.cloudinaryService.uploadMultipleFiles(
+        files,
+        CarRentalUploadType.VEHICLE_INTERIOR,
+      );
+
+      return {
+        message: 'Vehicle interior images uploaded successfully',
+        uploadResults: uploadResults.map((result) => ({
+          secure_url: result.secure_url,
+          public_id: result.public_id,
+          width: result.width,
+          height: result.height,
+        })),
+      };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Upload failed',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  /**
+   * Upload vehicle exterior images (approved agents/admins only)
+   */
+  @Post('upload/exterior')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.AGENT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Upload vehicle exterior images',
+    description:
+      'Upload vehicle exterior images to Cloudinary (approved agents/admins only)',
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('files', 8)) // Max 8 files
+  @ApiResponse({
+    status: 200,
+    description: 'Vehicle exterior images uploaded successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Agent must be approved',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid files or upload failed' })
+  async uploadExteriorImages(
+    @Request() req: RequestWithUser,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    try {
+      if (!files || files.length === 0) {
+        throw new HttpException('No files provided', HttpStatus.BAD_REQUEST);
+      }
+
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
+
+      // Upload to Cloudinary
+      const uploadResults = await this.cloudinaryService.uploadMultipleFiles(
+        files,
+        CarRentalUploadType.VEHICLE_EXTERIOR,
+      );
+
+      return {
+        message: 'Vehicle exterior images uploaded successfully',
+        uploadResults: uploadResults.map((result) => ({
+          secure_url: result.secure_url,
+          public_id: result.public_id,
+          width: result.width,
+          height: result.height,
+        })),
+      };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Upload failed',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  /**
+   * Upload vehicle documents (approved agents/admins only)
+   */
+  @Post('upload/documents')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.AGENT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Upload vehicle documents',
+    description:
+      'Upload vehicle documents (registration, insurance, etc.) to Cloudinary (approved agents/admins only)',
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('files', 5)) // Max 5 files
+  @ApiResponse({
+    status: 200,
+    description: 'Vehicle documents uploaded successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Agent must be approved',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid files or upload failed' })
+  async uploadDocuments(
+    @Request() req: RequestWithUser,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    try {
+      if (!files || files.length === 0) {
+        throw new HttpException('No files provided', HttpStatus.BAD_REQUEST);
+      }
+
+      // Check if agent is approved
+      await this.checkAgentApproval(req.user.id);
+
+      // Upload to Cloudinary
+      const uploadResults = await this.cloudinaryService.uploadMultipleFiles(
+        files,
+        CarRentalUploadType.VEHICLE_DOCUMENTS,
+      );
+
+      return {
+        message: 'Vehicle documents uploaded successfully',
+        uploadResults: uploadResults.map((result) => ({
+          secure_url: result.secure_url,
+          public_id: result.public_id,
+        })),
+      };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Upload failed',
         HttpStatus.BAD_REQUEST,
       );
     }

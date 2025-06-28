@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { CompleteProfileDto } from './dto/complete-profile.dto';
 import {
   UserResponse,
@@ -210,12 +211,56 @@ export class UsersService {
         zipCode: true,
         country: true,
         isVerified: true,
+        profileImageUrl: true,
+        licenseDocumentUrl: true,
       },
     });
 
     return {
       success: true,
       message: 'User updated successfully',
+      data: user as UserResponse,
+    };
+  }
+
+  /**
+   * Update user profile (including image URLs)
+   */
+  async updateProfile(
+    id: string,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<ApiResponse<UserResponse>> {
+    // Check if user exists
+    await this.findOne(id);
+
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: updateProfileDto,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+        licenseNumber: true,
+        dateOfBirth: true,
+        address: true,
+        city: true,
+        state: true,
+        zipCode: true,
+        country: true,
+        isVerified: true,
+        profileImageUrl: true,
+        licenseDocumentUrl: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Profile updated successfully',
       data: user as UserResponse,
     };
   }
