@@ -9,6 +9,7 @@ import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { ApiResponse } from '../common/dto/interfaces/api-response.interface';
 import * as bcrypt from 'bcryptjs';
 import { User } from '@prisma/client';
 
@@ -34,7 +35,7 @@ export class AuthService {
     return null;
   }
 
-  async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+  async login(loginDto: LoginDto): Promise<ApiResponse<AuthResponseDto>> {
     const user = (await this.validateUser(
       loginDto.email,
       loginDto.password,
@@ -50,7 +51,7 @@ export class AuthService {
 
     const payload = { email: user.email, sub: user.id, role: user.role };
 
-    return {
+    const authResponse: AuthResponseDto = {
       accessToken: this.jwtService.sign(payload),
       user: {
         id: user.id,
@@ -59,9 +60,15 @@ export class AuthService {
         role: user.role,
       },
     };
+
+    return {
+      success: true,
+      message: 'Login successful',
+      data: authResponse,
+    };
   }
 
-  async register(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
+  async register(createUserDto: CreateUserDto): Promise<ApiResponse<AuthResponseDto>> {
     try {
       const userResponse = await this.usersService.create(createUserDto);
       const user = userResponse.data as User;
@@ -70,7 +77,7 @@ export class AuthService {
       }
       const payload = { email: user.email, sub: user.id, role: user.role };
 
-      return {
+      const authResponse: AuthResponseDto = {
         accessToken: this.jwtService.sign(payload),
         user: {
           id: user.id,
@@ -78,6 +85,12 @@ export class AuthService {
           name: user.name,
           role: user.role,
         },
+      };
+
+      return {
+        success: true,
+        message: 'Registration successful',
+        data: authResponse,
       };
     } catch (error) {
       if (error instanceof ConflictException) {

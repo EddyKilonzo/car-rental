@@ -28,13 +28,103 @@ export class AgentService {
         throw new Error(`User with ID ${userId} is already an agent`);
       }
 
-      // track application(later*)######
+      // check if user already has a pending application
+      const existingApplication = await this.prisma.agentApplication.findFirst({
+        where: {
+          userId: userId,
+          status: 'PENDING',
+        },
+      });
+
+      if (existingApplication) {
+        throw new Error(`User with ID ${userId} already has a pending application`);
+      }
+
+      // create new application
+      await this.prisma.agentApplication.create({
+        data: {
+          userId: userId,
+          status: 'PENDING',
+        },
+      });
+
       return user;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to apply for agent: ${error.message}`);
       }
       throw new Error('Failed to apply for agent: Unknown error occurred');
+    }
+  }
+
+  /**
+   * Get agent application status for a user
+   * @param userId
+   * @returns Application status information
+   */
+  async getApplicationStatus(userId: string): Promise<{
+    hasApplied: boolean;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'NOT_APPLIED';
+    message?: string;
+  }> {
+    try {
+      // check if user exists
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new Error(`User with ID ${userId} not found`);
+      }
+
+      // If user is already an agent, they were approved
+      if (user.role === 'AGENT') {
+        return {
+          hasApplied: true,
+          status: 'APPROVED',
+          message: 'Your agent application has been approved! You can now post vehicles.'
+        };
+      }
+
+      // Check for existing application
+      const application = await this.prisma.agentApplication.findFirst({
+        where: { userId: userId },
+        orderBy: { appliedAt: 'desc' },
+      });
+
+      if (application) {
+        switch (application.status) {
+          case 'PENDING':
+            return {
+              hasApplied: true,
+              status: 'PENDING',
+              message: 'Your agent application is pending review by an administrator.'
+            };
+          case 'REJECTED':
+            return {
+              hasApplied: true,
+              status: 'REJECTED',
+              message: application.reason || 'Your agent application has been rejected.'
+            };
+          default:
+            return {
+              hasApplied: true,
+              status: 'PENDING',
+              message: 'Your agent application is being processed.'
+            };
+        }
+      }
+
+      return {
+        hasApplied: false,
+        status: 'NOT_APPLIED',
+        message: 'You have not applied to become an agent yet.'
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to get application status: ${error.message}`);
+      }
+      throw new Error('Failed to get application status: Unknown error occurred');
     }
   }
 
@@ -66,13 +156,39 @@ export class AgentService {
         );
       }
 
-      // approve by changing role from CUSTOMER to AGENT
-      return await this.prisma.user.update({
-        where: { id: userId },
-        data: {
-          role: 'AGENT',
+      // check if there's a pending application
+      const application = await this.prisma.agentApplication.findFirst({
+        where: {
+          userId: userId,
+          status: 'PENDING',
         },
       });
+
+      if (!application) {
+        throw new Error(`No pending application found for user with ID ${userId}`);
+      }
+
+      // Update application status and approve user
+      await this.prisma.$transaction([
+        this.prisma.agentApplication.update({
+          where: { id: application.id },
+          data: {
+            status: 'APPROVED',
+            reviewedAt: new Date(),
+          },
+        }),
+        this.prisma.user.update({
+          where: { id: userId },
+          data: {
+            role: 'AGENT',
+            isVerified: true,
+          },
+        }),
+      ]);
+
+      return await this.prisma.user.findUnique({
+        where: { id: userId },
+      }) as User;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(
@@ -89,24 +205,29 @@ export class AgentService {
    * Get all pending agent applications
    * @returns List of users who applied to be agents
    */
-
   async getPendingAgentApplications(): Promise<
     Pick<User, 'id' | 'name' | 'email' | 'phone' | 'createdAt'>[]
   > {
     try {
-      // Get all customers who  want to become agents
-      return await this.prisma.user.findMany({
+      // Get all users with pending applications
+      const applications = await this.prisma.agentApplication.findMany({
         where: {
-          role: 'CUSTOMER',
+          status: 'PENDING',
         },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-          createdAt: true,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              createdAt: true,
+            },
+          },
         },
       });
+
+      return applications.map(app => app.user);
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(
@@ -140,7 +261,28 @@ export class AgentService {
         throw new Error(`User with ID ${userId} is already an agent`);
       }
 
-      // track rejection(later*)######
+      // check if there's a pending application
+      const application = await this.prisma.agentApplication.findFirst({
+        where: {
+          userId: userId,
+          status: 'PENDING',
+        },
+      });
+
+      if (!application) {
+        throw new Error(`No pending application found for user with ID ${userId}`);
+      }
+
+      // Update application status to rejected
+      await this.prisma.agentApplication.update({
+        where: { id: application.id },
+        data: {
+          status: 'REJECTED',
+          reviewedAt: new Date(),
+          reason: 'Application rejected by administrator',
+        },
+      });
+
       return user;
     } catch (error) {
       if (error instanceof Error) {
@@ -229,6 +371,10 @@ export class AgentService {
     vehicleData: CreateVehicleDto,
   ): Promise<Vehicle> {
     try {
+      console.log('Received vehicle data:', vehicleData);
+      console.log('mainImageUrl value:', vehicleData.mainImageUrl);
+      console.log('mainImageUrl type:', typeof vehicleData.mainImageUrl);
+      
       // check if user exists and is an agent
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -266,13 +412,18 @@ export class AgentService {
       }
 
       // create the vehicle
-      return await this.prisma.vehicle.create({
+      const createdVehicle = await this.prisma.vehicle.create({
         data: {
           ...vehicleData,
           userId: userId,
           features: vehicleData.features || [],
         },
       });
+      
+      console.log('Created vehicle:', createdVehicle);
+      console.log('Created vehicle mainImageUrl:', createdVehicle.mainImageUrl);
+      
+      return createdVehicle;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to post vehicle: ${error.message}`);
@@ -425,6 +576,30 @@ export class AgentService {
         throw new Error(
           `Vehicle with ID ${vehicleId} not found or does not belong to the agent`,
         );
+      }
+
+      // check if license plate already exists (excluding current vehicle)
+      if (vehicleData.licensePlate !== vehicle.licensePlate) {
+        const existingLicensePlate = await this.prisma.vehicle.findUnique({
+          where: { licensePlate: vehicleData.licensePlate },
+        });
+
+        if (existingLicensePlate) {
+          throw new Error(
+            `Vehicle with license plate ${vehicleData.licensePlate} already exists`,
+          );
+        }
+      }
+
+      // check if VIN already exists (excluding current vehicle)
+      if (vehicleData.vin !== vehicle.vin) {
+        const existingVin = await this.prisma.vehicle.findUnique({
+          where: { vin: vehicleData.vin },
+        });
+
+        if (existingVin) {
+          throw new Error(`Vehicle with VIN ${vehicleData.vin} already exists`);
+        }
       }
 
       // update the vehicle

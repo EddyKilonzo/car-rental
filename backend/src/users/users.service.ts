@@ -345,6 +345,8 @@ export class UsersService {
         zipCode: true,
         country: true,
         isVerified: true,
+        profileImageUrl: true,
+        licenseDocumentUrl: true,
         // Include related data
         bookings: {
           select: {

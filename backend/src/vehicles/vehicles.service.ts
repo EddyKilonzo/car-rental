@@ -35,10 +35,6 @@ interface VehicleFilters {
 export class VehiclesService {
   constructor(private prisma: PrismaService) {}
 
-  /**
-   * Get all available vehicles for customers to view
-   * @returns List of available vehicles
-   */
   async getAllVehicles(): Promise<Vehicle[]> {
     try {
       return await this.prisma.vehicle.findMany({
@@ -64,11 +60,6 @@ export class VehiclesService {
     }
   }
 
-  /**
-   * Get vehicle details by ID
-   * @param vehicleId
-   * @returns Vehicle details
-   */
   async getVehicleById(vehicleId: string): Promise<Vehicle> {
     try {
       const vehicle = await this.prisma.vehicle.findUnique({
@@ -99,11 +90,6 @@ export class VehiclesService {
     }
   }
 
-  /**
-   * Search vehicles by filters
-   * @param filters
-   * @returns Filtered vehicles
-   */
   async searchVehicles(filters: VehicleFilters): Promise<Vehicle[]> {
     try {
       const whereClause: {
@@ -190,12 +176,6 @@ export class VehiclesService {
     }
   }
 
-  /**
-   * Create a booking for a vehicle
-   * @param userId
-   * @param bookingData
-   * @returns Created booking
-   */
   async createBooking(
     userId: string,
     bookingData: CreateBookingDto,

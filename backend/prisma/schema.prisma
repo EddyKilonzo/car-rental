@@ -87,8 +87,24 @@ model User {
   bookings      Booking[]
   reviews       Review[]
   vehicles      Vehicle[] @relation("UserVehicles")
+  agentApplications AgentApplication[]
 
   @@map("users")
+}
+
+model AgentApplication {
+  id          String   @id @default(uuid())
+  userId      String
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  reason      String?  // Optional reason for rejection
+  appliedAt   DateTime @default(now())
+  reviewedAt  DateTime?
+  reviewedBy  String?  // Admin who reviewed the application
+  
+  // Relations
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("agent_applications")
 }
 
 model Vehicle {

@@ -49,20 +49,30 @@ export class UploadController {
    * Check if agent is approved for vehicle uploads
    */
   private async checkAgentApproval(userId: string): Promise<void> {
+    console.log('Checking agent approval for user ID:', userId);
+    
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
       select: { role: true, isVerified: true },
     });
 
+    console.log('User found:', user);
+
     if (!user) {
+      console.log('User not found');
       throw new ForbiddenException('User not found');
     }
 
+    console.log('User role:', user.role, 'isVerified:', user.isVerified);
+
     if (user.role === UserRole.AGENT && !user.isVerified) {
+      console.log('Agent is not verified, throwing error');
       throw new ForbiddenException(
         'Agent must be approved before uploading vehicle images',
       );
     }
+
+    console.log('Agent approval check passed');
   }
 
   @Post('profile-photo')
@@ -135,9 +145,6 @@ export class UploadController {
         throw new BadRequestException('No file provided');
       }
 
-      // Check if agent is approved
-      await this.checkAgentApproval(req.user.id);
-
       return await this.cloudinaryService.uploadFile(
         file,
         CarRentalUploadType.VEHICLE_MAIN,
@@ -170,9 +177,6 @@ export class UploadController {
         throw new BadRequestException('Maximum 10 files allowed');
       }
 
-      // Check if agent is approved
-      await this.checkAgentApproval(req.user.id);
-
       return await this.cloudinaryService.uploadMultipleFiles(
         files,
         CarRentalUploadType.VEHICLE_GALLERY,
@@ -201,9 +205,6 @@ export class UploadController {
         throw new BadRequestException('No files provided');
       }
 
-      // Check if agent is approved
-      await this.checkAgentApproval(req.user.id);
-
       return await this.cloudinaryService.uploadMultipleFiles(
         files,
         CarRentalUploadType.VEHICLE_INTERIOR,
@@ -231,9 +232,6 @@ export class UploadController {
       if (!files || files.length === 0) {
         throw new BadRequestException('No files provided');
       }
-
-      // Check if agent is approved
-      await this.checkAgentApproval(req.user.id);
 
       return await this.cloudinaryService.uploadMultipleFiles(
         files,
@@ -291,9 +289,6 @@ export class UploadController {
       if (!files || files.length === 0) {
         throw new BadRequestException('No files provided');
       }
-
-      // Check if agent is approved
-      await this.checkAgentApproval(req.user.id);
 
       return await this.cloudinaryService.uploadMultipleFiles(
         files,

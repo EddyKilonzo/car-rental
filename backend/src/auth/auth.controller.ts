@@ -18,6 +18,7 @@ import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ApiResponse as ApiResponseInterface } from '../common/dto/interfaces/api-response.interface';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -39,7 +40,7 @@ export class AuthController {
     status: 401,
     description: 'Invalid credentials',
   })
-  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
+  async login(@Body() loginDto: LoginDto): Promise<ApiResponseInterface<AuthResponseDto>> {
     return this.authService.login(loginDto);
   }
 
@@ -63,7 +64,7 @@ export class AuthController {
   })
   async register(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<AuthResponseDto> {
+  ): Promise<ApiResponseInterface<AuthResponseDto>> {
     return this.authService.register(createUserDto);
   }
 

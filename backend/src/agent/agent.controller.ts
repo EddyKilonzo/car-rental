@@ -64,6 +64,26 @@ export class AgentController {
     }
   }
 
+  @Get('application/status')
+  @ApiOperation({ summary: 'Check agent application status (Customer only)' })
+  @ApiResponse({ status: 200, description: 'Application status retrieved' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only customers can check status',
+  })
+  @Roles(UserRole.CUSTOMER)
+  async getApplicationStatus(@Request() req: RequestWithUser) {
+    try {
+      const userId = req.user.id;
+      return await this.agentService.getApplicationStatus(userId);
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   @Get('applications/pending')
   @ApiOperation({ summary: 'Get pending agent applications (Admin only)' })
   @ApiResponse({ status: 200, description: 'List of pending applications' })

@@ -30,10 +30,6 @@ interface ReviewWhereClause {
 export class AdminService {
   constructor(private prisma: PrismaService) {}
 
-  /**
-   * Get system statistics
-   * @returns System overview statistics
-   */
   async getSystemStats() {
     try {
       const [
@@ -127,14 +123,6 @@ export class AdminService {
     }
   }
 
-  /**
-   * Get all users with pagination and filtering
-   * @param page
-   * @param limit
-   * @param role
-   * @param search
-   * @returns Paginated users
-   */
   async getAllUsers(
     page: number = 1,
     limit: number = 10,
@@ -171,6 +159,7 @@ export class AdminService {
             isVerified: true,
             createdAt: true,
             updatedAt: true,
+            profileImageUrl: true,
             _count: {
               select: {
                 bookings: true,

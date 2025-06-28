@@ -164,6 +164,14 @@ export class CreateVehicleDto {
   @IsString({ each: true })
   images?: string[];
 
+  @ApiPropertyOptional({
+    example: 'https://example.com/main-image.jpg',
+    description: 'Main vehicle image URL',
+  })
+  @IsOptional()
+  @IsString()
+  mainImageUrl?: string;
+
   @ApiProperty({
     example: 75.5,
     description: 'Price per day in currency units',
