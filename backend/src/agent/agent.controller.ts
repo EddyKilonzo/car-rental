@@ -24,6 +24,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 interface RequestWithUser extends Request {
   user: {
@@ -37,7 +38,10 @@ interface RequestWithUser extends Request {
 @Controller('agent')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AgentController {
-  constructor(private readonly agentService: AgentService) {}
+  constructor(
+    private readonly agentService: AgentService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   // Agent Application Management (Admin only)
   @Post('apply')
@@ -327,6 +331,190 @@ export class AgentController {
     try {
       const userId = req.user.id;
       return await this.agentService.deleteVehicle(userId, vehicleId);
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.AGENT)
+  @Put('vehicles/:vehicleId/fix-status')
+  @ApiOperation({ summary: 'Fix vehicle status (temporary)' })
+  @ApiBearerAuth('JWT-auth')
+  async fixVehicleStatus(
+    @Request() req: RequestWithUser,
+    @Param('vehicleId') vehicleId: string,
+  ) {
+    try {
+      // Check if vehicle belongs to agent
+      const vehicle = await this.prisma.vehicle.findFirst({
+        where: {
+          id: vehicleId,
+          userId: req.user.id,
+        },
+      });
+
+      if (!vehicle) {
+        throw new HttpException(
+          'Vehicle not found or access denied',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // Update vehicle status to AVAILABLE and ensure it's active
+      const updatedVehicle = await this.prisma.vehicle.update({
+        where: { id: vehicleId },
+        data: {
+          status: 'AVAILABLE',
+          isActive: true,
+        },
+      });
+
+      return {
+        success: true,
+        data: updatedVehicle,
+        message: 'Vehicle status fixed successfully',
+      };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // Booking Management (Agent only)
+  @Get('bookings')
+  @ApiOperation({ summary: 'Get agent bookings (Agent only)' })
+  @ApiResponse({ status: 200, description: 'List of agent bookings' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only agents can view their bookings',
+  })
+  @Roles(UserRole.AGENT)
+  async getAgentBookings(@Request() req: RequestWithUser) {
+    try {
+      const userId = req.user.id;
+      return await this.agentService.getAgentBookings(userId);
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Get('reviews')
+  @ApiOperation({ summary: 'Get agent reviews (Agent only)' })
+  @ApiResponse({ status: 200, description: 'List of agent reviews' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only agents can view their reviews',
+  })
+  @Roles(UserRole.AGENT)
+  async getAgentReviews(@Request() req: RequestWithUser) {
+    try {
+      const userId = req.user.id;
+      return await this.agentService.getAgentReviews(userId);
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Put('bookings/:bookingId/approve')
+  @ApiOperation({ summary: 'Approve booking (Agent only)' })
+  @ApiParam({ name: 'bookingId', description: 'Booking ID' })
+  @ApiResponse({ status: 200, description: 'Booking approved successfully' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only agents can approve bookings',
+  })
+  @Roles(UserRole.AGENT)
+  async approveBooking(
+    @Request() req: RequestWithUser,
+    @Param('bookingId') bookingId: string,
+  ) {
+    try {
+      const userId = req.user.id;
+      return await this.agentService.approveBooking(userId, bookingId);
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Put('bookings/:bookingId/decline')
+  @ApiOperation({ summary: 'Decline booking (Agent only)' })
+  @ApiParam({ name: 'bookingId', description: 'Booking ID' })
+  @ApiResponse({ status: 200, description: 'Booking declined successfully' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only agents can decline bookings',
+  })
+  @Roles(UserRole.AGENT)
+  async declineBooking(
+    @Request() req: RequestWithUser,
+    @Param('bookingId') bookingId: string,
+  ) {
+    try {
+      const userId = req.user.id;
+      return await this.agentService.declineBooking(userId, bookingId);
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Put('bookings/:bookingId/active')
+  @ApiOperation({ summary: 'Mark booking as active (Agent only)' })
+  @ApiParam({ name: 'bookingId', description: 'Booking ID' })
+  @ApiResponse({ status: 200, description: 'Booking marked as active' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only agents can mark bookings as active',
+  })
+  @Roles(UserRole.AGENT)
+  async markBookingAsActive(
+    @Request() req: RequestWithUser,
+    @Param('bookingId') bookingId: string,
+  ) {
+    try {
+      const userId = req.user.id;
+      return await this.agentService.markBookingAsActive(userId, bookingId);
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Put('bookings/:bookingId/completed')
+  @ApiOperation({ summary: 'Mark booking as completed (Agent only)' })
+  @ApiParam({ name: 'bookingId', description: 'Booking ID' })
+  @ApiResponse({ status: 200, description: 'Booking marked as completed' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only agents can mark bookings as completed',
+  })
+  @Roles(UserRole.AGENT)
+  async markBookingAsCompleted(
+    @Request() req: RequestWithUser,
+    @Param('bookingId') bookingId: string,
+  ) {
+    try {
+      const userId = req.user.id;
+      return await this.agentService.markBookingAsCompleted(userId, bookingId);
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',

@@ -303,12 +303,18 @@ export class AdminController {
     @Query('maxRating') maxRating?: string,
   ) {
     try {
-      return await this.adminService.getAllReviews(
+      const data = await this.adminService.getAllReviews(
         parseInt(page),
         parseInt(limit),
         minRating ? parseInt(minRating) : undefined,
         maxRating ? parseInt(maxRating) : undefined,
       );
+
+      return {
+        success: true,
+        data,
+        message: 'Reviews retrieved successfully',
+      };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
@@ -329,7 +335,13 @@ export class AdminController {
   })
   async getReviewStats() {
     try {
-      return await this.adminService.getReviewStats();
+      const data = await this.adminService.getReviewStats();
+
+      return {
+        success: true,
+        data,
+        message: 'Review statistics retrieved successfully',
+      };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
@@ -349,7 +361,13 @@ export class AdminController {
   @ApiResponse({ status: 404, description: 'Review not found' })
   async deleteReview(@Param('id') reviewId: string) {
     try {
-      return await this.adminService.deleteReview(reviewId);
+      const data = await this.adminService.deleteReview(reviewId);
+
+      return {
+        success: true,
+        data,
+        message: 'Review deleted successfully',
+      };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',

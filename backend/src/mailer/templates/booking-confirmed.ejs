@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed - CarRental</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            background-color: #f9fafb;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+        
+        .booking-details {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 4px solid #16a34a;
+        }
+        
+        .booking-details h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        
+        .vehicle-info {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .vehicle-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #15803d;
+            margin-bottom: 15px;
+        }
+        
+        .vehicle-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .important-info {
+            background-color: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .important-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+        
+        .important-info ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .important-info li {
+            padding: 5px 0;
+            color: #92400e;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .important-info li:before {
+            content: "⚠";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #A11312, #8a0f0e);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+            transition: transform 0.2s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            background-color: #f8fafc;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        
+        .contact-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .contact-info p {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .agent-info {
+            background-color: #f1f5f9;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .agent-info p {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .detail-grid, .vehicle-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🚗 CarRental</div>
+            <h1>Booking Confirmed!</h1>
+            <p>Your car rental has been confirmed by the agent</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Hello <%= customerName %>! 🎉
+            </div>
+            
+            <div class="message">
+                Great news! Your booking has been confirmed by the vehicle owner. 
+                Your car rental is now confirmed and ready for your trip.
+            </div>
+            
+            <div class="booking-details">
+                <h3>Booking Details</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Booking ID</div>
+                        <div class="detail-value"><%= bookingId %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value" style="color: #16a34a; font-weight: 600;">Confirmed</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Pickup Date</div>
+                        <div class="detail-value"><%= pickupDate %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Return Date</div>
+                        <div class="detail-value"><%= returnDate %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Total Price</div>
+                        <div class="detail-value">KSH <%= totalPrice %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Pickup Location</div>
+                        <div class="detail-value"><%= pickupLocation %></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="vehicle-info">
+                <h3>Vehicle Information</h3>
+                <div class="vehicle-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Vehicle</div>
+                        <div class="detail-value"><%= vehicleMake %> <%= vehicleModel %> (<%= vehicleYear %>)</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">License Plate</div>
+                        <div class="detail-value"><%= licensePlate %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Color</div>
+                        <div class="detail-value"><%= vehicleColor %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fuel Type</div>
+                        <div class="detail-value"><%= fuelType %></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="important-info">
+                <h3>Important Information</h3>
+                <ul>
+                    <li>Please arrive on time for pickup</li>
+                    <li>Bring your driver's license and booking confirmation</li>
+                    <li>Inspect the vehicle before driving</li>
+                    <li>Return the vehicle in the same condition</li>
+                    <li>Contact the agent if you have any issues</li>
+                </ul>
+            </div>
+            
+            <a href="<%= bookingUrl %>" class="cta-button">
+                View Booking Details
+            </a>
+            
+            <div class="message">
+                Have a great trip! If you need any assistance during your rental, 
+                don't hesitate to contact the vehicle owner or our support team.
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Best regards,</p>
+            <p><strong>The CarRental Team</strong></p>
+            
+            <div class="agent-info">
+                <p><strong>Vehicle Owner:</strong> <%= agentName %></p>
+                <p><strong>Contact:</strong> <%= agentEmail %></p>
+                <% if (agentPhone) { %>
+                    <p><strong>Phone:</strong> <%= agentPhone %></p>
+                <% } %>
+            </div>
+            
+            <div class="contact-info">
+                <h4>Need Help?</h4>
+                <p>Email: carrent@info.com</p>
+                <p>Phone: 0768163367</p>
+            </div>
+            
+            <p style="margin-top: 20px; font-size: 12px; color: #9ca3af;">
+                This email was sent to <%= customerEmail %>. If you have any questions, please contact our support team.
+            </p>
+        </div>
+    </div>
+</body>
+</html> 

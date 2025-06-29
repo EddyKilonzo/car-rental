@@ -69,6 +69,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Password reset fields
+  resetCode        String?
+  resetCodeExpiry  DateTime?
+
   // Customer specific fields
   licenseNumber String?
   dateOfBirth   String?
@@ -156,7 +160,6 @@ model Booking {
   pickupLocation String?
   returnLocation String?
   totalPrice     Float
-  deposit        Float?
   status         BookingStatus @default(PENDING)
   notes          String?
   createdAt      DateTime      @default(now())

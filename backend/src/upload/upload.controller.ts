@@ -50,7 +50,7 @@ export class UploadController {
    */
   private async checkAgentApproval(userId: string): Promise<void> {
     console.log('Checking agent approval for user ID:', userId);
-    
+
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
       select: { role: true, isVerified: true },

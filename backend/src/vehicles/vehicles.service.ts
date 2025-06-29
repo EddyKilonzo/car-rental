@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { MailerService } from '../mailer/mailer.service';
 import {
   Vehicle,
   Booking,
@@ -33,11 +34,27 @@ interface VehicleFilters {
 
 @Injectable()
 export class VehiclesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mailerService: MailerService,
+  ) {}
 
   async getAllVehicles(): Promise<Vehicle[]> {
     try {
-      return await this.prisma.vehicle.findMany({
+      // First, let's see ALL vehicles in the database to debug
+      const allVehicles = await this.prisma.vehicle.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
+
+      console.log('=== ALL VEHICLES IN DATABASE ===');
+      allVehicles.forEach((vehicle) => {
+        console.log(
+          `Vehicle ${vehicle.id}: ${vehicle.make} ${vehicle.model} - Status: ${vehicle.status}, isActive: ${vehicle.isActive}, userId: ${vehicle.userId}`,
+        );
+      });
+      console.log('=== END ALL VEHICLES ===');
+
+      const vehicles = await this.prisma.vehicle.findMany({
         where: {
           status: 'AVAILABLE',
           isActive: true,
@@ -53,6 +70,15 @@ export class VehiclesService {
           },
         },
       });
+
+      console.log('getAllVehicles - Found vehicles:', vehicles.length);
+      vehicles.forEach((vehicle) => {
+        console.log(
+          `Vehicle ${vehicle.id}: ${vehicle.make} ${vehicle.model} - Status: ${vehicle.status}, isActive: ${vehicle.isActive}`,
+        );
+      });
+
+      return vehicles;
     } catch (error) {
       throw new Error(
         `Failed to get vehicles: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -265,7 +291,6 @@ export class VehiclesService {
           pickupLocation: bookingData.pickupLocation,
           returnLocation: bookingData.returnLocation,
           totalPrice,
-          deposit: bookingData.deposit,
           notes: bookingData.notes,
         },
         include: {
@@ -411,7 +436,6 @@ export class VehiclesService {
           pickupLocation: bookingData.pickupLocation,
           returnLocation: bookingData.returnLocation,
           totalPrice,
-          deposit: bookingData.deposit,
           notes: `${bookingData.notes ? bookingData.notes + ' | ' : ''}Booked by agent: ${agent.name} (${agent.email})`,
         },
         include: {
@@ -458,6 +482,15 @@ export class VehiclesService {
         where: { userId },
         include: {
           vehicle: true,
+          reviews: {
+            select: {
+              id: true,
+              rating: true,
+              comment: true,
+              createdAt: true,
+              userId: true,
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
       });
@@ -698,7 +731,7 @@ export class VehiclesService {
 
   /**
    * Update booking status (Agent/Admin only)
-   * @param userId - ID of the agent/admin making the change
+   * @param userId - ID of the user updating the booking
    * @param bookingId - ID of the booking to update
    * @param status - New status to set
    * @returns Updated booking
@@ -728,7 +761,25 @@ export class VehiclesService {
       const booking = await this.prisma.booking.findUnique({
         where: { id: bookingId },
         include: {
-          vehicle: true,
+          vehicle: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
         },
       });
 
@@ -736,7 +787,7 @@ export class VehiclesService {
         throw new NotFoundException(`Booking with ID ${bookingId} not found`);
       }
 
-      // Validate status transition
+      // Check status transition
       if (booking.status === 'CANCELLED') {
         throw new BadRequestException('Cannot update a cancelled booking');
       }
@@ -752,7 +803,18 @@ export class VehiclesService {
         where: { id: bookingId },
         data: { status },
         include: {
-          vehicle: true,
+          vehicle: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  phone: true,
+                },
+              },
+            },
+          },
           user: {
             select: {
               id: true,
@@ -772,8 +834,41 @@ export class VehiclesService {
       } else if (status === 'COMPLETED' || status === 'CANCELLED') {
         await this.prisma.vehicle.update({
           where: { id: booking.vehicleId },
-          data: { status: 'AVAILABLE' },
+          data: {
+            status: 'AVAILABLE',
+            isActive: true,
+          },
         });
+      }
+
+      // Send booking confirmation email when status is CONFIRMED
+      if (status === 'CONFIRMED') {
+        try {
+          await this.mailerService.sendBookingConfirmationEmail({
+            customerName: booking.user.name,
+            customerEmail: booking.user.email,
+            bookingId: booking.id,
+            pickupDate: booking.startDate.toLocaleDateString(),
+            returnDate: booking.endDate.toLocaleDateString(),
+            totalPrice: booking.totalPrice,
+            pickupLocation: booking.pickupLocation || 'To be arranged',
+            vehicleMake: booking.vehicle.make,
+            vehicleModel: booking.vehicle.model,
+            vehicleYear: booking.vehicle.year,
+            licensePlate: booking.vehicle.licensePlate,
+            vehicleColor: booking.vehicle.color,
+            fuelType: booking.vehicle.fuelType,
+            agentName: booking.vehicle.user.name,
+            agentEmail: booking.vehicle.user.email,
+            agentPhone: booking.vehicle.user.phone || undefined,
+          });
+        } catch (emailError) {
+          console.error(
+            'Failed to send booking confirmation email:',
+            emailError,
+          );
+          // Don't fail booking update if email fails
+        }
       }
 
       return updatedBooking;
@@ -871,5 +966,27 @@ export class VehiclesService {
         `Failed to get bookings by status: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
+  }
+
+  async getUserReviews(userId: string): Promise<Review[]> {
+    return this.prisma.review.findMany({
+      where: { userId },
+      include: {
+        booking: {
+          include: {
+            vehicle: {
+              select: {
+                id: true,
+                make: true,
+                model: true,
+                year: true,
+                mainImageUrl: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 }

@@ -258,3 +258,71 @@ Authorization: Bearer invalid_token
 
 ###
 
+### ========================================
+### BOOKING MANAGEMENT
+### ========================================
+
+# Agent gets their bookings
+GET {{baseUrl}}/agent/bookings
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Agent gets their reviews
+GET {{baseUrl}}/agent/reviews
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Agent approves a booking
+PUT {{baseUrl}}/agent/bookings/e5c2db4b-c6ed-4358-9596-839b7b6e4d39/approve
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+###
+
+# Agent declines a booking
+PUT {{baseUrl}}/agent/bookings/e5c2db4b-c6ed-4358-9596-839b7b6e4d39/decline
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+###
+
+# Agent marks booking as active
+PUT {{baseUrl}}/agent/bookings/e5c2db4b-c6ed-4358-9596-839b7b6e4d39/active
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+###
+
+# Agent marks booking as completed
+PUT {{baseUrl}}/agent/bookings/e5c2db4b-c6ed-4358-9596-839b7b6e4d39/completed
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+###
+
+### ========================================
+### SPECIFIC BOOKING DEBUG
+### ========================================
+
+# Test the specific booking that's not showing up
+GET {{baseUrl}}/agent/bookings
+Authorization: Bearer {{agentToken}}
+
+###
+
+# Test approving the specific booking
+PUT {{baseUrl}}/agent/bookings/856420d0-2e3b-46dd-8d8b-cb71939003a7/approve
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+###
+
+# Test declining the specific booking
+PUT {{baseUrl}}/agent/bookings/856420d0-2e3b-46dd-8d8b-cb71939003a7/decline
+Authorization: Bearer {{agentToken}}
+Content-Type: application/json
+
+###
+

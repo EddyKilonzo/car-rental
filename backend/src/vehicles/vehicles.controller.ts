@@ -165,7 +165,15 @@ export class VehiclesController {
     @Body() bookingData: CreateBookingDto,
   ) {
     try {
-      return await this.vehiclesService.createBooking(req.user.id, bookingData);
+      const booking = await this.vehiclesService.createBooking(
+        req.user.id,
+        bookingData,
+      );
+      return {
+        success: true,
+        data: booking,
+        message: 'Booking created successfully',
+      };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
@@ -199,7 +207,12 @@ export class VehiclesController {
   @Get('bookings/my')
   async getUserBookings(@Request() req: RequestWithUser) {
     try {
-      return await this.vehiclesService.getUserBookings(req.user.id);
+      const bookings = await this.vehiclesService.getUserBookings(req.user.id);
+      return {
+        success: true,
+        data: bookings,
+        message: 'User bookings retrieved successfully',
+      };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
@@ -215,7 +228,15 @@ export class VehiclesController {
     @Param('id') bookingId: string,
   ) {
     try {
-      return await this.vehiclesService.getBookingById(req.user.id, bookingId);
+      const booking = await this.vehiclesService.getBookingById(
+        req.user.id,
+        bookingId,
+      );
+      return {
+        success: true,
+        data: booking,
+        message: 'Booking details retrieved successfully',
+      };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
@@ -232,7 +253,15 @@ export class VehiclesController {
     @Param('id') bookingId: string,
   ) {
     try {
-      return await this.vehiclesService.cancelBooking(req.user.id, bookingId);
+      const booking = await this.vehiclesService.cancelBooking(
+        req.user.id,
+        bookingId,
+      );
+      return {
+        success: true,
+        data: booking,
+        message: 'Booking cancelled successfully',
+      };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
@@ -249,7 +278,15 @@ export class VehiclesController {
     @Body() reviewData: CreateReviewDto,
   ) {
     try {
-      return await this.vehiclesService.createReview(req.user.id, reviewData);
+      const review = await this.vehiclesService.createReview(
+        req.user.id,
+        reviewData,
+      );
+      return {
+        success: true,
+        data: review,
+        message: 'Review created successfully',
+      };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
@@ -661,6 +698,24 @@ export class VehiclesController {
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Upload failed',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('reviews/user')
+  async getUserReviews(@Request() req: RequestWithUser) {
+    try {
+      const reviews = await this.vehiclesService.getUserReviews(req.user.id);
+      return {
+        success: true,
+        data: reviews,
+        message: 'User reviews retrieved successfully',
+      };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
         HttpStatus.BAD_REQUEST,
       );
     }

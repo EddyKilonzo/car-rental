@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Application Received - CarRental</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            background-color: #f9fafb;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #A11312, #8a0f0e);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+        
+        .application-details {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 4px solid #A11312;
+        }
+        
+        .application-details h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+            min-width: 120px;
+        }
+        
+        .detail-value {
+            color: #6b7280;
+        }
+        
+        .next-steps {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .next-steps h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0c4a6e;
+            margin-bottom: 15px;
+        }
+        
+        .steps-list {
+            list-style: none;
+        }
+        
+        .steps-list li {
+            padding: 8px 0;
+            color: #0c4a6e;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .steps-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #0369a1;
+            font-weight: bold;
+        }
+        
+        .footer {
+            background-color: #f8fafc;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        
+        .contact-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .contact-info p {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .detail-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .detail-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🚗 CarRental</div>
+            <h1>Agent Application Received</h1>
+            <p>Thank you for your interest in becoming a CarRental agent</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Hello <%= name %>! 👋
+            </div>
+            
+            <div class="message">
+                Thank you for submitting your application to become a CarRental agent! 
+                We've received your application and our team will review it carefully.
+            </div>
+            
+            <div class="application-details">
+                <h3>Application Details</h3>
+                <div class="detail-item">
+                    <span class="detail-label">Applicant:</span>
+                    <span class="detail-value"><%= name %></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value"><%= email %></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Application Date:</span>
+                    <span class="detail-value"><%= applicationDate %></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Application ID:</span>
+                    <span class="detail-value"><%= applicationId %></span>
+                </div>
+            </div>
+            
+            <div class="next-steps">
+                <h3>What happens next?</h3>
+                <ul class="steps-list">
+                    <li>Our admin team will review your application</li>
+                    <li>We'll verify your information and credentials</li>
+                    <li>You'll receive an email with our decision within 3-5 business days</li>
+                    <li>If approved, you'll get access to list your vehicles</li>
+                </ul>
+            </div>
+            
+            <div class="message">
+                While you wait, you can continue using CarRental as a customer to explore our platform 
+                and understand how the rental process works from a user's perspective.
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Best regards,</p>
+            <p><strong>The CarRental Team</strong></p>
+            
+            <div class="contact-info">
+                <h4>Need Help?</h4>
+                <p>Email: carrent@info.com</p>
+                <p>Phone: 0768163367</p>
+            </div>
+            
+            <p style="margin-top: 20px; font-size: 12px; color: #9ca3af;">
+                This email was sent to <%= email %>. If you didn't submit an agent application, please contact our support team.
+            </p>
+        </div>
+    </div>
+</body>
+</html> 

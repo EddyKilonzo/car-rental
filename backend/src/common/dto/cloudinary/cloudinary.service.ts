@@ -48,12 +48,12 @@ export enum CarRentalUploadType {
 
 @Injectable()
 export class CloudinaryService {
-  constructor(private configService: ConfigService) {
-    // Configure Cloudinary with environment variables
+  constructor() {
+    // Setup Cloudinary with environment variables
     cloudinary.config({
-      cloud_name: this.configService.get<string>('CLOUDINARY_CLOUD_NAME'),
-      api_key: this.configService.get<string>('CLOUDINARY_API_KEY'),
-      api_secret: this.configService.get<string>('CLOUDINARY_API_SECRET'),
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
     });
   }
 
@@ -209,7 +209,7 @@ export class CloudinaryService {
   ): Promise<CloudinaryUploadResult> {
     const config = this.getUploadConfig(uploadType);
 
-    // Validate file
+    // Check file
     this.validateFile(file, config);
 
     return new Promise<CloudinaryUploadResult>((resolve, reject) => {

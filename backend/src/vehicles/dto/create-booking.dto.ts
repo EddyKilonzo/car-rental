@@ -25,11 +25,6 @@ export class CreateBookingDto {
   returnLocation?: string;
 
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  deposit?: number;
-
-  @IsOptional()
   @IsString()
   notes?: string;
 }

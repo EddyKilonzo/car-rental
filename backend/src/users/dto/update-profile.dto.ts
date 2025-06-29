@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsUrl, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsUrl,
+  IsBoolean,
+  Matches,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateProfileDto {
@@ -17,6 +23,25 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   phone?: string;
+
+  @ApiPropertyOptional({
+    example: 'DL123456789',
+    description: 'Driver license number',
+  })
+  @IsOptional()
+  @IsString()
+  licenseNumber?: string;
+
+  @ApiPropertyOptional({
+    example: '1990-01-15',
+    description: 'Date of birth in YYYY-MM-DD format',
+  })
+  @IsOptional()
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: 'dateOfBirth must be in YYYY-MM-DD format',
+  })
+  dateOfBirth?: string;
 
   @ApiPropertyOptional({
     example: '123 Main Street',
