@@ -1,0 +1,148 @@
+<div class="bookings-container">
+  <div class="bookings-header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Back to Profile
+    </button>
+    <h1>My Bookings</h1>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading your bookings...</p>
+  </div>
+
+  <div *ngIf="error && !isLoading" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i>
+    <h2>Error</h2>
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="loadBookings()">Try Again</button>
+  </div>
+
+  <div *ngIf="!isLoading && !error" class="bookings-content">
+    <div *ngIf="bookings.length === 0" class="no-bookings">
+      <i class="fas fa-calendar-times"></i>
+      <h2>No Bookings Found</h2>
+      <p>You haven't made any bookings yet.</p>
+      <button class="btn btn-primary" (click)="navigateToVehicles()">
+        <i class="fas fa-car"></i> Browse Vehicles
+      </button>
+    </div>
+
+    <div *ngIf="bookings.length > 0" class="bookings-list">
+      <div class="bookings-stats">
+        <div class="stat-item">
+          <span class="stat-label">Total Bookings:</span>
+          <span class="stat-value">{{ bookings.length }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Active:</span>
+          <span class="stat-value">{{ activeBookingsCount }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Pending:</span>
+          <span class="stat-value">{{ pendingBookingsCount }}</span>
+        </div>
+      </div>
+
+      <div class="booking-cards">
+        <div *ngFor="let booking of bookings" class="booking-card">
+          <div class="booking-header">
+            <div class="vehicle-info">
+              <div class="vehicle-image">
+                <img 
+                  [src]="booking.vehicle.mainImageUrl || 'assets/hero.png'" 
+                  [alt]="booking.vehicle.make + ' ' + booking.vehicle.model"
+                  (error)="onImageError($event)"
+                  (click)="goToVehicleDetails(booking.vehicle.id)"
+                >
+              </div>
+              <div class="vehicle-details">
+                <h3>{{ booking.vehicle.year }} {{ booking.vehicle.make }} {{ booking.vehicle.model }}</h3>
+                <p class="booking-id">Booking #{{ booking.id.slice(-8) }}</p>
+                <div class="booking-dates">
+                  <span class="date-item">
+                    <i class="fas fa-calendar-plus"></i>
+                    {{ getFormattedDate(booking.startDate) }}
+                  </span>
+                  <span class="date-item">
+                    <i class="fas fa-calendar-minus"></i>
+                    {{ getFormattedDate(booking.endDate) }}
+                  </span>
+                  <span class="duration">
+                    <i class="fas fa-clock"></i>
+                    {{ getDuration(booking.startDate, booking.endDate) }} day{{ getDuration(booking.startDate, booking.endDate) !== 1 ? 's' : '' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="booking-status">
+              <span class="status-badge" [class]="getStatusClass(booking.status)">
+                {{ getStatusText(booking.status) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="booking-details">
+            <div class="detail-row">
+              <div class="detail-item">
+                <span class="detail-label">
+                  <i class="fas fa-map-marker-alt"></i> Pickup:
+                </span>
+                <span class="detail-value">{{ booking.pickupLocation || 'Not specified' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">
+                  <i class="fas fa-map-marker-alt"></i> Return:
+                </span>
+                <span class="detail-value">{{ booking.returnLocation || 'Not specified' }}</span>
+              </div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-item">
+                <span class="detail-label">
+                  <i class="fas fa-money-bill-wave"></i> Total Price:
+                </span>
+                <span class="detail-value price">{{ getFormattedPrice(booking.totalPrice) }}</span>
+              </div>
+            </div>
+
+            <div class="detail-row" *ngIf="booking.notes">
+              <div class="detail-item full-width">
+                <span class="detail-label">
+                  <i class="fas fa-sticky-note"></i> Notes:
+                </span>
+                <span class="detail-value">{{ booking.notes }}</span>
+              </div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-item">
+                <span class="detail-label">
+                  <i class="fas fa-calendar"></i> Booked on:
+                </span>
+                <span class="detail-value">{{ getFormattedDate(booking.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="booking-actions">
+            <button 
+              class="btn btn-secondary" 
+              (click)="goToVehicleDetails(booking.vehicle.id)"
+            >
+              <i class="fas fa-eye"></i> View Vehicle
+            </button>
+            <button 
+              *ngIf="canCancelBooking(booking)"
+              class="btn btn-danger" 
+              (click)="cancelBooking(booking.id)"
+            >
+              <i class="fas fa-times"></i> Cancel Booking
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

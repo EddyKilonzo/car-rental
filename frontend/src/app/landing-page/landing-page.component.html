@@ -1,4 +1,26 @@
 <div class="landing-page">
+  <!-- Profile Completion Banner -->
+  <div *ngIf="showProfileBanner" class="profile-banner">
+    <div class="banner-content">
+      <div class="banner-icon">
+        <i class="fas fa-user-edit"></i>
+      </div>
+      <div class="banner-text">
+        <h3>Complete Your Profile</h3>
+        <p>Add your details to get the best car rental experience</p>
+      </div>
+      <div class="banner-actions">
+        <button class="btn-complete" (click)="completeProfile()">
+          <i class="fas fa-edit"></i>
+          Complete Profile
+        </button>
+        <button class="btn-dismiss" (click)="dismissBanner()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <section class="hero seamless-hero">
     <div class="hero-content">
       <div class="hero-text">
@@ -50,7 +72,6 @@
     <div class="reviews-carousel">
       <button class="carousel-arrow left" (click)="prevReview()" aria-label="Previous Review">&#8592;</button>
       <div class="review-card">
-        <img [src]="reviews[currentReview].photo" alt="{{reviews[currentReview].name}}" class="review-photo" />
         <div class="review-content">
           <div class="review-rating">
             <ng-container *ngFor="let star of [1,2,3,4,5]; let i = index">

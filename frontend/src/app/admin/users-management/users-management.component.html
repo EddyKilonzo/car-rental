@@ -14,8 +14,8 @@
         <p>Loading users...</p>
       </div>
       
-      <!-- Users Table -->
-      <div *ngIf="!isLoading" class="table-container">
+      <!-- Desktop Table View -->
+      <div *ngIf="!isLoading" class="table-container desktop-view">
         <table class="users-table">
           <thead class="table-header">
             <tr>
@@ -108,6 +108,104 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Mobile Card View -->
+      <div *ngIf="!isLoading" class="mobile-view">
+        <div *ngFor="let user of users" class="user-card">
+          <div class="user-card-header">
+            <div class="user-info">
+              <div class="user-avatar-container">
+                <img *ngIf="user.profileImageUrl" [src]="user.profileImageUrl" alt="User Image" class="user-avatar" />
+                <div *ngIf="!user.profileImageUrl" class="user-avatar placeholder">
+                  <i class="fas fa-user"></i>
+                </div>
+              </div>
+              <div class="user-details">
+                <h3 class="user-name">{{ user.name }}</h3>
+                <p class="user-email">{{ user.email }}</p>
+              </div>
+            </div>
+            <div class="user-status">
+              <span class="status-badge" [ngClass]="user.isActive ? 'status-active' : 'status-inactive'">
+                {{ getStatusDisplayName(user.isActive) }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="user-card-body">
+            <div class="user-info-row">
+              <span class="info-label">Phone:</span>
+              <span class="info-value">{{ user.phone || 'Not provided' }}</span>
+            </div>
+            <div class="user-info-row">
+              <span class="info-label">Role:</span>
+              <span class="role-badge role-{{ user.role.toLowerCase() }}">
+                {{ getRoleDisplayName(user.role) }}
+              </span>
+            </div>
+            <div class="user-info-row">
+              <span class="info-label">Joined:</span>
+              <span class="info-value">{{ getFormattedDate(user.createdAt) }}</span>
+            </div>
+          </div>
+          
+          <div class="user-card-actions">
+            <div class="mobile-action-buttons">
+              <!-- Role Update Dropdown -->
+              <select 
+                #mobileRoleSelect
+                class="role-select mobile-role-select"
+                (change)="updateUserRole(user.id, mobileRoleSelect.value)"
+                [disabled]="processingUserId === user.id"
+              >
+                <option [value]="user.role" selected>{{ getRoleDisplayName(user.role) }}</option>
+                <option *ngFor="let role of getRoleOptions(user.role)" [value]="role">
+                  {{ getRoleDisplayName(role) }}
+                </option>
+              </select>
+              
+              <!-- Toggle Status Button -->
+              <button 
+                class="toggle-status-btn mobile-btn" 
+                [ngClass]="user.isActive ? 'deactivate-btn' : 'activate-btn'"
+                (click)="toggleUserStatus(user.id, user.isActive)"
+                [disabled]="processingUserId === user.id"
+              >
+                <svg *ngIf="user.isActive" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <svg *ngIf="!user.isActive" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20,6 9,17 4,12"/>
+                </svg>
+                {{ processingUserId === user.id ? 'Processing...' : (user.isActive ? 'Deactivate' : 'Activate') }}
+              </button>
+              
+              <!-- Delete Button -->
+              <button 
+                class="delete-btn mobile-btn" 
+                (click)="deleteUser(user.id, user.name)"
+                [disabled]="processingUserId === user.id"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3,6 5,6 21,6"/>
+                  <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"/>
+                </svg>
+                {{ processingUserId === user.id ? 'Processing...' : 'Delete' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Empty State for Mobile -->
+        <div *ngIf="users.length === 0" class="empty-message-mobile">
+          <div class="empty-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <p>No users found.</p>
+        </div>
       </div>
     </div>
   </div>

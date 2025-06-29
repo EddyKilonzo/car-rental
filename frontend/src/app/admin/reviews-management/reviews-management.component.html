@@ -1,0 +1,155 @@
+<div class="reviews-management">
+  <div class="dashboard-container">
+    <div class="header">
+      <h1 class="dashboard-title">
+        <i class="fas fa-star"></i>
+        Reviews Management
+      </h1>
+      <p class="dashboard-subtitle">Monitor and manage all customer reviews across vehicles and owners</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div *ngIf="reviewStats" class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-title">Total Reviews</h3>
+          <i class="fas fa-star stat-icon"></i>
+        </div>
+        <p class="stat-value stat-yellow">{{ reviewStats.totalReviews }}</p>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-title">Average Rating</h3>
+          <i class="fas fa-chart-line stat-icon"></i>
+        </div>
+        <p class="stat-value stat-green">{{ formatRating(reviewStats.averageRating) }}/5</p>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-title">Recent Reviews</h3>
+          <i class="fas fa-clock stat-icon"></i>
+        </div>
+        <p class="stat-value stat-blue">{{ reviewStats.recentReviews.length || 0 }}</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label for="minRating">Minimum Rating:</label>
+        <select id="minRating" [(ngModel)]="minRating" (change)="onFilterChange()">
+          <option [value]="undefined">Any</option>
+          <option [value]="1">1+ Stars</option>
+          <option [value]="2">2+ Stars</option>
+          <option [value]="3">3+ Stars</option>
+          <option [value]="4">4+ Stars</option>
+          <option [value]="5">5 Stars</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="maxRating">Maximum Rating:</label>
+        <select id="maxRating" [(ngModel)]="maxRating" (change)="onFilterChange()">
+          <option [value]="undefined">Any</option>
+          <option [value]="1">1 Star</option>
+          <option [value]="2">2 Stars</option>
+          <option [value]="3">3 Stars</option>
+          <option [value]="4">4 Stars</option>
+          <option [value]="5">5 Stars</option>
+        </select>
+      </div>
+      <button class="clear-filters-btn" (click)="clearFilters()">
+        <i class="fas fa-times"></i> Clear Filters
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading reviews...</p>
+    </div>
+
+    <!-- Reviews List -->
+    <div *ngIf="!isLoading" class="reviews-container">
+      <div class="reviews-header">
+        <h2 class="section-title">
+          <i class="fas fa-list"></i>
+          All Reviews ({{ totalReviews }})
+        </h2>
+      </div>
+
+      <div *ngIf="reviews.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <h3>No Reviews Found</h3>
+        <p>No reviews match your current filters.</p>
+      </div>
+
+      <div *ngIf="reviews.length > 0" class="reviews-grid">
+        <div *ngFor="let review of reviews" class="review-card">
+          <div class="review-header">
+            <div class="vehicle-info">
+              <div class="vehicle-details">
+                <h3 class="vehicle-title">{{ review.booking.vehicle.year }} {{ review.booking.vehicle.make }} {{ review.booking.vehicle.model }}</h3>
+                <p class="vehicle-license">License: {{ review.booking.vehicle.licensePlate }}</p>
+              </div>
+            </div>
+            <div class="rating-display">
+              <div class="stars">
+                <span class="star-rating">{{ getStars(review.rating) }}</span>
+              </div>
+              <span class="rating-text">{{ review.rating }}/5</span>
+            </div>
+          </div>
+
+          <div class="review-content" *ngIf="review.comment">
+            <p class="review-comment">{{ review.comment }}</p>
+          </div>
+
+          <div class="review-footer">
+            <div class="reviewer-info">
+              <div class="reviewer-details">
+                <span class="reviewer-name">{{ review.user.name }}</span>
+                <span class="reviewer-email">{{ review.user.email }}</span>
+              </div>
+              <div class="review-meta">
+                <span class="review-date">{{ getFormattedDate(review.createdAt) }}</span>
+                <span class="review-id">#{{ review.id.slice(-8) }}</span>
+              </div>
+            </div>
+            <div class="review-actions">
+              <button class="delete-btn" (click)="deleteReview(review.id)" title="Delete Review">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1" class="pagination">
+        <button 
+          class="page-btn" 
+          [disabled]="currentPage === 1"
+          (click)="onPageChange(currentPage - 1)"
+        >
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        
+        <div class="page-numbers">
+          <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+        </div>
+        
+        <button 
+          class="page-btn" 
+          [disabled]="currentPage === totalPages"
+          (click)="onPageChange(currentPage + 1)"
+        >
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

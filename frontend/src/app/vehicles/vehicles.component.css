@@ -14,7 +14,18 @@
   margin-bottom: 3rem;
 }
 
-.header h1 {
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.header-text {
+  text-align: left;
+}
+
+.header-text h1 {
   font-family: 'Inter', sans-serif;
   font-size: 2.5rem;
   font-weight: 800;
@@ -23,10 +34,49 @@
   letter-spacing: -0.02em;
 }
 
-.header p {
+.header-text p {
   font-size: 1.1rem;
   color: #6b7280;
-  margin-bottom: 2rem;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.refresh-btn {
+  background: #f8fafc;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.refresh-btn i {
+  font-size: 0.9rem;
+}
+
+.refresh-btn i.fa-spin {
+  animation: spin 1s linear infinite;
 }
 
 .add-vehicle-section {
@@ -379,15 +429,31 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .vehicles-page {
-    padding: 100px 10px 20px;
+    padding: 80px 15px 30px;
   }
   
-  .header h1 {
-    font-size: 2rem;
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .header-text {
+    order: 2;
+  }
+  
+  .header-text h1 {
+    font-size: 1.8rem;
+  }
+  
+  .header-actions {
+    order: 1;
+    width: 100%;
+    justify-content: center;
   }
   
   .filters-section {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   
   .filters-grid {
@@ -397,12 +463,13 @@
   
   .price-range,
   .year-range {
-    grid-column: span 1;
+    flex-direction: column;
+    gap: 0.5rem;
   }
   
   .vehicles-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 1rem;
   }
   
   .vehicle-card {
@@ -416,15 +483,82 @@
   .vehicle-info.minimal h3 {
     font-size: 1.1rem;
   }
+  
+  .vehicle-ministats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .vehicle-btn-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .vehicle-btn {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .vehicle-btn.minimal {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .filter-group {
+    margin-bottom: 0.5rem;
+  }
+  
+  .filter-input,
+  .filter-select {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .price-input,
+  .year-input {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .clear-filters-btn {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .refresh-btn {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  .add-vehicle-btn {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .header h1 {
-    font-size: 1.8rem;
+  .vehicles-page {
+    padding: 70px 10px 20px;
+  }
+  
+  .header-text h1 {
+    font-size: 1.5rem;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .refresh-btn {
+    width: 100%;
   }
   
   .filters-section {
-    padding: 1rem;
+    padding: 0.8rem;
   }
   
   .vehicle-card {
@@ -432,19 +566,193 @@
   }
   
   .vehicle-overlay {
-    padding: 1.5rem 1rem 1rem;
-  }
-  
-  .vehicle-overlay.minimal {
     padding: 1rem 0.8rem 0.8rem;
   }
   
+  .vehicle-overlay.minimal {
+    padding: 0.8rem 0.6rem 0.6rem;
+  }
+  
   .vehicle-btn-group {
-    flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.4rem;
   }
   
   .vehicle-btn {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .vehicle-btn.minimal {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  
+  .vehicle-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  .vehicle-info.minimal h3 {
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+  }
+  
+  .vehicle-ministats {
+    margin-bottom: 0.8rem;
+  }
+  
+  .vehicle-price {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.8rem;
+  }
+  
+  .filters-header {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+  
+  .filters-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .clear-filters-btn {
     width: 100%;
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+  
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+  
+  .empty-state h3 {
+    font-size: 1.2rem;
+  }
+  
+  .empty-state p {
+    font-size: 0.9rem;
+  }
+  
+  .results-info {
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .results-info p {
+    font-size: 0.9rem;
+  }
+  
+  .loading {
+    padding: 2rem 1rem;
+  }
+  
+  .spinner {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .vehicle-card:hover {
+    transform: none;
+  }
+  
+  .vehicle-btn:hover {
+    transform: none;
+  }
+  
+  .refresh-btn:hover {
+    transform: none;
+  }
+  
+  .add-vehicle-btn:hover {
+    transform: none;
+  }
+  
+  .clear-filters-btn:hover {
+    transform: none;
+  }
+  
+  /* Add active states for touch devices */
+  .vehicle-card:active {
+    transform: scale(0.98);
+  }
+  
+  .vehicle-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .refresh-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .add-vehicle-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .clear-filters-btn:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Landscape mobile improvements */
+@media (max-width: 768px) and (orientation: landscape) {
+  .vehicles-page {
+    padding: 0.8rem;
+  }
+  
+  .header-content {
+    flex-direction: row;
+    gap: 1rem;
+    text-align: left;
+  }
+  
+  .header-text {
+    order: 1;
+    flex: 1;
+  }
+  
+  .header-actions {
+    order: 2;
+    width: auto;
+  }
+  
+  .header-text h1 {
+    font-size: 1.4rem;
+  }
+  
+  .vehicles-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.8rem;
+  }
+  
+  .vehicle-card {
+    height: 200px;
+  }
+  
+  .vehicle-overlay {
+    padding: 1rem 0.8rem 0.8rem;
+  }
+  
+  .vehicle-info h3 {
+    font-size: 1.1rem;
+  }
+  
+  .vehicle-ministats {
+    flex-direction: row;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .vehicle-btn-group {
+    flex-direction: row;
+    gap: 0.4rem;
+  }
+  
+  .vehicle-btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
   }
 }

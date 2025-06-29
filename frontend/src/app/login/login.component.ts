@@ -1,14 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
+import { UserService } from '../services/user.service';
 import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -21,6 +23,7 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
     private toastService: ToastService
   ) {}
@@ -41,7 +44,13 @@ export class LoginComponent {
           localStorage.setItem('user', JSON.stringify(response.data.user));
           
           this.toastService.showSuccess('Login successful! Welcome back.');
-          this.router.navigate(['/']);
+          
+          // Check if profile is complete for customers
+          if (response.data.user.role === 'CUSTOMER') {
+            this.checkProfileCompletion();
+          } else {
+            this.router.navigate(['/']);
+          }
         } else {
           this.toastService.showError(response.message || 'Login failed. Please try again.');
         }
@@ -58,6 +67,43 @@ export class LoginComponent {
           this.toastService.showError('Login failed. Please try again later.');
         }
         console.error('Login error:', error);
+      }
+    });
+  }
+
+  private checkProfileCompletion() {
+    this.userService.getProfile().subscribe({
+      next: (response) => {
+        if (response.success) {
+          const user = response.data;
+          this.authService.updateCurrentUser(user);
+          
+          // Check if profile is complete
+          const requiredFields = [
+            user.name,
+            user.phone,
+            user.address,
+            user.city,
+            user.state,
+            user.zipCode,
+            user.country
+          ];
+          
+          const isComplete = requiredFields.every(field => field && field.trim() !== '');
+          
+          if (!isComplete) {
+            this.toastService.showInfo('Please complete your profile to get the best experience.');
+            this.router.navigate(['/profile']);
+          } else {
+            this.router.navigate(['/']);
+          }
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
+      error: (error) => {
+        console.error('Error checking profile:', error);
+        this.router.navigate(['/']);
       }
     });
   }

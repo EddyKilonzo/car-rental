@@ -5,25 +5,29 @@
     <span *ngIf="isLoggedIn" class="user-welcome">Welcome, {{ currentUser?.name }}</span>
   </div>
   
+  <!-- Desktop Navigation -->
   <div class="navbar-nav">
     <!-- Public Navigation -->
     <a *ngIf="!isLoggedIn" href="#about">About</a>
-    <a routerLink="/vehicles" routerLinkActive="active">Vehicles</a>
-    
-    <!-- Admin Navigation -->
-    <ng-container *ngIf="isAdmin()">
-      <a routerLink="/admin/agent-requests" routerLinkActive="active">Agent Requests</a>
-      <a routerLink="/admin/users" routerLinkActive="active">Users</a>
-      <a routerLink="/admin/stats" routerLinkActive="active">Dashboard</a>
-    </ng-container>
+    <a routerLink="/vehicles" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Vehicles</a>
     
     <!-- Agent Navigation -->
     <ng-container *ngIf="isAgent()">
-      <a routerLink="/my-vehicles" routerLinkActive="active">My Vehicles</a>
+      <a routerLink="/agent/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Bookings</a>
+      <a routerLink="/my-vehicles" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">My Vehicles</a>
+    </ng-container>
+    
+    <!-- Admin Navigation -->
+    <ng-container *ngIf="isAdmin()">
+      <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Dashboard</a>
+      <a routerLink="/admin/agent-requests" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Agent Requests</a>
+      <a routerLink="/admin/users" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Users</a>
+      <a routerLink="/admin/reviews" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Reviews</a>
     </ng-container>
     
     <!-- Customer Navigation -->
     <ng-container *ngIf="isCustomer()">
+      <a routerLink="/my-bookings" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">My Bookings</a>
     </ng-container>
     
     <!-- Authentication Section -->
@@ -48,6 +52,71 @@
                 <polyline points="16,17 21,12 16,7"/>
                 <line x1="21" y1="12" x2="9" y2="12"/>
               </svg>
+            </button>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+  
+  <!-- Mobile Menu Toggle -->
+  <div class="mobile-menu-toggle" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.active]="isMobileMenuOpen" [style.display]="isMobileMenuOpen ? 'block' : 'none'">
+    <div class="navbar-nav">
+      <!-- Public Navigation -->
+      <a *ngIf="!isLoggedIn" href="#about" (click)="closeMobileMenu()">About</a>
+      <a routerLink="/vehicles" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="closeMobileMenu()">Vehicles</a>
+      
+      <!-- Agent Navigation -->
+      <ng-container *ngIf="isAgent()">
+        <a routerLink="/agent/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="closeMobileMenu()">Bookings</a>
+        <a routerLink="/my-vehicles" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="closeMobileMenu()">My Vehicles</a>
+      </ng-container>
+      
+      <!-- Admin Navigation -->
+      <ng-container *ngIf="isAdmin()">
+        <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMobileMenu()">Dashboard</a>
+        <a routerLink="/admin/agent-requests" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="closeMobileMenu()">Agent Requests</a>
+        <a routerLink="/admin/users" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="closeMobileMenu()">Users</a>
+        <a routerLink="/admin/reviews" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="closeMobileMenu()">Reviews</a>
+      </ng-container>
+      
+      <!-- Customer Navigation -->
+      <ng-container *ngIf="isCustomer()">
+        <a routerLink="/my-bookings" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="closeMobileMenu()">My Bookings</a>
+      </ng-container>
+    </div>
+    
+    <!-- Mobile Authentication Section -->
+    <div class="auth-section">
+      <ng-container *ngIf="!isLoggedIn; else mobileLoggedInUser">
+        <a routerLink="/login" class="login-btn" (click)="closeMobileMenu()">Login</a>
+        <a routerLink="/signup" class="signup-btn" (click)="closeMobileMenu()">Sign Up</a>
+      </ng-container>
+      
+      <ng-template #mobileLoggedInUser>
+        <div class="user-menu">
+          <div class="user-actions">
+            <a class="profile-link" (click)="onProfileClick(); closeMobileMenu()" aria-label="Profile">
+              <svg class="person-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M21 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+              </svg>
+              Profile
+            </a>
+            <button class="logout-btn" (click)="logout(); closeMobileMenu()" aria-label="Logout">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16,17 21,12 16,7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Logout
             </button>
           </div>
         </div>

@@ -24,13 +24,38 @@ export class BookingService {
   }
 
   getUserBookings(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/users/bookings`, {
+    return this.http.get(`${this.baseUrl}/vehicles/bookings/my`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  getBookingById(bookingId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/vehicles/bookings/${bookingId}`, {
       headers: this.getAuthHeaders(),
     });
   }
 
   cancelBooking(bookingId: string): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/vehicles/bookings/${bookingId}/cancel`, {}, {
+    return this.http.put(`${this.baseUrl}/vehicles/bookings/${bookingId}/cancel`, {}, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  getAgentBookings(status: string = 'PENDING'): Observable<any[]> {
+    // Fetch bookings for agent's vehicles by status (default: PENDING)
+    return this.http.get<any[]>(`${this.baseUrl}/vehicles/bookings/status/${status}`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  approveBooking(bookingId: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/vehicles/bookings/${bookingId}/confirm`, {}, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  declineBooking(bookingId: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/vehicles/bookings/${bookingId}/cancel`, {}, {
       headers: this.getAuthHeaders(),
     });
   }

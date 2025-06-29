@@ -24,13 +24,15 @@ interface User {
 }
 
 interface ProfileUpdateData {
-  name?: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  country?: string;
+  name?: string | null;
+  phone?: string | null;
+  licenseNumber?: string | null;
+  dateOfBirth?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zipCode?: string | null;
+  country?: string | null;
   isActive?: boolean;
   profileImageUrl?: string | null;
 }
@@ -112,6 +114,20 @@ export class UserService {
 
   deleteUser(id: string): Observable<ApiResponse<{ message: string }>> {
     return this.http.delete<ApiResponse<{ message: string }>>(`${this.baseUrl}/users/${id}`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  // Delete current user's profile (soft delete - deactivate)
+  deactivateProfile(): Observable<ApiResponse<{ message: string }>> {
+    return this.http.delete<ApiResponse<{ message: string }>>(`${this.baseUrl}/users/profile`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  // Permanently delete current user's profile
+  deleteProfilePermanently(): Observable<ApiResponse<{ message: string }>> {
+    return this.http.delete<ApiResponse<{ message: string }>>(`${this.baseUrl}/users/profile/permanent`, {
       headers: this.getAuthHeaders(),
     });
   }

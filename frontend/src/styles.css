@@ -9,6 +9,10 @@ body {
   padding: 0;
   min-height: 100vh;
   padding-top: 100px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .app-container {
@@ -25,8 +29,37 @@ main {
 
 html {
   scroll-behavior: smooth;
+  font-size: 16px;
 }
 
+/* Ensure proper touch targets on mobile */
+button, 
+a, 
+input, 
+select, 
+textarea {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Improve focus visibility */
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #A11312;
+  outline-offset: 2px;
+}
+
+/* Remove focus outline for mouse users */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) {
+  outline: none;
+}
 
 .landing-page,
 .profile-page,
@@ -42,6 +75,95 @@ html {
 /* Mobile adjustments */
 @media (max-width: 768px) {
   body {
-    padding-top: 120px; 
+    padding-top: 80px; 
+  }
+  
+  html {
+    font-size: 14px;
+  }
+  
+  /* Ensure minimum touch targets on mobile */
+  button, 
+  a, 
+  input, 
+  select, 
+  textarea {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding-top: 70px;
+  }
+  
+  html {
+    font-size: 13px;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets for touch devices */
+  button, 
+  a, 
+  input, 
+  select, 
+  textarea {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  /* Remove hover effects on touch devices */
+  *:hover {
+    transform: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  button:focus,
+  a:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 3px solid #000;
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode styles if needed */
+}
+
+/* Print styles */
+@media print {
+  body {
+    padding-top: 0;
+  }
+  
+  .navbar,
+  .footer,
+  button,
+  .btn {
+    display: none !important;
   }
 }

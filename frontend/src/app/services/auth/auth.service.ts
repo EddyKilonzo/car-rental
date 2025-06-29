@@ -25,6 +25,18 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/auth/login`, data);
   }
 
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/forgot-password`, { email });
+  }
+
+  verifyResetCode(email: string, resetCode: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/verify-reset-code`, { email, resetCode });
+  }
+
+  resetPassword(email: string, resetCode: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/reset-password`, { email, resetCode, newPassword });
+  }
+
   getCurrentUser(): any {
     const userStr = localStorage.getItem('user');
     if (userStr) {
@@ -36,6 +48,10 @@ export class AuthService {
       }
     }
     return null;
+  }
+
+  updateCurrentUser(user: any): void {
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   logout(): void {

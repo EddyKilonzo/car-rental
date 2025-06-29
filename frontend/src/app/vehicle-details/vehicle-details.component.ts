@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
 import { VehicleService } from '../services/vehicle.service';
 import { ToastService } from '../services/toast.service';
+import { ReviewService, Review } from '../services/review.service';
 
 interface Vehicle {
   id: string;
@@ -44,6 +45,7 @@ interface Vehicle {
 })
 export class VehicleDetailsComponent implements OnInit {
   vehicle: Vehicle | null = null;
+  vehicleReviews: Review[] = [];
   isLoading = false;
   error = '';
   isAdmin = false;
@@ -53,6 +55,7 @@ export class VehicleDetailsComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private vehicleService: VehicleService,
+    private reviewService: ReviewService,
     private toastService: ToastService,
     private route: ActivatedRoute,
     public router: Router
@@ -64,6 +67,7 @@ export class VehicleDetailsComponent implements OnInit {
     this.isAgent = this.currentUser?.role === 'AGENT';
     
     this.loadVehicleDetails();
+    this.loadVehicleReviews();
   }
 
   loadVehicleDetails() {
@@ -101,6 +105,19 @@ export class VehicleDetailsComponent implements OnInit {
         console.error('Error loading vehicle details:', error);
         this.error = 'Failed to load vehicle details';
         this.isLoading = false;
+      }
+    });
+  }
+
+  loadVehicleReviews() {
+    const vehicleId = this.route.snapshot.paramMap.get('id');
+    if (!vehicleId) return;
+    this.reviewService.getVehicleReviews(vehicleId).subscribe({
+      next: (response) => {
+        this.vehicleReviews = response;
+      },
+      error: (error) => {
+        this.vehicleReviews = [];
       }
     });
   }

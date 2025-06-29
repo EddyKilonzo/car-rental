@@ -1,0 +1,217 @@
+<div class="booking-container">
+  <div class="booking-header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Back to Vehicle
+    </button>
+    <h1>Book Your Vehicle</h1>
+  </div>
+
+  <div *ngIf="isLoading && !vehicle" class="loading">
+    <div class="spinner"></div>
+    <p>Loading vehicle details...</p>
+  </div>
+
+  <div *ngIf="error && !isLoading" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i>
+    <h2>Error</h2>
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="goBack()">Go Back</button>
+  </div>
+
+  <div *ngIf="vehicle && !isLoading" class="booking-content">
+    <div class="vehicle-summary">
+      <div class="vehicle-image">
+        <img 
+          [src]="vehicle.mainImageUrl || 'assets/hero.png'" 
+          [alt]="vehicle.make + ' ' + vehicle.model"
+          (error)="onImageError($event)"
+          (load)="onImageLoad(vehicle.mainImageUrl || '')"
+        >
+      </div>
+      <div class="vehicle-info">
+        <h2>{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</h2>
+        <div class="vehicle-details">
+          <span class="detail-item">
+            <i class="fas fa-car"></i> {{ vehicle.vehicleType }}
+          </span>
+          <span class="detail-item">
+            <i class="fas fa-gas-pump"></i> {{ vehicle.fuelType }}
+          </span>
+          <span class="detail-item">
+            <i class="fas fa-cog"></i> {{ vehicle.transmission }}
+          </span>
+          <span class="detail-item">
+            <i class="fas fa-users"></i> {{ vehicle.seats }} seats
+          </span>
+        </div>
+        <div class="price-info">
+          <div class="daily-price">
+            <span class="price-label">Daily Rate:</span>
+            <span class="price-amount">{{ getFormattedPrice(vehicle.pricePerDay) }}</span>
+          </div>
+          <div *ngIf="vehicle.pricePerWeek" class="weekly-price">
+            <span class="price-label">Weekly Rate:</span>
+            <span class="price-amount">{{ getFormattedPrice(vehicle.pricePerWeek) }}</span>
+          </div>
+          <div *ngIf="vehicle.pricePerMonth" class="monthly-price">
+            <span class="price-label">Monthly Rate:</span>
+            <span class="price-amount">{{ getFormattedPrice(vehicle.pricePerMonth) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="booking-form-section">
+      <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="booking-form">
+        <div class="form-header">
+          <h3>Booking Details</h3>
+          <p>Please fill in your booking information below</p>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startDate">
+              <i class="fas fa-calendar-plus"></i> Start Date *
+            </label>
+            <input 
+              type="date" 
+              id="startDate"
+              formControlName="startDate"
+              [min]="minDate"
+              class="form-control"
+              [class.error]="bookingForm.get('startDate')?.invalid && bookingForm.get('startDate')?.touched"
+            >
+            <div *ngIf="bookingForm.get('startDate')?.invalid && bookingForm.get('startDate')?.touched" class="error-message">
+              <i class="fas fa-exclamation-circle"></i>
+              Start date is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="endDate">
+              <i class="fas fa-calendar-minus"></i> End Date *
+            </label>
+            <input 
+              type="date" 
+              id="endDate"
+              formControlName="endDate"
+              [min]="bookingForm.get('startDate')?.value || minDate"
+              class="form-control"
+              [class.error]="bookingForm.get('endDate')?.invalid && bookingForm.get('endDate')?.touched"
+            >
+            <div *ngIf="bookingForm.get('endDate')?.invalid && bookingForm.get('endDate')?.touched" class="error-message">
+              <i class="fas fa-exclamation-circle"></i>
+              End date is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pickupLocation">
+              <i class="fas fa-map-marker-alt"></i> Pickup Location *
+            </label>
+            <input 
+              type="text" 
+              id="pickupLocation"
+              formControlName="pickupLocation"
+              placeholder="Enter pickup location"
+              class="form-control"
+              [class.error]="bookingForm.get('pickupLocation')?.invalid && bookingForm.get('pickupLocation')?.touched"
+            >
+            <div *ngIf="bookingForm.get('pickupLocation')?.invalid && bookingForm.get('pickupLocation')?.touched" class="error-message">
+              <i class="fas fa-exclamation-circle"></i>
+              Pickup location is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="returnLocation">
+              <i class="fas fa-map-marker-alt"></i> Return Location *
+            </label>
+            <input 
+              type="text" 
+              id="returnLocation"
+              formControlName="returnLocation"
+              placeholder="Enter return location"
+              class="form-control"
+              [class.error]="bookingForm.get('returnLocation')?.invalid && bookingForm.get('returnLocation')?.touched"
+            >
+            <div *ngIf="bookingForm.get('returnLocation')?.invalid && bookingForm.get('returnLocation')?.touched" class="error-message">
+              <i class="fas fa-exclamation-circle"></i>
+              Return location is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="notes">
+              <i class="fas fa-sticky-note"></i> Special Notes (Optional)
+            </label>
+            <textarea 
+              id="notes"
+              formControlName="notes"
+              placeholder="Any special requirements or notes..."
+              rows="3"
+              class="form-control"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="booking-summary">
+          <h4><i class="fas fa-calculator"></i> Price Calculation</h4>
+          <div class="summary-details">
+            <div class="summary-item">
+              <span class="summary-label">Duration:</span>
+              <span class="summary-value">{{ totalDays }} day{{ totalDays !== 1 ? 's' : '' }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Daily Rate:</span>
+              <span class="summary-value">{{ getFormattedPrice(vehicle.pricePerDay) }}</span>
+            </div>
+            <div class="summary-item calculation" *ngIf="totalDays > 0">
+              <span class="summary-label">Calculation:</span>
+              <span class="summary-value">{{ getCalculationDisplay() }}</span>
+            </div>
+            <div class="summary-item total" *ngIf="totalDays > 0">
+              <span class="summary-label">Total Price:</span>
+              <span class="summary-value">{{ getTotalDisplay() }}</span>
+            </div>
+            <div class="summary-item" *ngIf="totalDays === 0">
+              <span class="summary-label">Total Price:</span>
+              <span class="summary-value">{{ getTotalDisplay() }}</span>
+            </div>
+          </div>
+          <div *ngIf="totalDays > 0" class="price-note">
+            <i class="fas fa-info-circle"></i>
+            <span>Total price is calculated based on the number of days selected</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="goBack()"
+            [disabled]="isLoading"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="bookingForm.invalid || isLoading"
+          >
+            <span *ngIf="!isLoading">
+              <i class="fas fa-check"></i> Confirm Booking
+            </span>
+            <span *ngIf="isLoading">
+              <div class="spinner-small"></div> Processing...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

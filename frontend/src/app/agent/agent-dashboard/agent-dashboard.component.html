@@ -1,0 +1,185 @@
+<div class="agent-dashboard-container">
+  <div class="header">
+    <h1>Agent Dashboard</h1>
+    <p>Manage your vehicle bookings and reviews</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading bookings...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading" class="content">
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'bookings'"
+        (click)="activeTab = 'bookings'"
+      >
+        <i class="fas fa-calendar-alt"></i>
+        Bookings ({{ bookings.length }})
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'reviews'"
+        (click)="activeTab = 'reviews'"
+      >
+        <i class="fas fa-star"></i>
+        Reviews ({{ reviews.length }})
+      </button>
+    </div>
+
+    <!-- Bookings Tab -->
+    <div *ngIf="activeTab === 'bookings'" class="tab-content">
+      <div *ngIf="bookings.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-calendar-times"></i>
+        </div>
+        <h3>No Bookings Found</h3>
+        <p>You don't have any bookings for your vehicles yet.</p>
+      </div>
+
+      <div *ngIf="bookings.length > 0" class="bookings-grid">
+        <div *ngFor="let booking of bookings" class="booking-card">
+          <div class="booking-header">
+            <div class="vehicle-info">
+              <img 
+                [src]="booking.vehicle.mainImageUrl || 'assets/images/default-car.jpg'" 
+                [alt]="booking.vehicle.make + ' ' + booking.vehicle.model"
+                class="vehicle-image"
+                (error)="onImageError($event)"
+              >
+              <div class="vehicle-details">
+                <h3>{{ booking.vehicle.make }} {{ booking.vehicle.model }}</h3>
+                <p class="vehicle-year">{{ booking.vehicle.year }}</p>
+              </div>
+            </div>
+            <div class="status-badge" [class]="getStatusClass(booking.status)">
+              {{ getStatusText(booking.status) }}
+            </div>
+          </div>
+
+          <div class="booking-details">
+            <div class="detail-group">
+              <div class="detail-label">Customer</div>
+              <div class="detail-value">{{ booking.user.name }}</div>
+            </div>
+            <div class="detail-group">
+              <div class="detail-label">Rental Period</div>
+              <div class="detail-value">{{ getFormattedDate(booking.startDate) }} - {{ getFormattedDate(booking.endDate) }}</div>
+            </div>
+            <div class="detail-group">
+              <div class="detail-label">Total Price</div>
+              <div class="detail-value price">KSH {{ booking.totalPrice | number:'1.0-0' }}</div>
+            </div>
+            <div class="detail-group" *ngIf="booking.pickupLocation">
+              <div class="detail-label">Pickup Location</div>
+              <div class="detail-value">{{ booking.pickupLocation }}</div>
+            </div>
+            <div class="detail-group" *ngIf="booking.returnLocation">
+              <div class="detail-label">Return Location</div>
+              <div class="detail-value">{{ booking.returnLocation }}</div>
+            </div>
+            <div class="detail-group" *ngIf="booking.notes">
+              <div class="detail-label">Notes</div>
+              <div class="detail-value">{{ booking.notes }}</div>
+            </div>
+          </div>
+
+          <div class="booking-actions">
+            <button 
+              *ngIf="booking.status === 'PENDING'"
+              class="btn btn-success"
+              (click)="approveBooking(booking.id)"
+              [disabled]="isProcessing"
+            >
+              <i class="fas fa-check"></i>
+              Approve
+            </button>
+            <button 
+              *ngIf="booking.status === 'PENDING'"
+              class="btn btn-danger"
+              (click)="declineBooking(booking.id)"
+              [disabled]="isProcessing"
+            >
+              <i class="fas fa-times"></i>
+              Decline
+            </button>
+            <button 
+              *ngIf="booking.status === 'CONFIRMED'"
+              class="btn btn-primary"
+              (click)="markAsActive(booking.id)"
+              [disabled]="isProcessing"
+            >
+              <i class="fas fa-play"></i>
+              Start Rental
+            </button>
+            <button 
+              *ngIf="booking.status === 'ACTIVE'"
+              class="btn btn-secondary"
+              (click)="markAsCompleted(booking.id)"
+              [disabled]="isProcessing"
+            >
+              <i class="fas fa-flag-checkered"></i>
+              Complete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Tab -->
+    <div *ngIf="activeTab === 'reviews'" class="tab-content">
+      <div *ngIf="reviews.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <h3>No Reviews Yet</h3>
+        <p>Your vehicles haven't received any reviews yet.</p>
+      </div>
+
+      <div *ngIf="reviews.length > 0" class="reviews-grid">
+        <div *ngFor="let review of reviews" class="review-card">
+          <div class="review-header">
+            <div class="vehicle-info">
+              <img 
+                [src]="review.booking.vehicle.mainImageUrl || 'assets/images/default-car.jpg'" 
+                [alt]="review.booking.vehicle.make + ' ' + review.booking.vehicle.model"
+                class="vehicle-image"
+                (error)="onImageError($event)"
+              >
+              <div class="vehicle-details">
+                <h3>{{ review.booking.vehicle.make }} {{ review.booking.vehicle.model }}</h3>
+                <p class="vehicle-year">{{ review.booking.vehicle.year }}</p>
+              </div>
+            </div>
+            <div class="rating-display">
+              <div class="stars">
+                <i 
+                  *ngFor="let star of [1,2,3,4,5]; let i = index" 
+                  class="fas fa-star"
+                  [class.filled]="i < review.rating"
+                ></i>
+              </div>
+              <span class="rating-text">{{ review.rating }}/5</span>
+            </div>
+          </div>
+
+          <div class="review-content" *ngIf="review.comment">
+            <p class="review-comment">{{ review.comment }}</p>
+          </div>
+
+          <div class="review-footer">
+            <div class="reviewer-info">
+              <span class="reviewer-name">{{ review.user.name }}</span>
+              <span class="review-date">{{ getFormattedDate(review.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

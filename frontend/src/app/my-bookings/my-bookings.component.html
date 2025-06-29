@@ -1,0 +1,185 @@
+<div class="my-bookings-container">
+  <div class="header">
+    <h1>My Bookings</h1>
+    <p>Manage your vehicle rentals and reviews</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading your bookings...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && bookings.length === 0" class="empty-state">
+    <div class="empty-icon">
+      <i class="fas fa-calendar-times"></i>
+    </div>
+    <h3>No Bookings Found</h3>
+    <p>You haven't made any bookings yet. Start by exploring our available vehicles.</p>
+    <button class="btn btn-primary" (click)="navigateToVehicles()">
+      <i class="fas fa-car"></i>
+      Browse Vehicles
+    </button>
+  </div>
+
+  <!-- Bookings Content -->
+  <div *ngIf="!isLoading && bookings.length > 0" class="content">
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'bookings'"
+        (click)="activeTab = 'bookings'"
+      >
+        <i class="fas fa-calendar-alt"></i>
+        Bookings ({{ bookings.length }})
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'reviews'"
+        (click)="activeTab = 'reviews'"
+      >
+        <i class="fas fa-star"></i>
+        Reviews ({{ getBookingsWithReviews().length }})
+      </button>
+    </div>
+
+    <!-- Bookings Tab -->
+    <div *ngIf="activeTab === 'bookings'" class="tab-content">
+      <div class="bookings-grid">
+        <div *ngFor="let booking of bookings" class="booking-card">
+          <div class="booking-header">
+            <div class="vehicle-info">
+              <img 
+                [src]="booking.vehicle.mainImageUrl || 'assets/images/default-car.jpg'" 
+                [alt]="booking.vehicle.make + ' ' + booking.vehicle.model"
+                class="vehicle-image"
+                (error)="onImageError($event)"
+              >
+              <div class="vehicle-details">
+                <h3>{{ booking.vehicle.make }} {{ booking.vehicle.model }}</h3>
+                <p class="vehicle-year">{{ booking.vehicle.year }}</p>
+              </div>
+            </div>
+            <div class="status-badge" [class]="getStatusClass(booking.status)">
+              {{ getStatusText(booking.status) }}
+            </div>
+          </div>
+
+          <div class="booking-details">
+            <div class="detail-row">
+              <span class="detail-label">Rental Period:</span>
+              <span class="detail-value">{{ getFormattedDate(booking.startDate) }} - {{ getFormattedDate(booking.endDate) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Total Price:</span>
+              <span class="detail-value price">{{ getFormattedPrice(booking.totalPrice) }}</span>
+            </div>
+            <div class="detail-row" *ngIf="booking.pickupLocation">
+              <span class="detail-label">Pickup:</span>
+              <span class="detail-value">{{ booking.pickupLocation }}</span>
+            </div>
+            <div class="detail-row" *ngIf="booking.returnLocation">
+              <span class="detail-label">Return:</span>
+              <span class="detail-value">{{ booking.returnLocation }}</span>
+            </div>
+          </div>
+
+          <div class="booking-actions">
+            <!-- Review Button for Completed Bookings -->
+            <button 
+              *ngIf="booking.status === 'COMPLETED' && !getUserReview(booking)"
+              class="btn btn-primary"
+              (click)="openReviewForm(booking)"
+            >
+              <i class="fas fa-star"></i>
+              Leave Review
+            </button>
+            
+            <!-- View Review Button for Completed Bookings with Reviews -->
+            <button 
+              *ngIf="booking.status === 'COMPLETED' && getUserReview(booking)"
+              class="btn btn-secondary"
+              (click)="viewReview(booking)"
+            >
+              <i class="fas fa-eye"></i>
+              View Review
+            </button>
+
+            <!-- Cancel Button for Pending/Confirmed Bookings -->
+            <button 
+              *ngIf="canCancelBooking(booking)"
+              class="btn btn-danger"
+              (click)="cancelBooking(booking.id)"
+            >
+              <i class="fas fa-times"></i>
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Tab -->
+    <div *ngIf="activeTab === 'reviews'" class="tab-content">
+      <div class="reviews-grid">
+        <div *ngFor="let booking of getBookingsWithReviews()" class="review-card">
+          <div class="review-header">
+            <div class="vehicle-info">
+              <img 
+                [src]="booking.vehicle.mainImageUrl || 'assets/images/default-car.jpg'" 
+                [alt]="booking.vehicle.make + ' ' + booking.vehicle.model"
+                class="vehicle-image"
+                (error)="onImageError($event)"
+              >
+              <div class="vehicle-details">
+                <h3>{{ booking.vehicle.make }} {{ booking.vehicle.model }}</h3>
+                <p class="vehicle-year">{{ booking.vehicle.year }}</p>
+              </div>
+            </div>
+            <div class="rating-display">
+              <div class="stars">
+                <i 
+                  *ngFor="let star of [1,2,3,4,5]; let i = index" 
+                  class="fas fa-star"
+                  [class.filled]="i < getUserReview(booking)!.rating"
+                ></i>
+              </div>
+              <span class="rating-text">{{ getUserReview(booking)!.rating }}/5</span>
+            </div>
+          </div>
+
+          <div class="review-content" *ngIf="getUserReview(booking)!.comment">
+            <p class="review-comment">{{ getUserReview(booking)!.comment }}</p>
+          </div>
+
+          <div class="review-footer">
+            <span class="review-date">{{ getFormattedDate(getUserReview(booking)!.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty Reviews State -->
+      <div *ngIf="getBookingsWithReviews().length === 0" class="empty-reviews">
+        <div class="empty-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <h3>No Reviews Yet</h3>
+        <p>Complete a rental to leave your first review!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Form Modal -->
+<div *ngIf="showReviewForm" class="modal-overlay" (click)="closeReviewForm()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <app-review-form
+      [bookingId]="selectedBooking?.id || ''"
+      [vehicleName]="(selectedBooking?.vehicle?.make || '') + ' ' + (selectedBooking?.vehicle?.model || '')"
+      (reviewSubmitted)="onReviewSubmitted()"
+      (reviewCancelled)="closeReviewForm()"
+    ></app-review-form>
+  </div>
+</div> 

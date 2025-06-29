@@ -54,6 +54,31 @@
             </div>
           </div>
         </div>
+
+        <!-- Image Upload Confirmation Section -->
+        <div *ngIf="selectedProfileImage" class="image-upload-section">
+          <div class="upload-preview">
+            <img [src]="profileImagePreview" alt="Preview" class="preview-image" />
+            <div class="upload-actions">
+              <button 
+                class="confirm-upload-btn"
+                (click)="uploadProfileImage()"
+                [disabled]="isUploadingImage"
+              >
+                <i class="fas fa-upload"></i>
+                {{ isUploadingImage ? 'Uploading...' : 'Upload Image' }}
+              </button>
+              <button 
+                class="cancel-upload-btn"
+                (click)="cancelImageUpload()"
+                [disabled]="isUploadingImage"
+              >
+                <i class="fas fa-times"></i>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Profile Form -->
@@ -94,6 +119,27 @@
                 type="tel" 
                 [(ngModel)]="profileData.phone" 
                 name="phone"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="licenseNumber">Driver's License Number</label>
+              <input 
+                id="licenseNumber" 
+                type="text" 
+                [(ngModel)]="profileData.licenseNumber" 
+                name="licenseNumber"
+                placeholder="Enter your license number"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="dateOfBirth">Date of Birth</label>
+              <input 
+                id="dateOfBirth" 
+                type="date" 
+                [(ngModel)]="profileData.dateOfBirth" 
+                name="dateOfBirth"
               />
             </div>
 
@@ -169,6 +215,14 @@
             <span class="detail-value">{{ currentUser.phone || 'Not provided' }}</span>
           </div>
           <div class="detail-row">
+            <span class="detail-label">Driver's License:</span>
+            <span class="detail-value">{{ currentUser.licenseNumber || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date of Birth:</span>
+            <span class="detail-value">{{ currentUser.dateOfBirth || 'Not provided' }}</span>
+          </div>
+          <div class="detail-row">
             <span class="detail-label">Address:</span>
             <span class="detail-value">{{ currentUser.address || 'Not provided' }}</span>
           </div>
@@ -188,6 +242,147 @@
             <span class="detail-label">Country:</span>
             <span class="detail-value">{{ currentUser.country || 'Not provided' }}</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Profile Completion Section -->
+      <div class="profile-completion-section" *ngIf="!isProfileComplete()">
+        <div class="completion-form-card">
+          <div class="completion-header">
+            <i class="fas fa-user-edit"></i>
+            <h5>Complete Your Profile</h5>
+          </div>
+          
+          <div class="completion-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" 
+                   [style.width.%]="profileCompletion">
+                <span class="progress-text">{{ profileCompletion }}% Complete</span>
+              </div>
+            </div>
+          </div>
+          
+          <p class="completion-message">Please complete the following information to book vehicles:</p>
+          
+          <form (ngSubmit)="updateProfile()" class="completion-form">
+            <div class="form-grid">
+              <div class="form-group" *ngIf="!currentUser?.phone">
+                <label for="completePhone">Phone Number *</label>
+                <input 
+                  id="completePhone" 
+                  type="tel" 
+                  [(ngModel)]="profileData.phone" 
+                  name="completePhone"
+                  placeholder="Enter your phone number"
+                  required
+                />
+              </div>
+
+              <div class="form-group" *ngIf="!currentUser?.licenseNumber">
+                <label for="completeLicense">Driver's License Number *</label>
+                <input 
+                  id="completeLicense" 
+                  type="text" 
+                  [(ngModel)]="profileData.licenseNumber" 
+                  name="completeLicense"
+                  placeholder="Enter your license number"
+                  required
+                />
+              </div>
+
+              <div class="form-group" *ngIf="!currentUser?.dateOfBirth">
+                <label for="completeDateOfBirth">Date of Birth *</label>
+                <input 
+                  id="completeDateOfBirth" 
+                  type="date" 
+                  [(ngModel)]="profileData.dateOfBirth" 
+                  name="completeDateOfBirth"
+                  required
+                />
+              </div>
+
+              <div class="form-group full-width" *ngIf="!currentUser?.address">
+                <label for="completeAddress">Address *</label>
+                <input 
+                  id="completeAddress" 
+                  type="text" 
+                  [(ngModel)]="profileData.address" 
+                  name="completeAddress"
+                  placeholder="Enter your full address"
+                  required
+                />
+              </div>
+
+              <div class="form-group" *ngIf="!currentUser?.city">
+                <label for="completeCity">City *</label>
+                <input 
+                  id="completeCity" 
+                  type="text" 
+                  [(ngModel)]="profileData.city" 
+                  name="completeCity"
+                  placeholder="Enter your city"
+                  required
+                />
+              </div>
+
+              <div class="form-group" *ngIf="!currentUser?.state">
+                <label for="completeState">State *</label>
+                <input 
+                  id="completeState" 
+                  type="text" 
+                  [(ngModel)]="profileData.state" 
+                  name="completeState"
+                  placeholder="Enter your state"
+                  required
+                />
+              </div>
+
+              <div class="form-group" *ngIf="!currentUser?.zipCode">
+                <label for="completeZipCode">ZIP Code *</label>
+                <input 
+                  id="completeZipCode" 
+                  type="text" 
+                  [(ngModel)]="profileData.zipCode" 
+                  name="completeZipCode"
+                  placeholder="Enter your ZIP code"
+                  required
+                />
+              </div>
+
+              <div class="form-group" *ngIf="!currentUser?.country">
+                <label for="completeCountry">Country *</label>
+                <input 
+                  id="completeCountry" 
+                  type="text" 
+                  [(ngModel)]="profileData.country" 
+                  name="completeCountry"
+                  placeholder="Enter your country"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="complete-profile-btn" [disabled]="isLoading">
+                <i class="fas fa-check"></i>
+                {{ isLoading ? 'Saving...' : 'Complete Profile' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Profile Complete Success Section -->
+      <div class="profile-complete-section" *ngIf="isProfileComplete()">
+        <div class="completion-success">
+          <div class="success-header">
+            <i class="fas fa-check-circle"></i>
+            <h5>Profile Complete!</h5>
+          </div>
+          <p class="success-message">Great! Your profile is complete and you're ready to book vehicles.</p>
+          <button class="success-btn" (click)="navigateToVehicles()">
+            <i class="fas fa-car"></i> Browse Vehicles
+          </button>
         </div>
       </div>
 

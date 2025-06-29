@@ -101,4 +101,26 @@ export class AdminService {
       headers: this.getAuthHeaders(),
     });
   }
+
+  getAllReviews(page: number = 1, limit: number = 10, minRating?: number, maxRating?: number): Observable<any> {
+    let url = `${this.baseUrl}/admin/reviews?page=${page}&limit=${limit}`;
+    if (minRating !== undefined) url += `&minRating=${minRating}`;
+    if (maxRating !== undefined) url += `&maxRating=${maxRating}`;
+    
+    return this.http.get(url, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  getReviewStats(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/admin/reviews/stats`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  deleteReview(reviewId: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/admin/reviews/${reviewId}`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
 } 

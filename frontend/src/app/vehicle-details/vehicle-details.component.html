@@ -8,7 +8,7 @@
       <span class="vehicle-type">{{ vehicle.vehicleType }}</span>
     </div>
     <div class="vehicle-price">
-      <span>${{ vehicle.pricePerDay }}</span><span class="period">/day</span>
+      <span>KSH {{ vehicle.pricePerDay }}</span><span class="period">/day</span>
     </div>
   </div>
   <div class="vehicle-min-content">
@@ -41,6 +41,29 @@
     </div>
   </div>
 </div>
+
+<!-- Reviews Section -->
+<div class="reviews-section" *ngIf="vehicleReviews && vehicleReviews.length > 0">
+  <h2 class="reviews-title">Customer Reviews</h2>
+  <div class="reviews-list">
+    <div *ngFor="let review of vehicleReviews" class="review-card">
+      <div class="review-header">
+        <div class="stars">
+          <i *ngFor="let star of [1,2,3,4,5]; let i = index" class="fas fa-star" [class.filled]="i < review.rating"></i>
+        </div>
+        <span class="review-rating">{{ review.rating }}/5</span>
+      </div>
+      <div class="review-content" *ngIf="review.comment">
+        <p class="review-comment">{{ review.comment }}</p>
+      </div>
+      <div class="review-footer">
+        <span class="review-author"><i class="fas fa-user"></i> {{ review.user.name || 'Anonymous' }}</span>
+        <span class="review-date"><i class="fas fa-calendar-alt"></i> {{ review.createdAt | date:'mediumDate' }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div *ngIf="isLoading" class="loading"><div class="spinner"></div>Loading vehicle details...</div>
 <div *ngIf="error && !isLoading" class="error">
   <h2>Error</h2>

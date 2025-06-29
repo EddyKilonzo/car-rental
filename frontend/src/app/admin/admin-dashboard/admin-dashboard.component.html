@@ -12,6 +12,10 @@
         <i class="fas fa-user-cog"></i>
         User Management
       </a>
+      <a routerLink="/admin/reviews" class="nav-link">
+        <i class="fas fa-star"></i>
+        Reviews Management
+      </a>
     </div>
 
     <!-- Loading State -->
@@ -68,7 +72,7 @@
       <div class="stat-card">
         <div class="stat-header">
           <h3 class="stat-title">Total Revenue</h3>
-          <i class="fas fa-dollar-sign stat-icon"></i>
+          <i class="fas fa-money-bill-wave stat-icon"></i>
         </div>
         <p class="stat-value stat-orange">{{ formatCurrency(stats.revenue.total) }}</p>
         <div class="stat-breakdown">
@@ -86,6 +90,7 @@
         <p class="stat-value stat-yellow">{{ stats.reviews.total }}</p>
         <div class="stat-breakdown">
           <span class="breakdown-item">Avg Rating: {{ formatRating(stats.reviews.averageRating) }}/5</span>
+          <a routerLink="/admin/reviews" class="breakdown-link">View All Reviews</a>
         </div>
       </div>
 
@@ -129,6 +134,31 @@
       </div>
       <div *ngIf="!stats" class="overview-text">
         No system data available.
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2 class="section-title">
+        <i class="fas fa-bolt"></i>
+        Quick Actions
+      </h2>
+      <div class="actions-grid">
+        <a routerLink="/admin/agent-requests" class="action-card">
+          <i class="fas fa-user-plus"></i>
+          <h3>Review Agent Requests</h3>
+          <p>Approve or reject agent applications</p>
+        </a>
+        <a routerLink="/admin/users" class="action-card">
+          <i class="fas fa-users-cog"></i>
+          <h3>Manage Users</h3>
+          <p>View and manage all user accounts</p>
+        </a>
+        <a routerLink="/admin/reviews" class="action-card">
+          <i class="fas fa-star"></i>
+          <h3>Monitor Reviews</h3>
+          <p>View and manage customer reviews</p>
+        </a>
       </div>
     </div>
   </div>

@@ -253,3 +253,163 @@ input[type="password"]::placeholder {
     padding: 1rem;
   }
 }
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 768px) {
+  .login-card {
+    border-radius: 16px;
+  }
+  
+  .login-form-section {
+    padding: 2rem 1.5rem;
+  }
+  
+  .login-title {
+    font-size: 1.8rem;
+  }
+  
+  .login-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  input[type="email"],
+  input[type="password"] {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  
+  .login-btn {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  
+  .login-options {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+  
+  .remember-me {
+    font-size: 0.9rem;
+  }
+  
+  .forgot-password {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form-section {
+    padding: 1.5rem 1rem;
+  }
+  
+  .login-title {
+    font-size: 1.6rem;
+  }
+  
+  .login-subtitle {
+    font-size: 0.85rem;
+  }
+  
+  form {
+    gap: 1rem;
+  }
+  
+  input[type="email"],
+  input[type="password"] {
+    padding: 0.9rem;
+    font-size: 0.95rem;
+  }
+  
+  .login-btn {
+    padding: 0.9rem;
+    font-size: 0.95rem;
+  }
+  
+  .login-options {
+    font-size: 0.85rem;
+  }
+  
+  .remember-me {
+    font-size: 0.85rem;
+  }
+  
+  .forgot-password {
+    font-size: 0.85rem;
+  }
+  
+  .login-footer {
+    font-size: 0.85rem;
+  }
+  
+  .error-message {
+    padding: 0.7rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .login-btn:hover {
+    transform: none;
+  }
+  
+  .login-btn:active {
+    transform: scale(0.98);
+  }
+  
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    box-shadow: 0 0 0 2px rgba(161, 19, 18, 0.2);
+  }
+}
+
+/* Landscape mobile improvements */
+@media (max-width: 768px) and (orientation: landscape) {
+  .login-page-bg {
+    margin-top: 40px;
+  }
+  
+  .login-card {
+    max-width: 90%;
+    min-height: auto;
+  }
+  
+  .login-form-section {
+    padding: 1.5rem;
+  }
+  
+  .login-title {
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .login-subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  form {
+    gap: 0.6rem;
+  }
+  
+  input[type="email"],
+  input[type="password"] {
+    padding: 0.8rem;
+  }
+  
+  .login-btn {
+    padding: 0.8rem;
+    margin-top: 0.3rem;
+  }
+  
+  .login-options {
+    flex-direction: row;
+    gap: 0;
+    margin-bottom: 0.1rem;
+  }
+  
+  .login-footer {
+    margin-top: 0.8rem;
+  }
+}

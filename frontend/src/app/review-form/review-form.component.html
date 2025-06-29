@@ -1,0 +1,56 @@
+<div class="review-form-container">
+  <div class="review-form-header">
+    <h3>Leave a Review</h3>
+    <p>Share your experience with this rental</p>
+  </div>
+
+  <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()" class="review-form">
+    <div class="rating-section">
+      <label class="rating-label">Rating</label>
+      <div class="star-rating">
+        <i 
+          *ngFor="let star of [1,2,3,4,5]; let i = index" 
+          class="fas fa-star star"
+          [class.filled]="i < reviewForm.get('rating')?.value"
+          [class.hover]="i < hoverRating"
+          (click)="setRating(star)"
+          (mouseenter)="hoverRating = star"
+          (mouseleave)="hoverRating = 0"
+        ></i>
+      </div>
+      <div class="rating-text" *ngIf="reviewForm.get('rating')?.value">
+        {{ getRatingText(reviewForm.get('rating')?.value) }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="comment">Comment (Optional)</label>
+      <textarea
+        id="comment"
+        formControlName="comment"
+        placeholder="Share your experience with this vehicle..."
+        rows="4"
+        class="form-control"
+      ></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+      >
+        Cancel
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary" 
+        [disabled]="reviewForm.invalid || isSubmitting"
+      >
+        <span *ngIf="isSubmitting">Submitting...</span>
+        <span *ngIf="!isSubmitting">Submit Review</span>
+      </button>
+    </div>
+  </form>
+</div> 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
@@ -24,6 +24,7 @@ export class NavbarComponent implements OnInit {
   userName = '';
   currentUser: User | null = null;
   currentRoute = '';
+  isMobileMenuOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -36,7 +37,18 @@ export class NavbarComponent implements OnInit {
     this.router.events.subscribe(() => {
       this.updateAuthStatus();
       this.currentRoute = this.router.url;
+      // Close mobile menu on route change
+      this.closeMobileMenu();
     });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    // Close mobile menu when clicking outside
+    const target = event.target as HTMLElement;
+    if (!target.closest('.navbar') && this.isMobileMenuOpen) {
+      this.closeMobileMenu();
+    }
   }
 
   updateAuthStatus() {
@@ -64,11 +76,21 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    console.log('Mobile menu toggled:', this.isMobileMenuOpen); // Debug log
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+  }
+
   logout() {
     this.authService.logout();
     this.toastService.showSuccess('You have been logged out successfully.');
     this.router.navigate(['/']);
     this.updateAuthStatus();
+    this.closeMobileMenu();
   }
 
   onProfileClick() {

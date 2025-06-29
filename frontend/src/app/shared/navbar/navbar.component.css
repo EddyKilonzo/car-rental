@@ -160,13 +160,182 @@
   height: 20px;
 }
 
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.mobile-menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-menu-toggle span {
+  width: 20px;
+  height: 2px;
+  background-color: #333;
+  margin: 2px 0;
+  transition: 0.3s;
+}
+
+.mobile-menu-toggle.active span:nth-child(1) {
+  transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-toggle.active span:nth-child(3) {
+  transform: rotate(45deg) translate(-5px, -6px);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(32px);
+  border-radius: 12px;
+  margin-top: 8px;
+  padding: 1rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 1001;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.mobile-menu.active {
+  display: block !important;
+}
+
+.mobile-menu .navbar-nav {
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  display: flex !important;
+}
+
+.mobile-menu .navbar-nav a {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  border-bottom: none;
+  font-weight: 500;
+  display: block;
+  text-decoration: none;
+  color: #333;
+}
+
+.mobile-menu .navbar-nav a:hover {
+  background-color: rgba(161, 19, 18, 0.1);
+}
+
+.mobile-menu .navbar-nav a.active,
+.mobile-menu .navbar-nav a.router-link-active {
+  background-color: rgba(161, 19, 18, 0.15);
+  color: #A11312;
+  border-bottom: none;
+}
+
+.mobile-menu .auth-section {
+  flex-direction: column;
+  gap: 8px;
+  margin: 1rem 0 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex !important;
+}
+
+.mobile-menu .login-btn,
+.mobile-menu .signup-btn {
+  width: 100%;
+  text-align: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: rgba(161, 19, 18, 0.1);
+  color: #A11312;
+  font-weight: 600;
+  display: block;
+  text-decoration: none;
+}
+
+.mobile-menu .login-btn:hover,
+.mobile-menu .signup-btn:hover {
+  background: rgba(161, 19, 18, 0.2);
+}
+
+.mobile-menu .user-menu {
+  flex-direction: column;
+  gap: 8px;
+  margin: 1rem 0 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex !important;
+}
+
+.mobile-menu .user-actions {
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  display: flex !important;
+}
+
+.mobile-menu .profile-link {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: rgba(161, 19, 18, 0.1);
+  color: #A11312;
+  font-weight: 500;
+  justify-content: center;
+  display: flex !important;
+  text-decoration: none;
+}
+
+.mobile-menu .profile-link:hover {
+  background: rgba(161, 19, 18, 0.2);
+}
+
+.mobile-menu .logout-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  font-weight: 500;
+  justify-content: center;
+  display: flex !important;
+}
+
+.mobile-menu .logout-btn:hover {
+  background: rgba(220, 53, 69, 0.2);
+}
+
 @media (max-width: 768px) {
-  .navbar-nav a span {
-    display: none;
+  .navbar {
+    width: 90%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    position: fixed;
+    top: 0.5rem;
   }
   
   .navbar-nav {
-    gap: 4px;
+    display: none !important;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex;
+    margin-left: auto;
   }
   
   .navbar-brand {
@@ -178,6 +347,59 @@
   }
   
   .auth-section {
-    margin-left: 8px;
+    display: none !important;
+  }
+  
+  .user-menu {
+    display: none !important;
+  }
+  
+  /* Ensure mobile menu is visible when active */
+  .mobile-menu.active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    width: 95%;
+    top: 0.3rem;
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .navbar-brand {
+    font-size: 0.9rem;
+  }
+  
+  .mobile-menu {
+    margin-top: 4px;
+    padding: 0.8rem;
+    max-height: 70vh;
+  }
+  
+  .mobile-menu .navbar-nav a {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .mobile-menu .login-btn,
+  .mobile-menu .signup-btn,
+  .mobile-menu .profile-link,
+  .mobile-menu .logout-btn {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Desktop - hide mobile menu */
+@media (min-width: 769px) {
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+  
+  .mobile-menu {
+    display: none !important;
   }
 } 

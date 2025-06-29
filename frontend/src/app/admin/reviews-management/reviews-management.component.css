@@ -1,0 +1,532 @@
+.reviews-management {
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 80px 20px 20px;
+}
+
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.dashboard-title i {
+  color: #A11312;
+  font-size: 1.5rem;
+}
+
+.dashboard-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Statistics Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #f1f3f4;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.stat-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.stat-icon {
+  font-size: 1.2rem;
+  color: #6b7280;
+  opacity: 0.8;
+}
+
+.stat-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0.25rem 0;
+  line-height: 1;
+}
+
+.stat-blue {
+  color: #2563eb;
+}
+
+.stat-green {
+  color: #16a34a;
+}
+
+.stat-yellow {
+  color: #ca8a04;
+}
+
+/* Filters Section */
+.filters-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f3f4;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-group label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.filter-group select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  background: white;
+  color: #374151;
+  transition: border-color 0.3s ease;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #A11312;
+  box-shadow: 0 0 0 3px rgba(161, 19, 18, 0.1);
+}
+
+.clear-filters-btn {
+  padding: 0.4rem 0.8rem;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #374151;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.2rem;
+}
+
+.clear-filters-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #A11312;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.75rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Reviews Container */
+.reviews-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f3f4;
+}
+
+.reviews-header {
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title i {
+  color: #A11312;
+  font-size: 1rem;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  color: #d1d5db;
+  margin-bottom: 0.75rem;
+}
+
+.empty-state h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.empty-state p {
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Reviews Grid */
+.reviews-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.review-card {
+  border: 1px solid #f1f3f4;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.review-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.vehicle-info {
+  flex: 1;
+}
+
+.vehicle-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.2rem 0;
+}
+
+.vehicle-license {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 500;
+}
+
+.rating-display {
+  text-align: right;
+}
+
+.stars {
+  margin-bottom: 0.2rem;
+}
+
+.star-rating {
+  font-size: 1rem;
+  color: #ca8a04;
+  letter-spacing: 1px;
+}
+
+.rating-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.review-content {
+  margin-bottom: 0.75rem;
+}
+
+.review-comment {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.reviewer-info {
+  flex: 1;
+}
+
+.reviewer-details {
+  margin-bottom: 0.4rem;
+}
+
+.reviewer-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  display: block;
+}
+
+.reviewer-email {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  color: #6b7280;
+  display: block;
+}
+
+.review-meta {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.review-date {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.review-id {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.review-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.delete-btn {
+  padding: 0.4rem;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background: #fecaca;
+  border-color: #f87171;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f3f4;
+}
+
+.page-btn {
+  padding: 0.6rem 0.8rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #374151;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+}
+
+.page-info {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .reviews-management {
+    padding: 70px 10px 15px;
+  }
+
+  .dashboard-container {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .dashboard-title {
+    font-size: 1.75rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .clear-filters-btn {
+    margin-top: 0.75rem;
+    justify-content: center;
+  }
+
+  .review-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .rating-display {
+    text-align: left;
+  }
+
+  .review-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .review-meta {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .reviews-management {
+    padding: 60px 5px 10px;
+  }
+
+  .dashboard-title {
+    font-size: 1.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+  }
+
+  .vehicle-title {
+    font-size: 0.9rem;
+  }
+
+  .review-card {
+    padding: 0.75rem;
+  }
+} 

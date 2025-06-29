@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
 import { VehicleService } from '../services/vehicle.service';
 import { AgentService } from '../services/agent.service';
+import { ToastService } from '../services/toast.service';
+import { filter, Subscription } from 'rxjs';
 
 interface Vehicle {
   id: string;
@@ -15,7 +17,7 @@ interface Vehicle {
   fuelType: string;
   seats: number;
   pricePerDay: number;
-  imageUrl?: string;
+  mainImageUrl?: string;
   isAvailable: boolean;
   agentId?: string;
   description?: string;
@@ -37,7 +39,7 @@ interface VehicleFilters {
   templateUrl: './vehicles.component.html',
   styleUrls: ['./vehicles.component.css']
 })
-export class VehiclesComponent implements OnInit {
+export class VehiclesComponent implements OnInit, OnDestroy {
   vehicles: Vehicle[] = [];
   filteredVehicles: Vehicle[] = [];
   myVehicles: Vehicle[] = [];
@@ -55,18 +57,26 @@ export class VehiclesComponent implements OnInit {
     maxPrice: null
   };
 
+  private subscription?: Subscription;
+
   constructor(
     private authService: AuthService,
     private vehicleService: VehicleService,
     private agentService: AgentService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
     this.checkUserRole();
     this.checkRoute();
     this.loadVehicles();
+    this.subscription = this.router.events.pipe(
+      filter((event: any) => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.loadVehicles();
+    });
   }
 
   checkUserRole() {
@@ -103,7 +113,7 @@ export class VehiclesComponent implements OnInit {
                 fuelType: vehicle.fuelType,
                 seats: vehicle.seats,
                 pricePerDay: vehicle.pricePerDay,
-                imageUrl: vehicle.mainImageUrl,
+                mainImageUrl: vehicle.mainImageUrl,
                 isAvailable: vehicle.status === 'AVAILABLE',
                 agentId: vehicle.userId,
                 description: vehicle.description,
@@ -142,7 +152,7 @@ export class VehiclesComponent implements OnInit {
             fuelType: vehicle.fuelType,
             seats: vehicle.seats,
             pricePerDay: vehicle.pricePerDay,
-            imageUrl: vehicle.mainImageUrl,
+            mainImageUrl: vehicle.mainImageUrl,
             isAvailable: vehicle.status === 'AVAILABLE',
             agentId: vehicle.userId,
             description: vehicle.description,
@@ -218,14 +228,14 @@ export class VehiclesComponent implements OnInit {
   }
 
   viewVehicleDetails(vehicleId: string) {
-    this.router.navigate(['/vehicle-details', vehicleId]);
+    this.router.navigate(['/vehicles', vehicleId]);
   }
 
   bookVehicle(vehicleId: string) {
     if (this.isAdmin) {
-      alert('Admins cannot book vehicles. Please use a customer account to make bookings.');
+      this.toastService.showError('Admins cannot book vehicles. Please use a customer account.');
     } else if (this.isAgent) {
-      alert('Agents cannot book vehicles. You can only post and manage vehicles.');
+      this.toastService.showError('Agents cannot book vehicles. You can only post and manage vehicles.');
     } else if (!this.currentUser) {
       this.router.navigate(['/login']);
     } else {
@@ -315,7 +325,32 @@ export class VehiclesComponent implements OnInit {
   }
 
   onBookNow(vehicle: Vehicle) {
+    if (!this.currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.isAdmin) {
+      this.toastService.showError('Admins cannot book vehicles. Please use a customer account.');
+      return;
+    }
+
+    if (this.isAgent) {
+      this.toastService.showError('Agents cannot book vehicles. You can only post and manage vehicles.');
+      return;
+    }
+
     // Navigate to vehicle details for booking
-    this.router.navigate(['/vehicles', vehicle.id]);
+    this.router.navigate(['/vehicle-details', vehicle.id]);
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  refreshVehicles() {
+    this.loadVehicles();
   }
 }

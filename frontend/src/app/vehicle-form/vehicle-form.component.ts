@@ -264,7 +264,7 @@ export class VehicleFormComponent implements OnInit {
       return false;
     }
 
-    // Validate numeric fields
+    // Check numeric fields
     const year = Number(this.vehicleForm.year);
     const mileage = Number(this.vehicleForm.mileage);
     const seats = Number(this.vehicleForm.seats);
@@ -296,7 +296,7 @@ export class VehicleFormComponent implements OnInit {
       return false;
     }
 
-    // Validate optional price fields
+    // Check optional price fields
     if (this.vehicleForm.pricePerWeek !== undefined && this.vehicleForm.pricePerWeek !== null) {
       const pricePerWeek = Number(this.vehicleForm.pricePerWeek);
       if (isNaN(pricePerWeek) || pricePerWeek <= 0) {

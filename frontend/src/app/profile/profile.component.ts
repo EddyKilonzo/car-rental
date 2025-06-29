@@ -30,13 +30,15 @@ interface User {
 }
 
 interface ProfileUpdateData {
-  name?: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  country?: string;
+  name?: string | null;
+  phone?: string | null;
+  licenseNumber?: string | null;
+  dateOfBirth?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zipCode?: string | null;
+  country?: string | null;
 }
 
 @Component({
@@ -65,6 +67,8 @@ export class ProfileComponent implements OnInit {
   profileData: ProfileUpdateData = {
     name: '',
     phone: '',
+    licenseNumber: '',
+    dateOfBirth: '',
     address: '',
     city: '',
     state: '',
@@ -72,17 +76,33 @@ export class ProfileComponent implements OnInit {
     country: ''
   };
 
+  profileCompletion: number = 0;
+  missingFields: string[] = [];
+
+  // Add missing properties
+  isUpdating = false;
+  isCompleting = false;
+  showCompleteProfileForm = false;
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
     private uploadService: UploadService,
     private toastService: ToastService,
     private agentService: AgentService,
-    private router: Router
+    public router: Router
   ) {}
 
   ngOnInit() {
+    this.currentUser = this.authService.getCurrentUser();
+    
+    if (!this.currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.loadUserProfile();
+    this.calculateProfileCompletion();
   }
 
   loadUserProfile() {
@@ -112,9 +132,24 @@ export class ProfileComponent implements OnInit {
 
   populateProfileData() {
     if (this.currentUser) {
+      // Format dateOfBirth for HTML date input (YYYY-MM-DD)
+      let formattedDateOfBirth = '';
+      if (this.currentUser.dateOfBirth) {
+        try {
+          const date = new Date(this.currentUser.dateOfBirth);
+          if (!isNaN(date.getTime())) {
+            formattedDateOfBirth = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+          }
+        } catch (error) {
+          console.warn('Error formatting dateOfBirth:', error);
+        }
+      }
+
       this.profileData = {
         name: this.currentUser.name || '',
         phone: this.currentUser.phone || '',
+        licenseNumber: this.currentUser.licenseNumber || '',
+        dateOfBirth: formattedDateOfBirth,
         address: this.currentUser.address || '',
         city: this.currentUser.city || '',
         state: this.currentUser.state || '',
@@ -135,41 +170,70 @@ export class ProfileComponent implements OnInit {
   }
 
   updateProfile() {
-    if (!this.currentUser) return;
-
-    // Validate required fields
-    if (!this.profileData.name || this.profileData.name.trim() === '') {
-      this.toastService.showError('Full name is required. Please enter your name.');
+    if (!this.currentUser) {
+      this.toastService.showError('User not found.');
       return;
     }
 
-    this.isLoading = true;
+    // Check required fields
+    if (!this.profileData.name || !this.profileData.name.trim()) {
+      this.toastService.showError('Name is required.');
+      return;
+    }
 
-    this.userService.updateProfile(this.profileData).subscribe({
+    // Check date format if provided
+    if (this.profileData.dateOfBirth && this.profileData.dateOfBirth.trim()) {
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(this.profileData.dateOfBirth)) {
+        this.toastService.showError('Date of birth must be in YYYY-MM-DD format.');
+        return;
+      }
+
+      // Check that it's a valid date
+      const date = new Date(this.profileData.dateOfBirth);
+      if (isNaN(date.getTime())) {
+        this.toastService.showError('Please enter a valid date of birth.');
+        return;
+      }
+    }
+
+    this.isUpdating = true;
+
+    const updateData = {
+      name: this.profileData.name.trim(),
+      phone: this.profileData.phone?.trim() || null,
+      licenseNumber: this.profileData.licenseNumber?.trim() || null,
+      dateOfBirth: this.profileData.dateOfBirth?.trim() || null,
+      address: this.profileData.address?.trim() || null,
+      city: this.profileData.city?.trim() || null,
+      state: this.profileData.state?.trim() || null,
+      zipCode: this.profileData.zipCode?.trim() || null,
+      country: this.profileData.country?.trim() || null,
+    };
+
+    this.userService.updateProfile(updateData).subscribe({
       next: (response) => {
-        this.isLoading = false;
+        this.isUpdating = false;
         if (response.success) {
           this.currentUser = response.data;
+          this.toastService.showSuccess('Profile updated successfully!');
           this.isEditing = false;
-          this.toastService.showSuccess('Profile updated successfully! Your information has been saved.');
+          this.calculateProfileCompletion();
+        } else {
+          this.toastService.showError('Failed to update profile. Please try again.');
         }
       },
       error: (error) => {
-        this.isLoading = false;
-        if (error.status === 400) {
-          this.toastService.showError('Invalid data provided. Please check your information and try again.');
-        } else if (error.status === 401) {
-          this.toastService.showError('Session expired. Please log in again to update your profile.');
-        } else if (error.status === 403) {
-          this.toastService.showError('You do not have permission to update this profile.');
-        } else if (error.status === 404) {
-          this.toastService.showError('Profile not found. Please contact support.');
-        } else {
-          this.toastService.showError('Failed to update profile. Please check your connection and try again.');
-        }
+        this.isUpdating = false;
         console.error('Profile update error:', error);
+        this.toastService.showError('Failed to update profile. Please try again.');
       }
     });
+  }
+
+  completeProfile() {
+    // Profile completion is handled through the regular updateProfile method
+    this.toastService.showInfo('Please use the edit profile form to complete your profile information.');
   }
 
   deactivateAccount() {
@@ -178,7 +242,7 @@ export class ProfileComponent implements OnInit {
     }
 
     this.isLoading = true;
-    this.userService.updateProfileById(this.currentUser.id, { isActive: false }).subscribe({
+    this.userService.deactivateProfile().subscribe({
       next: (response) => {
         this.isLoading = false;
         if (response.success) {
@@ -203,7 +267,7 @@ export class ProfileComponent implements OnInit {
     }
 
     this.isLoading = true;
-    this.userService.deleteUser(this.currentUser.id).subscribe({
+    this.userService.deleteProfilePermanently().subscribe({
       next: (response) => {
         this.isLoading = false;
         if (response.success) {
@@ -291,13 +355,13 @@ export class ProfileComponent implements OnInit {
   onProfileImageSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Validate file type
+      // Check file type
       if (!file.type.startsWith('image/')) {
         this.toastService.showError('Please select a valid image file.');
         return;
       }
 
-      // Validate file size (max 5MB)
+      // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         this.toastService.showError('Image size must be less than 5MB.');
         return;
@@ -328,25 +392,40 @@ export class ProfileComponent implements OnInit {
       const uploadResult = await this.uploadService.uploadProfilePhoto(this.selectedProfileImage).toPromise();
       console.log('Profile image upload result:', uploadResult);
       
-      // Update the user's profile image URL in the backend
-      if (this.currentUser) {
-        const imageUrl = uploadResult.uploadResult?.secure_url || uploadResult.secure_url;
-        
-        // Update the user's profile with the new image URL
-        this.userService.updateProfile({ profileImageUrl: imageUrl }).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.currentUser = response.data;
-              this.toastService.showSuccess('Profile image uploaded successfully!');
-              this.selectedProfileImage = null;
-              this.profileImagePreview = null;
+      // The backend endpoint already updates the user profile with the image URL
+      // We just need to update the local user data
+      if (uploadResult && uploadResult.user) {
+        console.log('Updating user with response data:', uploadResult.user);
+        this.currentUser = uploadResult.user;
+        this.toastService.showSuccess('Profile image uploaded successfully!');
+        this.selectedProfileImage = null;
+        this.profileImagePreview = null;
+      } else if (uploadResult && uploadResult.uploadResult && uploadResult.uploadResult.secure_url) {
+        // Fallback: manually update profile if the response doesn't include user data
+        console.log('Using fallback method with image URL:', uploadResult.uploadResult.secure_url);
+        const imageUrl = uploadResult.uploadResult.secure_url;
+        if (this.currentUser) {
+          this.userService.updateProfile({ profileImageUrl: imageUrl }).subscribe({
+            next: (response) => {
+              if (response.success) {
+                this.currentUser = response.data;
+                this.toastService.showSuccess('Profile image uploaded successfully!');
+                this.selectedProfileImage = null;
+                this.profileImagePreview = null;
+              } else {
+                console.error('Profile update response not successful:', response);
+                this.toastService.showError('Image uploaded but failed to update profile. Please try again.');
+              }
+            },
+            error: (error) => {
+              console.error('Failed to update profile with image URL:', error);
+              this.toastService.showError('Image uploaded but failed to update profile. Please try again.');
             }
-          },
-          error: (error) => {
-            console.error('Failed to update profile with image URL:', error);
-            this.toastService.showError('Image uploaded but failed to update profile. Please try again.');
-          }
-        });
+          });
+        }
+      } else {
+        console.error('Unexpected upload result structure:', uploadResult);
+        this.toastService.showError('Image uploaded but response format is unexpected. Please try again.');
       }
       
     } catch (error) {
@@ -360,5 +439,58 @@ export class ProfileComponent implements OnInit {
   cancelImageUpload() {
     this.selectedProfileImage = null;
     this.profileImagePreview = null;
+  }
+
+  calculateProfileCompletion() {
+    if (!this.currentUser) return;
+
+    const requiredFields = [
+      { name: 'Name', value: this.currentUser.name },
+      { name: 'Phone', value: this.currentUser.phone },
+      { name: 'Address', value: this.currentUser.address },
+      { name: 'City', value: this.currentUser.city },
+      { name: 'State', value: this.currentUser.state },
+      { name: 'Zip Code', value: this.currentUser.zipCode },
+      { name: 'Country', value: this.currentUser.country }
+    ];
+
+    const completedFields = requiredFields.filter(field => field.value && field.value.trim() !== '');
+    this.profileCompletion = Math.round((completedFields.length / requiredFields.length) * 100);
+    
+    this.missingFields = requiredFields
+      .filter(field => !field.value || field.value.trim() === '')
+      .map(field => field.name);
+  }
+
+  isProfileComplete(): boolean {
+    if (!this.currentUser) return false;
+    
+    // Check if required profile fields are filled (same as booking components)
+    const requiredFields = [
+      this.currentUser.name,
+      this.currentUser.phone,
+      this.currentUser.address,
+      this.currentUser.city,
+      this.currentUser.state,
+      this.currentUser.zipCode,
+      this.currentUser.country
+    ];
+    
+    return requiredFields.every(field => field && field.trim() !== '');
+  }
+
+  scrollToProfileForm() {
+    const profileFormCard = document.querySelector('.profile-form-card');
+    if (profileFormCard) {
+      profileFormCard.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  navigateToMyBookings() {
+    this.router.navigate(['/my-bookings']);
+  }
+
+  navigateToVehicles() {
+    this.router.navigate(['/vehicles']);
   }
 }

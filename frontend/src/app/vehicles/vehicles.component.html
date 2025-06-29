@@ -1,8 +1,18 @@
 <div class="vehicles-page">
   <div class="vehicles-container">
     <div class="header" *ngIf="!isAgent || isMyVehiclesRoute">
-      <h1>{{ getPageTitle() }}</h1>
-      <p>{{ getPageSubtitle() }}</p>
+      <div class="header-content">
+        <div class="header-text">
+          <h1>{{ getPageTitle() }}</h1>
+          <p>{{ getPageSubtitle() }}</p>
+        </div>
+        <div class="header-actions">
+          <button class="refresh-btn" (click)="refreshVehicles()" [disabled]="isLoading">
+            <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+            Refresh
+          </button>
+        </div>
+      </div>
       
       <!-- Add Vehicle Button for Agents - only on My Vehicles page -->
       <div *ngIf="isAgent && isMyVehiclesRoute" class="add-vehicle-section">
@@ -100,13 +110,13 @@
         <p>Showing {{ filteredVehicles.length }} of {{ vehicles.length }} vehicles</p>
       </div>
       <div class="vehicles-grid">
-        <div class="vehicle-card" *ngFor="let vehicle of filteredVehicles" [style.background-image]="'url(' + vehicle.imageUrl + ')'">
+        <div class="vehicle-card" *ngFor="let vehicle of filteredVehicles" [style.background-image]="'url(' + vehicle.mainImageUrl + ')'">
           <div class="vehicle-badge top">Top Vehicle</div>
           <div class="vehicle-overlay minimal">
             <div class="vehicle-info minimal">
               <h3>{{ vehicle.make }} {{ vehicle.model }}</h3>
               <div class="vehicle-ministats">
-                <span class="vehicle-price"><i class="fas fa-dollar-sign"></i> {{ vehicle.pricePerDay }}/day</span>
+                <span class="vehicle-price"><i class="fas fa-money-bill-wave"></i> KSH {{ vehicle.pricePerDay }}/day</span>
               </div>
               <div class="vehicle-btn-group">
                 <button class="vehicle-btn minimal" (click)="viewVehicleDetails(vehicle.id)">View</button>
