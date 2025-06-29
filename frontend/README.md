@@ -1,59 +1,140 @@
-# Frontend
+# Car Rental Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.4.
+Angular frontend for the Car Rental application with responsive design and user-friendly interface.
 
-## Development server
+## 🏗️ Tech Stack
 
-To start a local development server, run:
+- **Framework**: Angular 17 with TypeScript
+- **Styling**: CSS with responsive design
+- **State Management**: Angular services and RxJS
+- **Routing**: Angular Router with guards
+- **HTTP Client**: Angular HttpClient with interceptors
 
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js (v18+)
+- Angular CLI
+
+### Setup
 ```bash
-ng serve
+npm install
+
+# Start development server
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 📋 Environment Configuration
 
-## Code scaffolding
+Update `src/environments/environment.ts`:
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000'
+};
+```
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🔧 Code Generation
 
+### Generate Components
 ```bash
+# Generate a new component
 ng generate component component-name
+
+# Generate component with routing
+ng generate component component-name --routing
+
+# Generate component in specific folder
+ng generate component folder/component-name
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Generate Services
+```bash
+# Generate a new service
+ng generate service service-name
+
+# Generate service in specific folder
+ng generate service folder/service-name
+```
+
+### Generate Guards
+```bash
+# Generate a new guard
+ng generate guard guard-name
+```
+
+### Generate Pipes
+```bash
+# Generate a new pipe
+ng generate pipe pipe-name
+```
+
+### Generate Directives
+```bash
+# Generate a new directive
+ng generate directive directive-name
+```
+
+## 📱 Key Features
+
+### Customer Features
+- User registration and login
+- Vehicle browsing and search
+- Booking system with date selection
+- Profile management
+- Booking history
+- Reviews and ratings
+
+### Agent Features
+- Agent application
+- Vehicle management dashboard
+- Booking management
+- Image upload for vehicles
+
+### Admin Features
+- User management
+- Agent application review
+- Vehicle oversight
+- Review moderation
+
+## 🔐 Authentication
+
+- JWT token-based authentication
+- Role-based access control
+- Route guards for protected pages
+- Automatic token refresh
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Responsive grid layouts
+- Touch-friendly interfaces
+- Optimized for all screen sizes
+
+## 🧪 Testing
 
 ```bash
-ng generate --help
+npm run test
+npm run test:watch
 ```
 
-## Building
-
-To build the project run:
+## 🚀 Production Build
 
 ```bash
-ng build
+npm run build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## 📱 App Access
 
-## Running unit tests
+- Development: `http://localhost:4200`
+- Production: Configure in environment files
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 🎨 UI Components
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Responsive navbar with mobile menu
+- Toast notifications
+- Modal dialogs
+- Form validation
+- Image upload components
+- Booking calendar
+- Review system
