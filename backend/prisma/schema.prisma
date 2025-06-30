@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,6 +5,153 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String             @id @default(uuid())
+  email              String             @unique
+  password           String
+  name               String
+  phone              String?
+  role               UserRole           @default(CUSTOMER)
+  isActive           Boolean            @default(true)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  licenseNumber      String?
+  dateOfBirth        String?
+  address            String?
+  city               String?
+  state              String?
+  zipCode            String?
+  country            String?
+  isVerified         Boolean            @default(false)
+  licenseDocumentUrl String?
+  profileImageUrl    String?
+  resetCode          String?
+  resetCodeExpiry    DateTime?
+  agentApplications  AgentApplication[]
+  bookings           Booking[]
+  reviews            Review[]
+  vehicles           Vehicle[]          @relation("UserVehicles")
+
+  @@map("users")
+}
+
+model AgentApplication {
+  id         String    @id @default(uuid())
+  userId     String
+  status     String    @default("PENDING")
+  reason     String?
+  appliedAt  DateTime  @default(now())
+  reviewedAt DateTime?
+  reviewedBy String?
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@map("agent_applications")
+}
+
+model Vehicle {
+  id              String           @id @default(uuid())
+  make            String
+  model           String
+  year            Int
+  licensePlate    String           @unique
+  vin             String           @unique
+  mileage         Int
+  fuelType        FuelType
+  transmission    TransmissionType
+  vehicleType     VehicleType
+  seats           Int
+  doors           Int
+  color           String
+  description     String?
+  features        String[]
+  pricePerDay     Float
+  pricePerWeek    Float?
+  pricePerMonth   Float?
+  status          VehicleStatus    @default(AVAILABLE)
+  isActive        Boolean          @default(true)
+  lastMaintenance DateTime?
+  nextMaintenance DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  userId          String
+  documentUrls    String[]
+  exteriorImages  String[]
+  galleryImages   String[]
+  interiorImages  String[]
+  mainImageUrl    String?
+  bookings        Booking[]
+  maintenance     Maintenance[]
+  user            User             @relation("UserVehicles", fields: [userId], references: [id])
+
+  @@map("vehicles")
+}
+
+model Booking {
+  id             String        @id @default(uuid())
+  startDate      DateTime
+  endDate        DateTime
+  pickupLocation String?
+  returnLocation String?
+  totalPrice     Float
+  status         BookingStatus @default(PENDING)
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  userId         String
+  vehicleId      String
+  user           User          @relation(fields: [userId], references: [id])
+  vehicle        Vehicle       @relation(fields: [vehicleId], references: [id])
+  payments       Payment[]
+  reviews        Review[]
+
+  @@map("bookings")
+}
+
+model Payment {
+  id            String    @id @default(uuid())
+  amount        Float
+  paymentMethod String
+  transactionId String?   @unique
+  status        String    @default("pending")
+  paidAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  bookingId     String
+  booking       Booking   @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("reviews")
+}
+
+model Maintenance {
+  id          String    @id @default(uuid())
+  type        String
+  description String
+  cost        Float
+  date        DateTime
+  nextDueDate DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  vehicleId   String
+  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id])
+
+  @@map("maintenance")
 }
 
 enum UserRole {
@@ -57,173 +198,3 @@ enum VehicleType {
   TRUCK
   LUXURY
 }
-
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  phone     String?
-  role      UserRole @default(CUSTOMER)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Password reset fields
-  resetCode        String?
-  resetCodeExpiry  DateTime?
-
-  // Customer specific fields
-  licenseNumber String?
-  dateOfBirth   String?
-  address       String?
-  city          String?
-  state         String?
-  zipCode       String?
-  country       String?
-  isVerified    Boolean  @default(false)
-
-  // Profile images (Cloudinary URLs)
-  profileImageUrl String?
-  licenseDocumentUrl String?
-
-  // Relations
-  bookings      Booking[]
-  reviews       Review[]
-  vehicles      Vehicle[] @relation("UserVehicles")
-  agentApplications AgentApplication[]
-
-  @@map("users")
-}
-
-model AgentApplication {
-  id          String   @id @default(uuid())
-  userId      String
-  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
-  reason      String?  // Optional reason for rejection
-  appliedAt   DateTime @default(now())
-  reviewedAt  DateTime?
-  reviewedBy  String?  // Admin who reviewed the application
-  
-  // Relations
-  user        User     @relation(fields: [userId], references: [id])
-
-  @@map("agent_applications")
-}
-
-model Vehicle {
-  id              String         @id @default(uuid())
-  make            String
-  model           String
-  year            Int
-  licensePlate    String         @unique
-  vin             String         @unique
-  mileage         Int
-  fuelType        FuelType
-  transmission    TransmissionType
-  vehicleType     VehicleType
-  seats           Int
-  doors           Int
-  color           String
-  description     String?
-  features        String[]
-  pricePerDay     Float
-  pricePerWeek    Float?
-  pricePerMonth   Float?
-  status          VehicleStatus  @default(AVAILABLE)
-  isActive        Boolean        @default(true)
-  lastMaintenance DateTime?
-  nextMaintenance DateTime?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
-  // Vehicle images (Cloudinary URLs)
-  mainImageUrl    String?
-  galleryImages   String[]       // Array of Cloudinary URLs
-  interiorImages  String[]       // Array of Cloudinary URLs
-  exteriorImages  String[]       // Array of Cloudinary URLs
-  documentUrls    String[]       // Array of Cloudinary URLs (registration, insurance, etc.)
-
-  // Relations
-  user            User           @relation("UserVehicles", fields: [userId], references: [id])
-  userId          String
-  bookings        Booking[]
-  maintenance     Maintenance[]
-
-  @@map("vehicles")
-}
-
-model Booking {
-  id             String        @id @default(uuid())
-  startDate      DateTime
-  endDate        DateTime
-  pickupLocation String?
-  returnLocation String?
-  totalPrice     Float
-  status         BookingStatus @default(PENDING)
-  notes          String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-
-  // Relations
-  user           User          @relation(fields: [userId], references: [id])
-  userId         String
-  vehicle        Vehicle       @relation(fields: [vehicleId], references: [id])
-  vehicleId      String
-  payments       Payment[]
-  reviews        Review[]
-
-  @@map("bookings")
-}
-
-model Payment {
-  id            String   @id @default(uuid())
-  amount        Float
-  paymentMethod String
-  transactionId String?  @unique
-  status        String   @default("pending")
-  paidAt        DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Relations
-  booking   Booking  @relation(fields: [bookingId], references: [id])
-  bookingId String
-
-  @@map("payments")
-}
-
-model Review {
-  id        String   @id @default(uuid())
-  rating    Int
-  comment   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  booking   Booking  @relation(fields: [bookingId], references: [id])
-  bookingId String
-
-  @@map("reviews")
-}
-
-model Maintenance {
-  id          String   @id @default(uuid())
-  type        String
-  description String
-  cost        Float
-  date        DateTime
-  nextDueDate DateTime?
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
-  vehicleId   String
-
-  @@map("maintenance")
-}
-

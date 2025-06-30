@@ -246,9 +246,21 @@ export class AgentService {
    * Get all pending agent applications
    * @returns List of users who applied to be agents
    */
-  async getPendingAgentApplications(): Promise<
-    Pick<User, 'id' | 'name' | 'email' | 'phone' | 'createdAt'>[]
-  > {
+  async getPendingAgentApplications(): Promise<{
+    applications: Array<{
+      id: string;
+      userId: string;
+      status: string;
+      createdAt: string;
+      user: {
+        id: string;
+        name: string;
+        email: string;
+        phone: string | null;
+        createdAt: string;
+      };
+    }>;
+  }> {
     try {
       // Get all users with pending applications
       const applications = await this.prisma.agentApplication.findMany({
@@ -268,7 +280,21 @@ export class AgentService {
         },
       });
 
-      return applications.map((app) => app.user);
+      return {
+        applications: applications.map((app) => ({
+          id: app.id,
+          userId: app.userId,
+          status: app.status,
+          createdAt: app.appliedAt.toISOString(),
+          user: {
+            id: app.user.id,
+            name: app.user.name,
+            email: app.user.email,
+            phone: app.user.phone,
+            createdAt: app.user.createdAt.toISOString(),
+          },
+        })),
+      };
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(

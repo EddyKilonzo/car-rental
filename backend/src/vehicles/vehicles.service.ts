@@ -45,23 +45,10 @@ export class VehiclesService {
 
   async getAllVehicles(): Promise<Vehicle[]> {
     try {
-      // First, let's see ALL vehicles in the database to debug
+      // Get all vehicles to show them in the listing (including booked ones)
       const allVehicles = await this.prisma.vehicle.findMany({
-        orderBy: { createdAt: 'desc' },
-      });
-
-      console.log('=== ALL VEHICLES IN DATABASE ===');
-      allVehicles.forEach((vehicle) => {
-        console.log(
-          `Vehicle ${vehicle.id}: ${vehicle.make} ${vehicle.model} - Status: ${vehicle.status}, isActive: ${vehicle.isActive}, userId: ${vehicle.userId}`,
-        );
-      });
-      console.log('=== END ALL VEHICLES ===');
-
-      const vehicles = await this.prisma.vehicle.findMany({
         where: {
-          status: 'AVAILABLE',
-          isActive: true,
+          isActive: true, // Only show active vehicles, but include all statuses
         },
         orderBy: { createdAt: 'desc' },
         include: {
@@ -75,14 +62,14 @@ export class VehiclesService {
         },
       });
 
-      console.log('getAllVehicles - Found vehicles:', vehicles.length);
-      vehicles.forEach((vehicle) => {
+      console.log('getAllVehicles - Found vehicles:', allVehicles.length);
+      allVehicles.forEach((vehicle) => {
         console.log(
           `Vehicle ${vehicle.id}: ${vehicle.make} ${vehicle.model} - Status: ${vehicle.status}, isActive: ${vehicle.isActive}`,
         );
       });
 
-      return vehicles;
+      return allVehicles;
     } catch (error) {
       throw new Error(
         `Failed to get vehicles: ${error instanceof Error ? error.message : 'Unknown error'}`,

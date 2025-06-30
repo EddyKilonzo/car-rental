@@ -22,6 +22,7 @@ interface Review {
       model: string;
       year: number;
       licensePlate: string;
+      mainImageUrl?: string;
     };
   };
 }
@@ -158,6 +159,12 @@ export class ReviewsManagementComponent implements OnInit {
   formatRating(rating: number): string {
     return rating.toFixed(1);
   }
+
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    target.src = 'assets/hero.png';
+  }
+
   /**
    * 
    * @param reviewId ID of the review to be deleted

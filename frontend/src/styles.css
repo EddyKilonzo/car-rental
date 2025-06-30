@@ -167,3 +167,66 @@ textarea:focus:not(:focus-visible) {
     display: none !important;
   }
 }
+
+/* Vehicle Badge Styles - Global Override */
+.vehicle-badge {
+  position: absolute !important;
+  top: 12px !important;
+  left: 12px !important;
+  background: rgba(161, 19, 18, 0.8) !important;
+  background-color: rgba(161, 19, 18, 0.8) !important;
+  color: white !important;
+  padding: 0.4rem 0.8rem !important;
+  border-radius: 20px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  z-index: 2 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.vehicle-badge.available {
+  background: rgba(40, 167, 69, 0.8) !important;
+  background-color: rgba(40, 167, 69, 0.8) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
+}
+
+.vehicle-badge.badge-booked {
+  background: rgba(220, 38, 38, 0.8) !important;
+  background-color: rgba(220, 38, 38, 0.8) !important;
+  color: #ffffff !important;
+}
+
+.vehicle-badge.badge-top {
+  background: rgba(5, 150, 105, 0.8) !important;
+  background-color: rgba(5, 150, 105, 0.8) !important;
+  color: white !important;
+}
+
+.vehicle-badge.premium {
+  background: rgba(255, 215, 0, 0.8) !important;
+  background-color: rgba(255, 215, 0, 0.8) !important;
+  color: #1a1a1a !important;
+}
+
+.vehicle-badge.new {
+  background: rgba(16, 185, 129, 0.8) !important;
+  background-color: rgba(16, 185, 129, 0.8) !important;
+  color: white !important;
+}
+
+.vehicle-badge.budget {
+  background: rgba(59, 130, 246, 0.8) !important;
+  background-color: rgba(59, 130, 246, 0.8) !important;
+  color: white !important;
+}
+
+.vehicle-badge.popular {
+  background: rgba(139, 92, 246, 0.8) !important;
+  background-color: rgba(139, 92, 246, 0.8) !important;
+  color: white !important;
+}

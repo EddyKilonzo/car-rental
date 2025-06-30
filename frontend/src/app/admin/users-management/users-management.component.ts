@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { ToastService } from '../../services/toast.service';
@@ -21,7 +22,7 @@ interface User {
 @Component({
   selector: 'app-users-management',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './users-management.component.html',
   styleUrls: ['./users-management.component.css']
 })
@@ -31,8 +32,13 @@ export class UsersManagementComponent implements OnInit {
   private authService = inject(AuthService);
 
   users: User[] = [];
+  filteredUsers: User[] = [];
   isLoading = false;
   processingUserId: string | null = null;
+  
+  // Filter properties
+  nameFilter: string = '';
+  roleFilter: string = '';
 
   /** Inserted by Angular inject() migration for backwards compatibility */
   constructor(...args: unknown[]);
@@ -61,6 +67,7 @@ export class UsersManagementComponent implements OnInit {
         this.isLoading = false;
         console.log('Users API response:', response);
         this.users = response.users || [];
+        this.filteredUsers = [...this.users];
         console.log('Loaded users:', this.users);
       },
       error: (error) => {
@@ -71,6 +78,28 @@ export class UsersManagementComponent implements OnInit {
         this.toastService.showError('Failed to load users.');
       }
     });
+  }
+
+  applyFilters() {
+    this.filteredUsers = this.users.filter(user => {
+      const matchesName = !this.nameFilter || 
+        user.name.toLowerCase().includes(this.nameFilter.toLowerCase()) ||
+        user.email.toLowerCase().includes(this.nameFilter.toLowerCase());
+      
+      const matchesRole = !this.roleFilter || user.role === this.roleFilter;
+      
+      return matchesName && matchesRole;
+    });
+  }
+
+  clearFilters() {
+    this.nameFilter = '';
+    this.roleFilter = '';
+    this.filteredUsers = [...this.users];
+  }
+
+  hasActiveFilters(): boolean {
+    return this.nameFilter.trim() !== '' || this.roleFilter !== '';
   }
 
   toggleUserStatus(userId: string, currentStatus: boolean) {

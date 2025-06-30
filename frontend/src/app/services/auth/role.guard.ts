@@ -1,35 +1,34 @@
-import { Injectable, inject } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { AuthService } from './auth.service';
 
-function parseJwt(token: string): any {
-  try {
-    return JSON.parse(atob(token.split('.')[1]));
-  } catch (e) {
-    return null;
-  }
-}
-
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class RoleGuard implements CanActivate {
-  private router = inject(Router);
+  constructor(private authService: AuthService, private router: Router) {}
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {}
-
-  canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      return this.router.parseUrl('/login');
-    }
-    const payload = parseJwt(token);
-    const allowedRoles = route.data['roles'] as string[];
-    if (payload && allowedRoles && allowedRoles.includes(payload.role)) {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    const requiredRoles = route.data['roles'] as Array<string>;
+    
+    if (!requiredRoles || requiredRoles.length === 0) {
       return true;
-    } else {
-      return this.router.parseUrl('/unauthorized');
     }
+
+    const userRole = this.authService.getUserRole();
+    
+    if (!userRole) {
+      this.router.navigate(['/unauthorized']);
+      return false;
+    }
+
+    const hasRequiredRole = requiredRoles.includes(userRole);
+    
+    if (!hasRequiredRole) {
+      this.router.navigate(['/unauthorized']);
+      return false;
+    }
+
+    return true;
   }
 } 

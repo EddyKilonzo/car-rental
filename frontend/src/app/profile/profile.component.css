@@ -38,7 +38,7 @@
   padding: 3rem;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
 }
 
 .loading-spinner {
@@ -66,7 +66,7 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -230,7 +230,7 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
 }
 
 .form-header {
@@ -390,7 +390,7 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
 }
 
 .account-actions-card h3 {
@@ -666,7 +666,7 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
 }
 
 .section-header {
@@ -889,10 +889,10 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 2px solid #A11312;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
+  animation: slideInUp 0.6s ease-out;
 }
 
 .completion-form-card::before {
@@ -1085,13 +1085,13 @@
 }
 
 .completion-success {
-  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-  border: 1px solid #28a745;
+  background: white;
   border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
+  animation: slideInUp 0.6s ease-out;
 }
 
 .completion-success::before {

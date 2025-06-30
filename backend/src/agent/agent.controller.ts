@@ -98,7 +98,8 @@ export class AgentController {
   @Roles(UserRole.ADMIN)
   async getPendingApplications() {
     try {
-      return await this.agentService.getPendingAgentApplications();
+      const data = await this.agentService.getPendingAgentApplications();
+      return { success: true, data };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
@@ -122,7 +123,8 @@ export class AgentController {
   @Roles(UserRole.ADMIN)
   async approveApplication(@Param('userId') userId: string) {
     try {
-      return await this.agentService.approveAgentApplication(userId);
+      const user = await this.agentService.approveAgentApplication(userId);
+      return { success: true, data: { user } };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
@@ -146,7 +148,8 @@ export class AgentController {
   @Roles(UserRole.ADMIN)
   async rejectApplication(@Param('userId') userId: string) {
     try {
-      return await this.agentService.rejectAgentApplication(userId);
+      const user = await this.agentService.rejectAgentApplication(userId);
+      return { success: true, data: { user } };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',

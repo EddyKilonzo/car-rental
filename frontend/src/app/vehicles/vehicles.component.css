@@ -109,7 +109,7 @@
   border-radius: 16px;
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   border: 1px solid #f1f3f4;
 }
 
@@ -288,20 +288,22 @@
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
 
 .vehicle-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
 }
 
+/* Base badge styles with glass effect */
 .vehicle-badge {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: linear-gradient(135deg, #A11312, #8a0f0e);
+  background: rgba(161, 19, 18, 0.15);
+  background-color: rgba(161, 19, 18, 0.15);
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
@@ -310,31 +312,66 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   z-index: 2;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.vehicle-badge.top {
-  background: linear-gradient(135deg, #A11312, #8a0f0e);
+.vehicle-badge.badge-booked {
+  background: rgba(220, 38, 38, 0.15);
+  background-color: rgba(220, 38, 38, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.vehicle-badge.badge-available {
+  background: rgba(34, 197, 94, 0.15) !important;
+  background-color: rgba(34, 197, 94, 0.15) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+.vehicle-badge.badge-top {
+  background: rgba(5, 150, 105, 0.8);
+  background-color: rgba(5, 150, 105, 0.8);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .vehicle-badge.premium {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
+  background: rgba(255, 215, 0, 0.8);
+  background-color: rgba(255, 215, 0, 0.8);
   color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .vehicle-badge.new {
-  background: linear-gradient(135deg, #10B981, #059669);
+  background: rgba(16, 185, 129, 0.8);
+  background-color: rgba(16, 185, 129, 0.8);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .vehicle-badge.budget {
-  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  background: rgba(59, 130, 246, 0.8);
+  background-color: rgba(59, 130, 246, 0.8);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .vehicle-badge.popular {
-  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  background: rgba(139, 92, 246, 0.8);
+  background-color: rgba(139, 92, 246, 0.8);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .vehicle-overlay {
@@ -387,75 +424,25 @@
 
 .vehicle-ministats {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .vehicle-price {
-  background: rgba(161, 19, 18, 0.9);
-  color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: #A11312;
 }
 
-/* Removed vehicle seats section - simplified cards */
-/*
-.vehicle-seats {
-  background: rgba(255, 255, 255, 0.9);
-  color: #374151;
-  padding: 0.3rem 0.6rem;
-  border-radius: 12px;
+.vehicle-status {
   font-size: 0.8rem;
+  color: #dc2626;
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-*/
-
-/* Removed vehicle features section - simplified cards */
-/*
-.vehicle-features {
-  display: flex;
-  gap: 0.3rem;
-  margin-bottom: 0.5rem;
-  flex-wrap: wrap;
 }
 
-.feature-tag {
-  background: rgba(255, 255, 255, 0.9);
-  color: #374151;
-  padding: 0.2rem 0.4rem;
-  border-radius: 8px;
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+.vehicle-status i {
+  margin-right: 0.25rem;
 }
-
-.feature-more {
-  background: rgba(161, 19, 18, 0.8);
-  color: white;
-  padding: 0.2rem 0.4rem;
-  border-radius: 8px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.feature-more:hover {
-  background: rgba(161, 19, 18, 1);
-  transform: scale(1.05);
-}
-*/
 
 .vehicle-btn {
   padding: 0.5rem 0.8rem;
@@ -1050,23 +1037,21 @@
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  padding: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 2rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(161, 19, 18, 0.08);
+  gap: 1rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(161, 19, 18, 0.1);
   transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
-  min-height: 80px;
+  backdrop-filter: blur(10px);
 }
 
 .stat-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  background: rgba(255, 255, 255, 0.75);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
 .stat-card.primary {
@@ -1137,12 +1122,12 @@
 }
 
 .earnings-card {
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(161, 19, 18, 0.08);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(161, 19, 18, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .earnings-title {
@@ -1215,19 +1200,18 @@
 }
 
 .vehicle-performance-card {
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  padding: 1.2rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(161, 19, 18, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(161, 19, 18, 0.1);
   transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
 }
 
 .vehicle-performance-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  background: rgba(255, 255, 255, 0.75);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
 .vehicle-performance-header {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
@@ -46,13 +46,6 @@ interface User {
   role: string;
 }
 
-// Import VehicleResponse from service to avoid conflicts
-interface VehicleResponse {
-  success: boolean;
-  data: Vehicle | Vehicle[];
-  message?: string;
-}
-
 interface VehicleFilters {
   search: string;
   vehicleType: string;
@@ -75,12 +68,34 @@ interface VehicleEarnings {
   lastBookingDate?: string;
 }
 
+interface Booking {
+  id: string;
+  status: string;
+  totalPrice: number;
+  createdAt?: string;
+  updatedAt?: string;
+  vehicle: {
+    id: string;
+  };
+}
+
+interface Review {
+  id: string;
+  rating: number;
+  booking: {
+    vehicle: {
+      id: string;
+    };
+  };
+}
+
 @Component({
   selector: 'app-vehicles',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './vehicles.component.html',
-  styleUrls: ['./vehicles.component.css']
+  styleUrls: ['./vehicles.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class VehiclesComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
@@ -126,15 +141,13 @@ export class VehiclesComponent implements OnInit, OnDestroy {
 
   private subscription?: Subscription;
 
-  constructor() {}
-
   ngOnInit() {
     this.checkUserRole();
     this.checkRoute();
     this.loadVehicles();
     
     this.subscription = this.router.events.pipe(
-      filter((event: any) => event instanceof NavigationEnd)
+      filter((event: unknown) => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.loadVehicles();
     });
@@ -165,14 +178,9 @@ export class VehiclesComponent implements OnInit, OnDestroy {
         next: (vehicles: Vehicle[]) => {
           this.isLoading = false;
           
-          if (this.currentUser?.role === 'AGENT') {
-            // For agents, show only their vehicles
-            this.vehicles = vehicles.filter(vehicle => vehicle.userId === this.currentUser?.id);
-          } else {
-            // For customers and admins, show all vehicles (backend already filters for active/available)
-            this.vehicles = vehicles;
-          }
-
+          // For agents, show all vehicles (not just their own)
+          // For customers and admins, show all vehicles
+          this.vehicles = vehicles;
           this.applyFilters();
         },
         error: (error) => {
@@ -185,25 +193,35 @@ export class VehiclesComponent implements OnInit, OnDestroy {
 
   loadAgentVehicles() {
     this.agentService.getAgentVehicles().subscribe({
-      next: (response: any) => {
+      next: (response: unknown) => {
         // Backend returns vehicles array directly, not wrapped in data property
-        const vehiclesData = Array.isArray(response) ? response : (response?.data || []);
+        const vehiclesData = Array.isArray(response) ? response : ((response as { data?: Vehicle[] })?.data || []);
         
         if (vehiclesData && vehiclesData.length > 0) {
-          const agentVehicles = vehiclesData.map((vehicle: any) => ({
+          const agentVehicles = vehiclesData.map((vehicle: Vehicle) => ({
             id: vehicle.id,
             make: vehicle.make,
             model: vehicle.model,
             year: vehicle.year,
-            type: vehicle.vehicleType,
+            vehicleType: vehicle.vehicleType,
             fuelType: vehicle.fuelType,
+            transmission: vehicle.transmission,
             seats: vehicle.seats,
+            doors: vehicle.doors,
+            color: vehicle.color,
             pricePerDay: vehicle.pricePerDay,
-            mainImageUrl: vehicle.mainImageUrl,
-            isAvailable: vehicle.status === 'AVAILABLE',
-            agentId: vehicle.userId,
+            pricePerWeek: vehicle.pricePerWeek,
+            pricePerMonth: vehicle.pricePerMonth,
+            status: vehicle.status,
+            isActive: vehicle.isActive,
             description: vehicle.description,
-            features: vehicle.features || []
+            features: vehicle.features || [],
+            mainImageUrl: vehicle.mainImageUrl,
+            galleryImages: vehicle.galleryImages,
+            interiorImages: vehicle.interiorImages,
+            exteriorImages: vehicle.exteriorImages,
+            userId: vehicle.userId,
+            user: vehicle.user
           }));
           
           // For "My Vehicles" route, show only agent's vehicles
@@ -334,12 +352,18 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     if (this.isMyVehiclesRoute) {
       return 'My Vehicles';
     }
+    if (this.isAgent) {
+      return 'All Vehicles';
+    }
     return 'Available Vehicles';
   }
 
   getPageSubtitle(): string {
     if (this.isMyVehiclesRoute) {
       return 'Manage your vehicle listings';
+    }
+    if (this.isAgent) {
+      return 'Browse all vehicles in the market';
     }
     return 'Find your perfect ride for any occasion';
   }
@@ -348,12 +372,13 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     return this.isAgent && vehicle.userId === this.currentUser?.id;
   }
 
-  onImageError(event: any): void {
-    console.error('Vehicle image failed to load:', event.target?.src);
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    console.error('Vehicle image failed to load:', target?.src);
     console.error('Image error details:', event);
     
-    if (event.target) {
-      const originalSrc = event.target.src;
+    if (target) {
+      const originalSrc = target.src;
       console.log('Original image source:', originalSrc);
       
       if (originalSrc && originalSrc.includes('cloudinary')) {
@@ -365,7 +390,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       }
       
       // Use a more reliable placeholder
-      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
     }
   }
 
@@ -448,31 +473,26 @@ export class VehiclesComponent implements OnInit, OnDestroy {
   }
 
   getVehicleBadge(vehicle: Vehicle): { text: string; class: string } | null {
-    // Premium badge for luxury vehicles
-    if (vehicle.pricePerDay > 8000) {
-      return { text: 'Premium', class: 'premium' };
-    }
+    console.log('getVehicleBadge called for vehicle:', vehicle.make, vehicle.model, 'Status:', vehicle.status);
     
-    // Top vehicle badge
-    if (this.isTopVehicle(vehicle)) {
-      return { text: 'Top Vehicle', class: 'top' };
+    // Show "Booked" badge only for vehicles that are actually rented
+    if (vehicle.status === 'RENTED') {
+      console.log('Returning booked badge for:', vehicle.make, vehicle.model);
+      return {
+        text: 'Booked',
+        class: 'badge-booked'
+      };
     }
-    
-    // New badge for recent vehicles (last 2 years)
-    if (vehicle.year >= new Date().getFullYear() - 2) {
-      return { text: 'New', class: 'new' };
+    // Show "Available" badge if the vehicle is available
+    if (vehicle.status === 'AVAILABLE') {
+      console.log('Returning available badge for:', vehicle.make, vehicle.model);
+      return {
+        text: 'Available',
+        class: 'badge-available'
+      };
     }
-    
-    // Budget badge for affordable vehicles
-    if (vehicle.pricePerDay <= 2000) {
-      return { text: 'Budget', class: 'budget' };
-    }
-    
-    // Popular badge for popular vehicle types
-    if (['SUV', 'SEDAN'].includes(vehicle.vehicleType)) {
-      return { text: 'Popular', class: 'popular' };
-    }
-    
+    // No badge for other statuses
+    console.log('No badge for:', vehicle.make, vehicle.model, 'Status:', vehicle.status);
     return null;
   }
 
@@ -488,8 +508,8 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       console.log('Real bookings loaded:', bookingsResponse);
       console.log('Real reviews loaded:', reviewsResponse);
       
-      const bookings = bookingsResponse || [];
-      const reviews = reviewsResponse || [];
+      const bookings: Booking[] = (bookingsResponse as Booking[]) || [];
+      const reviews: Review[] = (reviewsResponse as Review[]) || [];
       
       // Calculate real earnings from completed bookings
       this.calculateRealEarningsFromBookings(bookings, reviews);
@@ -511,7 +531,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     });
   }
 
-  calculateRealEarningsFromBookings(bookings: any[], reviews: any[]) {
+  calculateRealEarningsFromBookings(bookings: Booking[], reviews: Review[]) {
     console.log('Calculating real earnings from bookings...');
     
     // Calculate overall stats
@@ -528,12 +548,16 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     
-    const monthlyBookings = completedBookings.filter(booking => 
-      new Date(booking.updatedAt || booking.createdAt) >= thirtyDaysAgo
-    );
-    const weeklyBookings = completedBookings.filter(booking => 
-      new Date(booking.updatedAt || booking.createdAt) >= sevenDaysAgo
-    );
+    const monthlyBookings = completedBookings.filter(booking => {
+      const dateStr = booking.updatedAt || booking.createdAt;
+      if (!dateStr) return false;
+      return new Date(dateStr) >= thirtyDaysAgo;
+    });
+    const weeklyBookings = completedBookings.filter(booking => {
+      const dateStr = booking.updatedAt || booking.createdAt;
+      if (!dateStr) return false;
+      return new Date(dateStr) >= sevenDaysAgo;
+    });
     
     const monthlyEarnings = monthlyBookings.reduce((sum, booking) => sum + booking.totalPrice, 0);
     const weeklyEarnings = weeklyBookings.reduce((sum, booking) => sum + booking.totalPrice, 0);
@@ -554,8 +578,8 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     console.log('Real earnings calculated:', this.agentStats);
   }
 
-  calculateVehicleEarnings(bookings: any[], reviews: any[]) {
-    const vehicleEarningsMap = new Map<string, any>();
+  calculateVehicleEarnings(bookings: Booking[], reviews: Review[]) {
+    const vehicleEarningsMap = new Map<string, VehicleEarnings>();
     
     // Initialize vehicle earnings for all vehicles
     this.vehicles.forEach(vehicle => {
@@ -570,7 +594,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
         totalBookings: 0,
         averageRating: 0,
         totalReviews: 0,
-        lastBookingDate: null
+        lastBookingDate: undefined
       });
     });
     
@@ -583,10 +607,12 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       if (vehicleEarnings) {
         vehicleEarnings.totalEarnings += booking.totalPrice;
         vehicleEarnings.totalBookings += 1;
-        
-        const bookingDate = new Date(booking.updatedAt || booking.createdAt);
-        if (!vehicleEarnings.lastBookingDate || bookingDate > new Date(vehicleEarnings.lastBookingDate)) {
-          vehicleEarnings.lastBookingDate = bookingDate.toISOString();
+        const dateStr = booking.updatedAt || booking.createdAt;
+        if (dateStr) {
+          const bookingDate = new Date(dateStr);
+          if (!vehicleEarnings.lastBookingDate || bookingDate > new Date(vehicleEarnings.lastBookingDate)) {
+            vehicleEarnings.lastBookingDate = bookingDate.toISOString();
+          }
         }
       }
     });
@@ -625,6 +651,21 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     // Load earnings data when switching to performance tab
     if (tab === 'performance' && this.isAgent && this.isMyVehiclesRoute) {
       this.loadVehicleEarnings();
+    }
+  }
+
+  getVehicleStatusText(status: string): string {
+    switch (status) {
+      case 'AVAILABLE':
+        return 'Available';
+      case 'RENTED':
+        return 'Currently Rented';
+      case 'MAINTENANCE':
+        return 'Under Maintenance';
+      case 'OUT_OF_SERVICE':
+        return 'Out of Service';
+      default:
+        return status;
     }
   }
 }

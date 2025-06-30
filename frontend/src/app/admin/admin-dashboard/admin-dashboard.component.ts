@@ -52,7 +52,7 @@ export class AdminDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.loadSystemStats();
   }
-
+  //load system stats
   loadSystemStats(): void {
     this.isLoading = true;
     this.adminService.getSystemStats().subscribe({

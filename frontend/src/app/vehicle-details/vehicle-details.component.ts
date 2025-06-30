@@ -161,10 +161,13 @@ export class VehicleDetailsComponent implements OnInit {
       return 'Admin Access - Cannot Book';
     }
     if (this.isAgent) {
-      return 'Agent Access - Cannot Book';
+      return 'Agents Cannot Book Vehicles';
     }
     if (!this.currentUser) {
       return 'Login to Book';
+    }
+    if (this.vehicle?.status !== 'AVAILABLE') {
+      return 'Not Available';
     }
     return 'Book Now';
   }

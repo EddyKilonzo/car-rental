@@ -89,39 +89,64 @@
 
       <div *ngIf="reviews.length > 0" class="reviews-grid">
         <div *ngFor="let review of reviews" class="review-card">
-          <div class="review-header">
-            <div class="vehicle-info">
-              <div class="vehicle-details">
-                <h3 class="vehicle-title">{{ review.booking.vehicle.year }} {{ review.booking.vehicle.make }} {{ review.booking.vehicle.model }}</h3>
-                <p class="vehicle-license">License: {{ review.booking.vehicle.licensePlate }}</p>
-              </div>
+          <div class="card-header">
+            <div class="vehicle-image">
+              <img 
+                [src]="review.booking.vehicle.mainImageUrl || 'assets/images/default-car.jpg'" 
+                [alt]="review.booking.vehicle.make + ' ' + review.booking.vehicle.model"
+                (error)="onImageError($event)"
+              >
             </div>
-            <div class="rating-display">
+            <div class="rating-badge">
               <div class="stars">
-                <span class="star-rating">{{ getStars(review.rating) }}</span>
+                <i 
+                  *ngFor="let star of [1,2,3,4,5]; let i = index" 
+                  class="fas fa-star"
+                  [class.filled]="i < review.rating"
+                ></i>
               </div>
               <span class="rating-text">{{ review.rating }}/5</span>
             </div>
           </div>
 
-          <div class="review-content" *ngIf="review.comment">
-            <p class="review-comment">{{ review.comment }}</p>
-          </div>
+          <div class="card-body">
+            <h3 class="vehicle-title">
+              {{ review.booking.vehicle.year }} {{ review.booking.vehicle.make }} {{ review.booking.vehicle.model }}
+            </h3>
+            <div class="vehicle-license">{{ review.booking.vehicle.licensePlate }}</div>
+            
+            <div class="review-content" *ngIf="review.comment">
+              <p class="review-comment">{{ review.comment }}</p>
+            </div>
 
-          <div class="review-footer">
             <div class="reviewer-info">
-              <div class="reviewer-details">
-                <span class="reviewer-name">{{ review.user.name }}</span>
-                <span class="reviewer-email">{{ review.user.email }}</span>
+              <div class="info-row">
+                <div class="info-item">
+                  <i class="fas fa-user"></i>
+                  <span>{{ review.user.name }}</span>
+                </div>
+                <div class="info-item">
+                  <i class="fas fa-envelope"></i>
+                  <span>{{ review.user.email }}</span>
+                </div>
               </div>
-              <div class="review-meta">
-                <span class="review-date">{{ getFormattedDate(review.createdAt) }}</span>
-                <span class="review-id">#{{ review.id.slice(-8) }}</span>
+              
+              <div class="info-row">
+                <div class="info-item">
+                  <i class="fas fa-calendar"></i>
+                  <span>{{ getFormattedDate(review.createdAt) }}</span>
+                </div>
+                <div class="info-item">
+                  <i class="fas fa-hashtag"></i>
+                  <span>#{{ review.id.slice(-8) }}</span>
+                </div>
               </div>
             </div>
-            <div class="review-actions">
-              <button class="delete-btn" (click)="deleteReview(review.id)" title="Delete Review">
+            
+            <div class="card-actions">
+              <button class="action-btn delete-btn" (click)="deleteReview(review.id)" title="Delete Review">
                 <i class="fas fa-trash"></i>
+                <span>Delete</span>
               </button>
             </div>
           </div>

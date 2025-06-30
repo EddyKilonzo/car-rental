@@ -37,7 +37,7 @@
   text-decoration: none;
   color: #1a1a1a;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
 }
 
@@ -46,6 +46,8 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   background: linear-gradient(135deg, #A11312, #8a0f0e);
   color: white;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
 }
 
 .nav-link i {
@@ -89,14 +91,14 @@
   background: white;
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
   transition: all 0.3s ease;
   border: 1px solid #f1f3f4;
 }
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
 }
 
 .stat-header {
@@ -184,7 +186,7 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   border: 1px solid #f1f3f4;
   margin-bottom: 2rem;
 }
@@ -278,24 +280,20 @@
 }
 
 .action-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 2rem 1.5rem;
-  background: #f9fafb;
-  border: 1px solid #f1f3f4;
-  border-radius: 12px;
-  text-decoration: none;
-  color: #1a1a1a;
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
+  border: 1px solid #f1f3f4;
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
 .action-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  background: white;
-  border-color: #A11312;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
 .action-card i {

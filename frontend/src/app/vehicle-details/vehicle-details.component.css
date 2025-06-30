@@ -38,7 +38,7 @@
   padding: 60px 20px;
   background: white;
   border-radius: 15px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
 }
 
 .error h2 {
@@ -72,7 +72,7 @@
   background: white;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
 }
 
 .vehicle-header {
@@ -135,7 +135,7 @@
 .main-image {
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   position: relative;
 }
 
@@ -190,7 +190,7 @@
 .gallery-item {
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease;
 }
 
@@ -270,9 +270,10 @@
 }
 
 .book-btn.disabled {
-  background: #6c757d;
+  background: #6b7280;
+  color: #9ca3af;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .book-btn.disabled:hover {
@@ -569,18 +570,18 @@
 }
 
 .review-card {
-  background: #f8fafc;
+  background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 20px 18px 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transition: box-shadow 0.2s;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #f1f3f4;
+  transition: all 0.3s ease;
 }
 
 .review-card:hover {
-  box-shadow: 0 6px 24px rgba(161,19,18,0.10);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
 .review-header {
@@ -689,4 +690,25 @@
 .owner-email {
   font-size: 0.9rem;
   color: #6b7280;
+}
+
+.vehicle-status-indicator {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.vehicle-status-indicator .status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vehicle-status-indicator .status-badge i {
+  font-size: 1rem;
 }

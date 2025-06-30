@@ -82,6 +82,7 @@ interface Review {
       model: string;
       year: number;
       licensePlate: string;
+      mainImageUrl?: string;
     };
   };
 }
@@ -95,6 +96,7 @@ interface AgentApplication {
     id: string;
     name: string;
     email: string;
+    phone?: string | null;
   };
 }
 
@@ -163,9 +165,9 @@ export class AdminService {
   }
 
   getPendingAgentApplications(): Observable<AdminResponse<{ applications: AgentApplication[] }>> {
-    return this.http.get<AdminResponse<{ applications: AgentApplication[] }>>(`${this.baseUrl}/agent/applications/pending`, {
-      headers: this.getAuthHeaders(),
-    });
+    console.log('AdminService: Making request to get pending agent applications');
+    
+    return this.http.get<AdminResponse<{ applications: AgentApplication[] }>>(`${this.baseUrl}/agent/applications/pending`);
   }
 
   approveAgent(userId: string): Observable<AdminResponse<unknown>> {

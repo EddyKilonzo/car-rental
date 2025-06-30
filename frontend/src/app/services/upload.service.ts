@@ -44,7 +44,7 @@ export class UploadService {
   uploadVehicleMainImage(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${this.baseUrl}/upload/vehicle/main-image`, formData, {
+    return this.http.post(`${this.baseUrl}/vehicles/upload/main-image`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -54,7 +54,7 @@ export class UploadService {
     files.forEach((file, index) => {
       formData.append('files', file);
     });
-    return this.http.post(`${this.baseUrl}/upload/vehicle/gallery`, formData, {
+    return this.http.post(`${this.baseUrl}/vehicles/upload/gallery`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -64,7 +64,7 @@ export class UploadService {
     files.forEach((file, index) => {
       formData.append('files', file);
     });
-    return this.http.post(`${this.baseUrl}/upload/vehicle/interior`, formData, {
+    return this.http.post(`${this.baseUrl}/vehicles/upload/interior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -74,7 +74,7 @@ export class UploadService {
     files.forEach((file, index) => {
       formData.append('files', file);
     });
-    return this.http.post(`${this.baseUrl}/upload/vehicle/exterior`, formData, {
+    return this.http.post(`${this.baseUrl}/vehicles/upload/exterior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -84,7 +84,7 @@ export class UploadService {
     files.forEach((file, index) => {
       formData.append('files', file);
     });
-    return this.http.post(`${this.baseUrl}/upload/vehicle/documents`, formData, {
+    return this.http.post(`${this.baseUrl}/vehicles/upload/documents`, formData, {
       headers: this.getAuthHeaders(),
     });
   }

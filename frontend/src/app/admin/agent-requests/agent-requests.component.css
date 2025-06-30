@@ -128,51 +128,43 @@
   gap: 0.5rem;
 }
 
-.approve-btn {
-  background: linear-gradient(135deg, #28a745, #20c997);
-  color: white;
-  border: none;
+.approve-btn, .reject-btn {
+  background: transparent;
+  border: 2px solid;
   border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 6px 16px;
+  font-weight: 500;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  transition: all 0.3s ease;
+  gap: 6px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
+.approve-btn {
+  color: #2ecc40;
+  border-color: #2ecc40;
+}
 .approve-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #218838, #1ea085);
-  transform: translateY(-1px);
+  background: rgba(46, 204, 64, 0.08);
+  color: #27ae60;
+  border-color: #27ae60;
 }
 
 .reject-btn {
-  background: linear-gradient(135deg, #dc3545, #c82333);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  transition: all 0.3s ease;
+  color: #ff4136;
+  border-color: #ff4136;
 }
-
 .reject-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c82333, #a71e2a);
-  transform: translateY(-1px);
+  background: rgba(255, 65, 54, 0.08);
+  color: #c0392b;
+  border-color: #c0392b;
 }
 
-.approve-btn:disabled,
-.reject-btn:disabled {
+.approve-btn:disabled, .reject-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 
 .empty-message {

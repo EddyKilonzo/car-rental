@@ -42,12 +42,26 @@
       </div>
     </div>
     <div class="vehicle-actions">
-      <button class="vehicle-btn" (click)="onBookClick()" [disabled]="!canBookVehicle() || vehicle.status !== 'AVAILABLE'">
-        <i class="fas fa-calendar-check"></i> Book
+      <button 
+        class="vehicle-btn" 
+        (click)="onBookClick()" 
+        [disabled]="!canBookVehicle() || vehicle.status !== 'AVAILABLE'"
+        [class.disabled]="vehicle.status !== 'AVAILABLE'"
+      >
+        <i class="fas fa-calendar-check"></i> 
+        {{ getBookingButtonText() }}
       </button>
       <button class="vehicle-btn secondary" (click)="goBack()">
         <i class="fas fa-arrow-left"></i> Back
       </button>
+    </div>
+    
+    <!-- Vehicle Status Indicator -->
+    <div *ngIf="vehicle.status !== 'AVAILABLE'" class="vehicle-status-indicator">
+      <div class="status-badge" [class]="getVehicleStatusClass()">
+        <i class="fas fa-info-circle"></i>
+        {{ getVehicleStatusText() }}
+      </div>
     </div>
   </div>
 </div>

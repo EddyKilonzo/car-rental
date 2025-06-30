@@ -10,6 +10,7 @@ import {
   HttpStatus,
   HttpException,
   Body,
+  Post,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,6 +25,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole, VehicleStatus } from '@prisma/client';
+import { MailerService } from '../mailer/mailer.service';
 
 interface RequestWithUser extends Request {
   user: {
@@ -38,7 +40,10 @@ interface RequestWithUser extends Request {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly mailerService: MailerService,
+  ) {}
 
   // ========================================
   // SYSTEM STATISTICS
@@ -367,6 +372,29 @@ export class AdminController {
         success: true,
         data,
         message: 'Review deleted successfully',
+      };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : 'Unknown error',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Post('send-email')
+  @ApiOperation({ summary: 'Send all email templates for testing (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Email sent successfully' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only admins can send emails',
+  })
+  async sendAllEmailTemplates() {
+    try {
+      await this.mailerService.sendAllEmailTemplates();
+
+      return {
+        success: true,
+        message: 'All email templates sent successfully',
       };
     } catch (error) {
       throw new HttpException(

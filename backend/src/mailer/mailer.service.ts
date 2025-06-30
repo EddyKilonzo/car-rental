@@ -198,7 +198,7 @@ export class MailerService {
   }
   /**
    * Sends a password reset email with a reset code.
-   * @param emailData Email data including email address, user name, and reset code.
+   * @param emailData Email data including email address, name, and reset code.
    * @returns Promise resolving to the sent message info.
    */
   async sendPasswordResetEmail(emailData: {
@@ -208,6 +208,7 @@ export class MailerService {
   }): Promise<SentMessageInfo> {
     const html = this.renderTemplate('password-reset', {
       name: emailData.name,
+      email: emailData.email,
       resetCode: emailData.resetCode,
     });
     return this.sendEmail(
@@ -215,5 +216,84 @@ export class MailerService {
       '🔐 Password Reset Code - CarRental',
       html,
     );
+  }
+
+  /**
+   * Sends all email templates for testing purposes.
+   * @returns Promise resolving to the sent message info.
+   */
+  async sendAllEmailTemplates(): Promise<void> {
+    console.log('🚀 Starting to send all email templates...\n');
+
+    try {
+      // Test Welcome Email
+      await this.sendWelcomeEmail({
+        name: 'Eddy Max',
+        email: 'eddymax3715@gmail.com'
+      });
+      console.log('✅ Welcome email sent successfully!');
+
+      // Test Booking Confirmed Email
+      await this.sendBookingConfirmationEmail({
+        customerName: 'Eddy Max',
+        customerEmail: 'eddymax3715@gmail.com',
+        bookingId: 'TEST-BOOKING-123',
+        pickupDate: '2025-01-15',
+        returnDate: '2025-01-20',
+        totalPrice: 25000,
+        pickupLocation: 'Nairobi Airport',
+        vehicleMake: 'Toyota',
+        vehicleModel: 'Camry',
+        vehicleYear: 2022,
+        licensePlate: 'KCA 123A',
+        vehicleColor: 'Silver',
+        fuelType: 'Petrol',
+        agentName: 'John Doe',
+        agentEmail: 'john.doe@example.com',
+        agentPhone: '+254 700 000 000'
+      });
+      console.log('✅ Booking confirmed email sent successfully!');
+
+      // Test Agent Application Email
+      await this.sendAgentApplicationEmail({
+        name: 'Eddy Max',
+        email: 'eddymax3715@gmail.com',
+        applicationId: 'APP-123',
+        applicationDate: '2025-01-15'
+      });
+      console.log('✅ Agent application email sent successfully!');
+
+      // Test Agent Response Approved Email
+      await this.sendAgentApplicationResponse({
+        name: 'Eddy Max',
+        email: 'eddymax3715@gmail.com',
+        status: 'Approved'
+      });
+      console.log('✅ Agent response approved email sent successfully!');
+
+      // Test Agent Response Denied Email
+      await this.sendAgentApplicationResponse({
+        name: 'Eddy Max',
+        email: 'eddymax3715@gmail.com',
+        status: 'Denied',
+        reason: 'Insufficient documentation provided'
+      });
+      console.log('✅ Agent response denied email sent successfully!');
+
+      // Test Password Reset Email
+      await this.sendPasswordResetEmail({
+        name: 'Eddy Max',
+        email: 'eddymax3715@gmail.com',
+        resetCode: '123456'
+      });
+      console.log('✅ Password reset email sent successfully!');
+
+      console.log('\n🎉 All test emails sent successfully!');
+      console.log('📧 Check your email: eddymax3715@gmail.com');
+
+    } catch (error) {
+      console.error('\n💥 Error sending test emails:', error);
+      throw error;
+    }
   }
 }

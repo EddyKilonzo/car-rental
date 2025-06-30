@@ -542,7 +542,9 @@ export class AdminService {
                     id: true,
                     make: true,
                     model: true,
+                    year: true,
                     licensePlate: true,
+                    mainImageUrl: true,
                   },
                 },
               },
@@ -600,6 +602,8 @@ export class AdminService {
                     select: {
                       make: true,
                       model: true,
+                      year: true,
+                      mainImageUrl: true,
                     },
                   },
                 },

@@ -98,6 +98,23 @@ interface VehicleEarnings {
   lastBookingDate?: string;
 }
 
+interface CreateVehicleData {
+  make: string;
+  model: string;
+  year: number;
+  vehicleType: string;
+  fuelType: string;
+  transmission: string;
+  seats: number;
+  doors: number;
+  color: string;
+  pricePerDay: number;
+  pricePerWeek?: number;
+  pricePerMonth?: number;
+  description?: string;
+  features?: string[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -116,19 +133,31 @@ export class AgentService {
   }
 
   applyToBecomeAgent(): Observable<AgentResponse> {
-    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/applications`, {}, {
+    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/apply`, {}, {
       headers: this.getAuthHeaders(),
     });
   }
 
   getApplicationStatus(): Observable<ApplicationStatus> {
-    return this.http.get<ApplicationStatus>(`${this.baseUrl}/agent/applications/status`, {
+    return this.http.get<ApplicationStatus>(`${this.baseUrl}/agent/application/status`, {
       headers: this.getAuthHeaders(),
     });
   }
 
   getAgentVehicles(): Observable<Vehicle[]> {
     return this.http.get<Vehicle[]>(`${this.baseUrl}/agent/vehicles`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  createVehicle(vehicleData: CreateVehicleData): Observable<AgentResponse> {
+    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles`, vehicleData, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  updateVehicle(vehicleId: string, vehicleData: Partial<CreateVehicleData>): Observable<AgentResponse> {
+    return this.http.put<AgentResponse>(`${this.baseUrl}/agent/vehicles/${vehicleId}`, vehicleData, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -210,13 +239,13 @@ export class AgentService {
   }
 
   markBookingAsActive(bookingId: string): Observable<AgentResponse> {
-    return this.http.put<AgentResponse>(`${this.baseUrl}/agent/bookings/${bookingId}/activate`, {}, {
+    return this.http.put<AgentResponse>(`${this.baseUrl}/agent/bookings/${bookingId}/active`, {}, {
       headers: this.getAuthHeaders(),
     });
   }
 
   markBookingAsCompleted(bookingId: string): Observable<AgentResponse> {
-    return this.http.put<AgentResponse>(`${this.baseUrl}/agent/bookings/${bookingId}/complete`, {}, {
+    return this.http.put<AgentResponse>(`${this.baseUrl}/agent/bookings/${bookingId}/completed`, {}, {
       headers: this.getAuthHeaders(),
     });
   }

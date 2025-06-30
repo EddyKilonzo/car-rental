@@ -30,7 +30,7 @@
             <tr *ngFor="let application of applications" class="table-row">
               <td class="table-cell">{{ application.user.name }}</td>
               <td class="table-cell">{{ application.user.email }}</td>
-              <td class="table-cell">Not provided</td>
+              <td class="table-cell">{{ application.user.phone || 'Not provided' }}</td>
               <td class="table-cell">{{ getFormattedDate(application.createdAt) }}</td>
               <td class="table-cell actions-cell">
                 <div class="action-buttons">

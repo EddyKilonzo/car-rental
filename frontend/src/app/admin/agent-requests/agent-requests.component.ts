@@ -12,6 +12,7 @@ interface AgentApplication {
     id: string;
     name: string;
     email: string;
+    phone?: string | null;
   };
 }
 
@@ -37,16 +38,21 @@ export class AgentRequestsComponent implements OnInit {
 
   loadAgentApplications() {
     this.isLoading = true;
+    console.log('Loading agent applications...');
     this.adminService.getPendingAgentApplications().subscribe({
       next: (response) => {
+        console.log('Agent applications response:', response);
         this.isLoading = false;
         if (response.success) {
           this.applications = response.data.applications || [];
+          console.log('Applications loaded:', this.applications);
         } else {
           this.error = response.message || 'Failed to load agent applications';
+          console.error('Error loading applications:', this.error);
         }
       },
       error: (error) => {
+        console.error('Error in loadAgentApplications:', error);
         this.isLoading = false;
         this.error = 'Failed to load agent applications';
         console.error('Error loading agent applications:', error);

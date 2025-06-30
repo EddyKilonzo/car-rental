@@ -52,8 +52,9 @@
       <div class="filters-grid">
         <!-- Search -->
         <div class="filter-group">
-          <label>Search</label>
+          <label for="search-input">Search</label>
           <input 
+            id="search-input"
             type="text" 
             placeholder="Search by make, model..."
             [(ngModel)]="filters.search"
@@ -64,8 +65,13 @@
 
         <!-- Vehicle Type -->
         <div class="filter-group">
-          <label>Vehicle Type</label>
-          <select [(ngModel)]="filters.vehicleType" (change)="applyFilters()" class="filter-select">
+          <label for="vehicle-type-select">Vehicle Type</label>
+          <select 
+            id="vehicle-type-select"
+            [(ngModel)]="filters.vehicleType" 
+            (change)="applyFilters()" 
+            class="filter-select"
+          >
             <option value="">All Types</option>
             <option value="SEDAN">Sedan</option>
             <option value="SUV">SUV</option>
@@ -80,8 +86,13 @@
 
         <!-- Fuel Type -->
         <div class="filter-group">
-          <label>Fuel Type</label>
-          <select [(ngModel)]="filters.fuelType" (change)="applyFilters()" class="filter-select">
+          <label for="fuel-type-select">Fuel Type</label>
+          <select 
+            id="fuel-type-select"
+            [(ngModel)]="filters.fuelType" 
+            (change)="applyFilters()" 
+            class="filter-select"
+          >
             <option value="">All Fuels</option>
             <option value="GASOLINE">Gasoline</option>
             <option value="DIESEL">Diesel</option>
@@ -93,9 +104,10 @@
 
         <!-- Price Range -->
         <div class="filter-group price-range">
-          <label>Price Range (per day)</label>
+          <label for="min-price-input">Price Range (per day)</label>
           <div class="price-inputs">
             <input 
+              id="min-price-input"
               type="number" 
               placeholder="Min"
               [(ngModel)]="filters.minPrice"
@@ -104,6 +116,7 @@
             >
             <span class="price-separator">-</span>
             <input 
+              id="max-price-input"
               type="number" 
               placeholder="Max"
               [(ngModel)]="filters.maxPrice"
@@ -128,7 +141,9 @@
       </div>
       <div class="vehicles-grid">
         <div class="vehicle-card" *ngFor="let vehicle of filteredVehicles" [style.background-image]="'url(' + vehicle.mainImageUrl + ')'">
-          <div class="vehicle-badge" [class]="getVehicleBadge(vehicle)?.class" *ngIf="getVehicleBadge(vehicle)">
+          <div class="vehicle-badge" 
+               [class]="getVehicleBadge(vehicle)?.class" 
+               *ngIf="getVehicleBadge(vehicle)">
             {{ getVehicleBadge(vehicle)?.text }}
           </div>
           
@@ -149,6 +164,9 @@
                   <h3>{{ vehicle.make }} {{ vehicle.model }}</h3>
                   <div class="vehicle-ministats">
                     <span class="vehicle-price"><i class="fas fa-money-bill-wave"></i> KSH {{ vehicle.pricePerDay }}/day</span>
+                    <span *ngIf="vehicle.status !== 'AVAILABLE'" class="vehicle-status">
+                      <i class="fas fa-clock"></i> {{ getVehicleStatusText(vehicle.status) }}
+                    </span>
                   </div>
                 </div>
                 <div class="vehicle-btn-group">

@@ -17,12 +17,14 @@ import { MyBookingsComponent } from './my-bookings/my-bookings.component';
 import { AuthGuard } from './services/auth/auth.guard';
 import { RoleGuard } from './services/auth/role.guard';
 import { AgentDashboardComponent } from './agent/agent-dashboard/agent-dashboard';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'unauthorized', component: NotFoundComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'vehicles', component: VehiclesComponent },
   { path: 'vehicles/:id', component: VehicleDetailsComponent },
@@ -37,5 +39,5 @@ export const routes: Routes = [
   { path: 'admin/agent-requests', component: AgentRequestsComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['ADMIN'] } },
   { path: 'admin/reviews', component: ReviewsManagementComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['ADMIN'] } },
   { path: 'agent/dashboard', component: AgentDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['AGENT'] } },
-  { path: '**', redirectTo: '' }
+  { path: '**', component: NotFoundComponent }
 ];

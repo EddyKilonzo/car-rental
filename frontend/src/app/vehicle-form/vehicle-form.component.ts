@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
 import { UploadService } from '../services/upload.service';
 import { VehicleService } from '../services/vehicle.service';
+import { AgentService } from '../services/agent.service';
 import { ToastService } from '../services/toast.service';
 
 interface VehicleForm {
@@ -39,6 +40,7 @@ export class VehicleFormComponent implements OnInit {
   private authService = inject(AuthService);
   private uploadService = inject(UploadService);
   private vehicleService = inject(VehicleService);
+  private agentService = inject(AgentService);
   private toastService = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -68,7 +70,7 @@ export class VehicleFormComponent implements OnInit {
   isEditMode = false;
   vehicleId: string | null = null;
   currentImageUrl: string | null = null;
-  newFeature: string = '';
+  newFeature = '';
 
   vehicleTypes = ['SEDAN', 'SUV', 'HATCHBACK', 'COUPE', 'CONVERTIBLE', 'VAN', 'TRUCK', 'LUXURY'];
   fuelTypes = ['PETROL', 'DIESEL', 'ELECTRIC', 'HYBRID', 'LPG'];
@@ -124,7 +126,7 @@ export class VehicleFormComponent implements OnInit {
         this.previewUrl = this.currentImageUrl;
         this.isLoading = false;
       },
-      error: (err) => {
+      error: () => {
         this.toastService.showError('Failed to load vehicle data.');
         this.isLoading = false;
       }
@@ -176,16 +178,29 @@ export class VehicleFormComponent implements OnInit {
       // Only upload image if a file is selected
       if (this.selectedFile) {
         try {
+          console.log('Starting image upload for file:', this.selectedFile.name);
           const uploadResult = await this.uploadService.uploadVehicleMainImage(this.selectedFile).toPromise();
           console.log('Raw upload result:', uploadResult);
           console.log('Upload result type:', typeof uploadResult);
           console.log('Upload result keys:', Object.keys(uploadResult));
+          console.log('Upload result.uploadResult:', uploadResult.uploadResult);
+          console.log('Upload result.secure_url:', uploadResult.secure_url);
           
-          imageUrl = uploadResult.secure_url || '';
+          // Fix: Extract URL from the correct nested structure
+          imageUrl = uploadResult.uploadResult?.secure_url || uploadResult.secure_url || '';
           console.log('Extracted image URL:', imageUrl);
           console.log('Image upload successful:', uploadResult);
+          
+          if (!imageUrl) {
+            throw new Error('No image URL received from upload');
+          }
         } catch (uploadError) {
           console.error('Image upload failed:', uploadError);
+          console.error('Upload error details:', {
+            message: (uploadError as any)?.message,
+            status: (uploadError as any)?.status,
+            error: (uploadError as any)?.error
+          });
           imageUrl = this.currentImageUrl || '';
           this.toastService.showWarning('Image upload failed. Vehicle will be updated without new image.');
         }
@@ -223,11 +238,11 @@ export class VehicleFormComponent implements OnInit {
       console.log('mainImageUrl type:', typeof vehicleData.mainImageUrl);
 
       if (this.isEditMode && this.vehicleId) {
-        const result = await this.vehicleService.updateVehicle(this.vehicleId, vehicleData).toPromise();
+        const result = await this.agentService.updateVehicle(this.vehicleId, vehicleData).toPromise();
         console.log('Vehicle update successful:', result);
         this.toastService.showSuccess('Vehicle updated successfully!');
       } else {
-        const result = await this.vehicleService.createVehicle(vehicleData).toPromise();
+        const result = await this.agentService.createVehicle(vehicleData).toPromise();
         console.log('Vehicle creation successful:', result);
         this.toastService.showSuccess('Vehicle added successfully!');
       }
@@ -238,16 +253,17 @@ export class VehicleFormComponent implements OnInit {
       
       // Type guard to check if error is an object with properties
       if (error && typeof error === 'object') {
-        console.error('Error details:', (error as any).error);
-        console.error('Error message:', (error as any).message);
-        console.error('Error status:', (error as any).status);
+        const errorObj = error as Record<string, unknown>;
+        console.error('Error details:', errorObj['error']);
+        console.error('Error message:', errorObj['message']);
+        console.error('Error status:', errorObj['status']);
         
         // Show more specific error message if available
         let errorMessage = 'Failed to save vehicle. Please try again.';
-        if ((error as any).error && (error as any).error.message) {
-          errorMessage = (error as any).error.message;
-        } else if ((error as any).message) {
-          errorMessage = (error as any).message;
+        if (errorObj['error'] && typeof errorObj['error'] === 'object' && (errorObj['error'] as Record<string, unknown>)['message']) {
+          errorMessage = (errorObj['error'] as Record<string, unknown>)['message'] as string;
+        } else if (errorObj['message']) {
+          errorMessage = errorObj['message'] as string;
         }
         
         this.toastService.showError(errorMessage);
@@ -260,10 +276,54 @@ export class VehicleFormComponent implements OnInit {
   }
 
   validateForm(): boolean {
-    if (!this.vehicleForm.make || !this.vehicleForm.model || !this.vehicleForm.licensePlate || 
-        !this.vehicleForm.vin || !this.vehicleForm.vehicleType || !this.vehicleForm.fuelType || 
-        !this.vehicleForm.transmission || !this.vehicleForm.color) {
-      this.toastService.showError('Please fill in all required fields.');
+    console.log('Validating form with values:', this.vehicleForm);
+    
+    // Check required text fields with trimming
+    if (!this.vehicleForm.make?.trim()) {
+      console.log('Make validation failed:', this.vehicleForm.make);
+      this.toastService.showError('Please enter the vehicle make.');
+      return false;
+    }
+    
+    if (!this.vehicleForm.model?.trim()) {
+      console.log('Model validation failed:', this.vehicleForm.model);
+      this.toastService.showError('Please enter the vehicle model.');
+      return false;
+    }
+    
+    if (!this.vehicleForm.licensePlate?.trim()) {
+      console.log('License plate validation failed:', this.vehicleForm.licensePlate);
+      this.toastService.showError('Please enter the license plate number.');
+      return false;
+    }
+    
+    if (!this.vehicleForm.vin?.trim()) {
+      console.log('VIN validation failed:', this.vehicleForm.vin);
+      this.toastService.showError('Please enter the VIN number.');
+      return false;
+    }
+    
+    if (!this.vehicleForm.vehicleType?.trim()) {
+      console.log('Vehicle type validation failed:', this.vehicleForm.vehicleType);
+      this.toastService.showError('Please select a vehicle type.');
+      return false;
+    }
+    
+    if (!this.vehicleForm.fuelType?.trim()) {
+      console.log('Fuel type validation failed:', this.vehicleForm.fuelType);
+      this.toastService.showError('Please select a fuel type.');
+      return false;
+    }
+    
+    if (!this.vehicleForm.transmission?.trim()) {
+      console.log('Transmission validation failed:', this.vehicleForm.transmission);
+      this.toastService.showError('Please select a transmission type.');
+      return false;
+    }
+    
+    if (!this.vehicleForm.color?.trim()) {
+      console.log('Color validation failed:', this.vehicleForm.color);
+      this.toastService.showError('Please enter the vehicle color.');
       return false;
     }
 
@@ -275,26 +335,31 @@ export class VehicleFormComponent implements OnInit {
     const pricePerDay = Number(this.vehicleForm.pricePerDay);
 
     if (isNaN(year) || year < 1900 || year > new Date().getFullYear() + 1) {
+      console.log('Year validation failed:', this.vehicleForm.year, 'parsed as:', year);
       this.toastService.showError('Please enter a valid year.');
       return false;
     }
 
     if (isNaN(mileage) || mileage < 0) {
+      console.log('Mileage validation failed:', this.vehicleForm.mileage, 'parsed as:', mileage);
       this.toastService.showError('Please enter a valid mileage.');
       return false;
     }
 
     if (isNaN(seats) || seats <= 0 || seats > 20) {
+      console.log('Seats validation failed:', this.vehicleForm.seats, 'parsed as:', seats);
       this.toastService.showError('Please enter a valid number of seats (1-20).');
       return false;
     }
 
     if (isNaN(doors) || doors < 2 || doors > 6) {
+      console.log('Doors validation failed:', this.vehicleForm.doors, 'parsed as:', doors);
       this.toastService.showError('Please enter a valid number of doors (2-6).');
       return false;
     }
 
     if (isNaN(pricePerDay) || pricePerDay <= 0) {
+      console.log('Price per day validation failed:', this.vehicleForm.pricePerDay, 'parsed as:', pricePerDay);
       this.toastService.showError('Price per day must be greater than 0.');
       return false;
     }
@@ -303,6 +368,7 @@ export class VehicleFormComponent implements OnInit {
     if (this.vehicleForm.pricePerWeek !== undefined && this.vehicleForm.pricePerWeek !== null) {
       const pricePerWeek = Number(this.vehicleForm.pricePerWeek);
       if (isNaN(pricePerWeek) || pricePerWeek <= 0) {
+        console.log('Price per week validation failed:', this.vehicleForm.pricePerWeek, 'parsed as:', pricePerWeek);
         this.toastService.showError('Price per week must be greater than 0.');
         return false;
       }
@@ -311,11 +377,13 @@ export class VehicleFormComponent implements OnInit {
     if (this.vehicleForm.pricePerMonth !== undefined && this.vehicleForm.pricePerMonth !== null) {
       const pricePerMonth = Number(this.vehicleForm.pricePerMonth);
       if (isNaN(pricePerMonth) || pricePerMonth <= 0) {
+        console.log('Price per month validation failed:', this.vehicleForm.pricePerMonth, 'parsed as:', pricePerMonth);
         this.toastService.showError('Price per month must be greater than 0.');
         return false;
       }
     }
 
+    console.log('Form validation passed successfully');
     return true;
   }
 

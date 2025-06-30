@@ -68,6 +68,9 @@
                 [alt]="booking.vehicle.make + ' ' + booking.vehicle.model"
                 (error)="onImageError($event)"
                 (click)="goToVehicleDetails(booking.vehicle.id)"
+                (keyup.enter)="goToVehicleDetails(booking.vehicle.id)"
+                (keyup.space)="goToVehicleDetails(booking.vehicle.id)"
+                tabindex="0"
               >
             </div>
             <div class="status-badge" [class]="getStatusClass(booking.status)">
@@ -76,7 +79,11 @@
           </div>
 
           <div class="card-body">
-            <h3 class="vehicle-title" (click)="goToVehicleDetails(booking.vehicle.id)">
+            <h3 class="vehicle-title" 
+                (click)="goToVehicleDetails(booking.vehicle.id)"
+                (keyup.enter)="goToVehicleDetails(booking.vehicle.id)"
+                (keyup.space)="goToVehicleDetails(booking.vehicle.id)"
+                tabindex="0">
               {{ booking.vehicle.year }} {{ booking.vehicle.make }} {{ booking.vehicle.model }}
             </h3>
             
