@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -36,6 +36,13 @@ interface VehicleForm {
   styleUrls: ['./vehicle-form.component.css']
 })
 export class VehicleFormComponent implements OnInit {
+  private authService = inject(AuthService);
+  private uploadService = inject(UploadService);
+  private vehicleService = inject(VehicleService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   vehicleForm: VehicleForm = {
     make: '',
     model: '',
@@ -67,14 +74,10 @@ export class VehicleFormComponent implements OnInit {
   fuelTypes = ['PETROL', 'DIESEL', 'ELECTRIC', 'HYBRID', 'LPG'];
   transmissionTypes = ['MANUAL', 'AUTOMATIC'];
 
-  constructor(
-    private authService: AuthService,
-    private uploadService: UploadService,
-    private vehicleService: VehicleService,
-    private toastService: ToastService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit() {
     const currentUser = this.authService.getCurrentUser();

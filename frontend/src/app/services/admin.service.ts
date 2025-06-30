@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -33,13 +33,109 @@ interface SystemStats {
   };
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  isVerified?: boolean;
+  profileImageUrl?: string | null;
+}
+
+interface Vehicle {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  vehicleType: string;
+  fuelType: string;
+  transmission: string;
+  seats: number;
+  doors: number;
+  color: string;
+  pricePerDay: number;
+  status: string;
+  isActive: boolean;
+  mainImageUrl?: string;
+  userId: string;
+}
+
+interface Review {
+  id: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  booking: {
+    id: string;
+    vehicle: {
+      id: string;
+      make: string;
+      model: string;
+      year: number;
+      licensePlate: string;
+    };
+  };
+}
+
+interface AgentApplication {
+  id: string;
+  userId: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+interface AdminResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+}
+
+interface PaginationData {
+  pages: number;
+  total: number;
+}
+
+interface ReviewsResponse {
+  success: boolean;
+  data: {
+    reviews: Review[];
+    pagination: PaginationData;
+  };
+}
+
+interface ReviewStatsResponse {
+  success: boolean;
+  data: {
+    totalReviews: number;
+    averageRating: number;
+    ratingDistribution: Array<{ rating: number; count: number }>;
+    recentReviews: Review[];
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
+  private http = inject(HttpClient);
+
   private baseUrl = 'http://localhost:3000';
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('accessToken');
@@ -54,72 +150,72 @@ export class AdminService {
     });
   }
 
-  getAllUsers(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/admin/users`, {
+  getAllUsers(): Observable<{ users: User[]; pagination: any }> {
+    return this.http.get<{ users: User[]; pagination: any }>(`${this.baseUrl}/admin/users`, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  getAllVehicles(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/admin/vehicles`, {
+  getAllVehicles(): Observable<AdminResponse<{ vehicles: Vehicle[] }>> {
+    return this.http.get<AdminResponse<{ vehicles: Vehicle[] }>>(`${this.baseUrl}/admin/vehicles`, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  getPendingAgentApplications(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/agent/applications/pending`, {
+  getPendingAgentApplications(): Observable<AdminResponse<{ applications: AgentApplication[] }>> {
+    return this.http.get<AdminResponse<{ applications: AgentApplication[] }>>(`${this.baseUrl}/agent/applications/pending`, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  approveAgent(userId: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/agent/applications/${userId}/approve`, {}, {
+  approveAgent(userId: string): Observable<AdminResponse<unknown>> {
+    return this.http.put<AdminResponse<unknown>>(`${this.baseUrl}/agent/applications/${userId}/approve`, {}, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  rejectAgent(userId: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/agent/applications/${userId}/reject`, {}, {
+  rejectAgent(userId: string): Observable<AdminResponse<unknown>> {
+    return this.http.put<AdminResponse<unknown>>(`${this.baseUrl}/agent/applications/${userId}/reject`, {}, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  toggleUserStatus(userId: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/admin/users/${userId}/toggle-status`, {}, {
+  toggleUserStatus(userId: string): Observable<AdminResponse<unknown>> {
+    return this.http.put<AdminResponse<unknown>>(`${this.baseUrl}/admin/users/${userId}/toggle-status`, {}, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  updateUserRole(userId: string, role: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/admin/users/${userId}/role`, { role }, {
+  updateUserRole(userId: string, role: string): Observable<AdminResponse<unknown>> {
+    return this.http.put<AdminResponse<unknown>>(`${this.baseUrl}/admin/users/${userId}/role`, { role }, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  deleteUser(userId: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/admin/users/${userId}`, {
+  deleteUser(userId: string): Observable<AdminResponse<unknown>> {
+    return this.http.delete<AdminResponse<unknown>>(`${this.baseUrl}/admin/users/${userId}`, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  getAllReviews(page: number = 1, limit: number = 10, minRating?: number, maxRating?: number): Observable<any> {
+  getAllReviews(page: number = 1, limit: number = 10, minRating?: number, maxRating?: number): Observable<ReviewsResponse> {
     let url = `${this.baseUrl}/admin/reviews?page=${page}&limit=${limit}`;
     if (minRating !== undefined) url += `&minRating=${minRating}`;
     if (maxRating !== undefined) url += `&maxRating=${maxRating}`;
     
-    return this.http.get(url, {
+    return this.http.get<ReviewsResponse>(url, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  getReviewStats(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/admin/reviews/stats`, {
+  getReviewStats(): Observable<ReviewStatsResponse> {
+    return this.http.get<ReviewStatsResponse>(`${this.baseUrl}/admin/reviews/stats`, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  deleteReview(reviewId: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/admin/reviews/${reviewId}`, {
+  deleteReview(reviewId: string): Observable<AdminResponse<unknown>> {
+    return this.http.delete<AdminResponse<unknown>>(`${this.baseUrl}/admin/reviews/${reviewId}`, {
       headers: this.getAuthHeaders(),
     });
   }

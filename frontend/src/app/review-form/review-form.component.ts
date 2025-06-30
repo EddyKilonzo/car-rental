@@ -1,8 +1,14 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReviewService, CreateReviewRequest } from '../services/review.service';
 import { ToastService } from '../services/toast.service';
+
+interface ReviewResponse {
+  success: boolean;
+  message?: string;
+  data?: unknown;
+}
 
 @Component({
   selector: 'app-review-form',
@@ -12,8 +18,12 @@ import { ToastService } from '../services/toast.service';
   styleUrls: ['./review-form.component.css']
 })
 export class ReviewFormComponent implements OnInit {
-  @Input() bookingId: string = '';
-  @Input() vehicleName: string = '';
+  private fb = inject(FormBuilder);
+  private reviewService = inject(ReviewService);
+  private toastService = inject(ToastService);
+
+  @Input() bookingId = '';
+  @Input() vehicleName = '';
   @Output() reviewSubmitted = new EventEmitter<void>();
   @Output() reviewCancelled = new EventEmitter<void>();
 
@@ -21,11 +31,7 @@ export class ReviewFormComponent implements OnInit {
   isSubmitting = false;
   hoverRating = 0;
 
-  constructor(
-    private fb: FormBuilder,
-    private reviewService: ReviewService,
-    private toastService: ToastService
-  ) {
+  constructor() {
     this.reviewForm = this.fb.group({
       rating: [0, [Validators.required, Validators.min(1), Validators.max(5)]],
       comment: ['', [Validators.maxLength(500)]]
@@ -69,10 +75,14 @@ export class ReviewFormComponent implements OnInit {
     };
 
     this.reviewService.createReview(reviewData).subscribe({
-      next: (response) => {
+      next: (response: ReviewResponse) => {
         this.isSubmitting = false;
-        this.toastService.showSuccess('Review submitted successfully!');
-        this.reviewSubmitted.emit();
+        if (response.success) {
+          this.toastService.showSuccess('Review submitted successfully!');
+          this.reviewSubmitted.emit();
+        } else {
+          this.toastService.showError(response.message || 'Failed to submit review');
+        }
       },
       error: (error) => {
         this.isSubmitting = false;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
@@ -33,7 +33,15 @@ interface Vehicle {
     id: string;
     name: string;
     email: string;
+    avatarUrl?: string;
   };
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
 @Component({
@@ -44,22 +52,22 @@ interface Vehicle {
   styleUrls: ['./vehicle-details.component.css']
 })
 export class VehicleDetailsComponent implements OnInit {
+  private authService = inject(AuthService);
+  private vehicleService = inject(VehicleService);
+  private reviewService = inject(ReviewService);
+  private toastService = inject(ToastService);
+  private route = inject(ActivatedRoute);
+  router = inject(Router);
+
   vehicle: Vehicle | null = null;
   vehicleReviews: Review[] = [];
   isLoading = false;
   error = '';
   isAdmin = false;
   isAgent = false;
-  currentUser: any = null;
+  currentUser: User | null = null;
 
-  constructor(
-    private authService: AuthService,
-    private vehicleService: VehicleService,
-    private reviewService: ReviewService,
-    private toastService: ToastService,
-    private route: ActivatedRoute,
-    public router: Router
-  ) {}
+  constructor() {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
@@ -209,13 +217,14 @@ export class VehicleDetailsComponent implements OnInit {
     }
   }
 
-  onImageError(event: any): void {
-    console.error('Image failed to load:', event.target?.src);
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    console.error('Image failed to load:', target?.src);
     console.error('Image error details:', event);
     
-    if (event.target) {
+    if (target) {
       // Try to determine the issue
-      const originalSrc = event.target.src;
+      const originalSrc = target.src;
       console.log('Original image source:', originalSrc);
       
       if (originalSrc && originalSrc.includes('cloudinary')) {
@@ -227,7 +236,7 @@ export class VehicleDetailsComponent implements OnInit {
       }
       
       // Use a more reliable placeholder
-      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';
+      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';
     }
   }
 
@@ -238,5 +247,12 @@ export class VehicleDetailsComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/vehicles']);
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '';
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 }

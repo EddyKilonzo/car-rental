@@ -35,12 +35,17 @@ export class AuthService {
     });
 
     if (user && (await bcrypt.compare(password, user.password))) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...result } = user;
       return result;
     }
     return null;
   }
-
+  /**
+   * Login user
+   * @param loginDto Login credentials
+   * @returns JWT access token and user information
+   */
   async login(loginDto: LoginDto): Promise<ApiResponse<AuthResponseDto>> {
     const user = (await this.validateUser(
       loginDto.email,
@@ -73,7 +78,13 @@ export class AuthService {
       data: authResponse,
     };
   }
+  /** */
 
+  /**
+   * Register user
+   * @param createUserDto User registration information
+   * @returns JWT access token and user information
+   */
   async register(
     createUserDto: CreateUserDto,
   ): Promise<ApiResponse<AuthResponseDto>> {
@@ -119,7 +130,11 @@ export class AuthService {
       throw new UnauthorizedException('Registration failed');
     }
   }
-
+  /**
+   * Forgot password - send reset code to user's email
+   * @param forgotPasswordDto Email of the user requesting password reset
+   * @returns Success message
+   */
   async forgotPassword(
     forgotPasswordDto: ForgotPasswordDto,
   ): Promise<ApiResponse<null>> {
@@ -169,6 +184,11 @@ export class AuthService {
     };
   }
 
+  /**
+   * Verify reset code
+   * @param verifyResetCodeDto Email and reset code to verify
+   * @returns Success message if valid
+   */
   async verifyResetCode(
     verifyResetCodeDto: VerifyResetCodeDto,
   ): Promise<ApiResponse<null>> {
@@ -198,6 +218,11 @@ export class AuthService {
       data: null,
     };
   }
+  /**
+   * Reset password using reset code
+   * @param resetPasswordDto Email, reset code, and new password
+   * @returns Success message if password reset is successful
+   */
 
   async resetPassword(
     resetPasswordDto: ResetPasswordDto,

@@ -138,218 +138,210 @@
   gap: 1.5rem;
 }
 
+.bookings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
 .booking-card {
   background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  position: relative;
+  border-radius: 16px;
   overflow: hidden;
-}
-
-.booking-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: #A11312;
-}
-
-.booking-card.status-confirmed::before {
-  background: #1e9c47;
-}
-
-.booking-card.status-cancelled::before {
-  background: #888;
-}
-
-.booking-card.status-pending::before {
-  background: #A11312;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .booking-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(161, 19, 18, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-.booking-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+.card-header {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
 }
 
-.vehicle-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
+.vehicle-image {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
-.vehicle-icon {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #A11312 0%, #8a0f0e 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.5rem;
-  box-shadow: 0 4px 12px rgba(161, 19, 18, 0.3);
+.vehicle-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-.vehicle-icon i {
-  font-size: 1.5rem;
-}
-
-.vehicle-details h3 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 0.25rem 0;
-}
-
-.vehicle-details p {
-  color: #666;
-  margin: 0;
-  font-size: 0.9rem;
+.booking-card:hover .vehicle-image img {
+  transform: scale(1.05);
 }
 
 .status-badge {
-  padding: 0.5em 1.2em;
-  border-radius: 25px;
-  font-size: 0.85rem;
-  font-weight: 700;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: rgba(161, 19, 18, 0.1);
-  color: #A11312;
-  border: 2px solid #A11312;
-  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.9);
 }
 
-.booking-card.status-confirmed .status-badge {
-  background: rgba(30, 156, 71, 0.1);
-  color: #1e9c47;
-  border-color: #1e9c47;
+.status-pending {
+  color: #d97706;
 }
 
-.booking-card.status-cancelled .status-badge {
-  background: rgba(136, 136, 136, 0.1);
-  color: #888;
-  border-color: #888;
+.status-confirmed {
+  color: #059669;
 }
 
-.booking-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding: 1.5rem;
-  background: #f8f9fa;
-  border-radius: 12px;
+.status-active {
+  color: #16a34a;
 }
 
-.detail-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.status-completed {
+  color: #2563eb;
 }
 
-.detail-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.status-cancelled {
+  color: #dc2626;
 }
 
-.detail-value {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1a1a1a;
+.card-body {
+  padding: 20px;
 }
 
-.detail-value.customer {
-  color: #A11312;
+.vehicle-title {
+  margin: 0 0 8px 0;
+  color: #1e293b;
+  font-size: 1.125rem;
   font-weight: 700;
+  transition: color 0.2s ease;
 }
 
-.detail-value.price {
-  color: #1e9c47;
-  font-weight: 700;
-  font-size: 1.1rem;
+.vehicle-title:hover {
+  color: #A11312;
 }
 
-.detail-value.dates {
-  color: #666;
-  font-size: 0.9rem;
+.vehicle-year {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 16px;
 }
 
-.booking-actions {
+.booking-info {
+  margin-bottom: 20px;
+}
+
+.info-row {
   display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
-.approve-btn, .decline-btn {
-  padding: 0.75em 1.5em;
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: #64748b;
+  flex: 1;
+}
+
+.info-item i {
+  color: #94a3b8;
+  width: 16px;
+  text-align: center;
+}
+
+.info-item.price {
+  color: #A11312;
+  font-weight: 600;
+}
+
+.info-item.price i {
+  color: #A11312;
+}
+
+.card-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 10px 16px;
   border: none;
   border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  min-width: 120px;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 6px;
 }
 
-.approve-btn::before {
-  content: '✓';
-  font-weight: bold;
-}
-
-.decline-btn::before {
-  content: '✕';
-  font-weight: bold;
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .approve-btn {
-  background: linear-gradient(135deg, #A11312 0%, #8a0f0e 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
 }
 
-.approve-btn:hover {
-  background: linear-gradient(135deg, #8a0f0e 0%, #7a0e0e 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(161, 19, 18, 0.4);
+.approve-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
 
 .decline-btn {
-  background: #fff;
-  color: #A11312;
-  border: 2px solid #A11312;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
 }
 
-.decline-btn:hover {
-  background: #A11312;
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(161, 19, 18, 0.4);
+.decline-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.start-btn {
+  background: linear-gradient(135deg, #A11312 0%, #8a0f0e 100%);
+  color: white;
+}
+
+.start-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(161, 19, 18, 0.3);
+}
+
+.complete-btn {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.complete-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .notes-section {
@@ -799,34 +791,423 @@
 
 @media (max-width: 768px) {
   .agent-dashboard-container {
-    padding: 1rem;
+    padding: 16px;
   }
-  
+
   .header h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
-  
+
   .bookings-grid,
   .reviews-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
-  
-  .booking-header {
+
+  .card-header {
+    height: 140px;
+  }
+
+  .card-body {
+    padding: 16px;
+  }
+
+  .info-row {
     flex-direction: column;
-    gap: 1rem;
+    gap: 8px;
   }
-  
-  .booking-actions {
+
+  .card-actions {
     flex-direction: column;
   }
-  
-  .btn {
+
+  .action-btn {
     width: 100%;
-    justify-content: center;
   }
-  
+
   .tab-btn {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
   }
+}
+
+@media (max-width: 480px) {
+  .agent-dashboard-container {
+    padding: 12px;
+  }
+
+  .booking-card {
+    border-radius: 12px;
+  }
+
+  .card-header {
+    height: 120px;
+  }
+
+  .card-body {
+    padding: 12px;
+  }
+
+  .vehicle-title {
+    font-size: 1rem;
+  }
+
+  .action-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Earnings & Stats Styles */
+.earnings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(161, 19, 18, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card.primary {
+  border-left: 4px solid #A11312;
+}
+
+.stat-card.success {
+  border-left: 4px solid #28a745;
+}
+
+.stat-card.info {
+  border-left: 4px solid #17a2b8;
+}
+
+.stat-card.warning {
+  border-left: 4px solid #ffc107;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.stat-card.primary .stat-icon {
+  background: linear-gradient(135deg, #A11312, #c41e3a);
+}
+
+.stat-card.success .stat-icon {
+  background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.stat-card.info .stat-icon {
+  background: linear-gradient(135deg, #17a2b8, #6f42c1);
+}
+
+.stat-card.warning .stat-icon {
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.25rem 0;
+  font-family: 'Lufga', sans-serif;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
+}
+
+.earnings-breakdown {
+  margin-bottom: 2rem;
+}
+
+.earnings-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(161, 19, 18, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.earnings-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Lufga', sans-serif;
+}
+
+.earnings-title i {
+  color: #A11312;
+}
+
+.earnings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.earnings-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(161, 19, 18, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(161, 19, 18, 0.1);
+}
+
+.earnings-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.earnings-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #A11312;
+  font-family: 'Lufga', sans-serif;
+}
+
+.vehicle-earnings {
+  margin-top: 2rem;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Lufga', sans-serif;
+}
+
+.section-title i {
+  color: #A11312;
+}
+
+.vehicle-earnings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.vehicle-earnings-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(161, 19, 18, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.vehicle-earnings-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.vehicle-earnings-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(161, 19, 18, 0.1);
+}
+
+.vehicle-earnings-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid rgba(161, 19, 18, 0.1);
+}
+
+.vehicle-earnings-info {
+  flex: 1;
+}
+
+.vehicle-earnings-info h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.25rem 0;
+  font-family: 'Lufga', sans-serif;
+}
+
+.vehicle-year {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+.vehicle-earnings-total {
+  text-align: right;
+}
+
+.total-amount {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #A11312;
+  margin-bottom: 0.25rem;
+  font-family: 'Lufga', sans-serif;
+}
+
+.total-label {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.vehicle-earnings-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 1rem;
+}
+
+.vehicle-stat {
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(161, 19, 18, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(161, 19, 18, 0.1);
+}
+
+.stat-number {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+  font-family: 'Lufga', sans-serif;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .earnings-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .vehicle-earnings-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .vehicle-earnings-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .vehicle-earnings-total {
+    text-align: center;
+  }
+
+  .vehicle-earnings-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .earnings-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .vehicle-earnings-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .earnings-item {
+    padding: 0.75rem;
+  }
+
+  .earnings-value {
+    font-size: 1.2rem;
+  }
+}
+
+.vehicle-earnings-card.transparent {
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 2px 10px rgba(161, 19, 18, 0.06);
+  border: 1px solid rgba(161, 19, 18, 0.07);
+  backdrop-filter: blur(6px);
+}
+
+.vehicle-earnings-card.transparent:hover {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 6px 24px rgba(161, 19, 18, 0.10);
 } 

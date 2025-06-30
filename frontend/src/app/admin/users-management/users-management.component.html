@@ -53,18 +53,20 @@
               <td class="table-cell">{{ getFormattedDate(user.createdAt) }}</td>
               <td class="table-cell actions-cell">
                 <div class="action-buttons">
-                  <!-- Role Update Dropdown -->
-                  <select 
-                    #roleSelect
-                    class="role-select"
-                    (change)="updateUserRole(user.id, roleSelect.value)"
+                  <!-- Demote Agent Button (only for agents) -->
+                  <button 
+                    *ngIf="user.role === 'AGENT'"
+                    class="demote-btn" 
+                    (click)="demoteAgent(user.id, user.name)"
                     [disabled]="processingUserId === user.id"
                   >
-                    <option [value]="user.role" selected>{{ getRoleDisplayName(user.role) }}</option>
-                    <option *ngFor="let role of getRoleOptions(user.role)" [value]="role">
-                      {{ getRoleDisplayName(role) }}
-                    </option>
-                  </select>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9 12l2 2 4-4"/>
+                      <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
+                      <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"/>
+                    </svg>
+                    {{ processingUserId === user.id ? 'Processing...' : 'Demote' }}
+                  </button>
                   
                   <!-- Toggle Status Button -->
                   <button 
@@ -152,18 +154,20 @@
           
           <div class="user-card-actions">
             <div class="mobile-action-buttons">
-              <!-- Role Update Dropdown -->
-              <select 
-                #mobileRoleSelect
-                class="role-select mobile-role-select"
-                (change)="updateUserRole(user.id, mobileRoleSelect.value)"
+              <!-- Demote Agent Button (only for agents) -->
+              <button 
+                *ngIf="user.role === 'AGENT'"
+                class="demote-btn mobile-btn" 
+                (click)="demoteAgent(user.id, user.name)"
                 [disabled]="processingUserId === user.id"
               >
-                <option [value]="user.role" selected>{{ getRoleDisplayName(user.role) }}</option>
-                <option *ngFor="let role of getRoleOptions(user.role)" [value]="role">
-                  {{ getRoleDisplayName(role) }}
-                </option>
-              </select>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12l2 2 4-4"/>
+                  <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
+                  <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"/>
+                </svg>
+                {{ processingUserId === user.id ? 'Processing...' : 'Demote' }}
+              </button>
               
               <!-- Toggle Status Button -->
               <button 

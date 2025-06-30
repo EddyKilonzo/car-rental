@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
@@ -19,6 +19,10 @@ interface User {
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private toastService = inject(ToastService);
+
   isLoggedIn = false;
   userRole = '';
   userName = '';
@@ -26,13 +30,7 @@ export class NavbarComponent implements OnInit {
   currentRoute = '';
   isMobileMenuOpen = false;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private toastService: ToastService
-  ) {}
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.updateAuthStatus();
     this.router.events.subscribe(() => {
       this.updateAuthStatus();
@@ -41,17 +39,24 @@ export class NavbarComponent implements OnInit {
       this.closeMobileMenu();
     });
   }
-
+  /**
+   * 
+   * @param event Event triggered when clicking anywhere in the document
+   * Listens for clicks on the document to close the mobile menu when clicking outside of it
+   */
   @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event) {
+  onDocumentClick(event: Event): void {
     // Close mobile menu when clicking outside
     const target = event.target as HTMLElement;
     if (!target.closest('.navbar') && this.isMobileMenuOpen) {
       this.closeMobileMenu();
     }
   }
+  /**
+   * Updates the authentication status and retrieves user data from localStorage.
+   */
 
-  updateAuthStatus() {
+  updateAuthStatus(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
       // Get user data from localStorage
@@ -75,40 +80,44 @@ export class NavbarComponent implements OnInit {
       this.userName = '';
     }
   }
+  /**
+   * Toggles the mobile menu open/close state.
+   * Logs the current state of the mobile menu for debugging purposes.
+   */
 
-  toggleMobileMenu() {
+  toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     console.log('Mobile menu toggled:', this.isMobileMenuOpen); // Debug log
   }
-
-  closeMobileMenu() {
+  // Closes the mobile menu.
+  closeMobileMenu(): void {
     this.isMobileMenuOpen = false;
   }
-
-  logout() {
+  // Logs the current user data for debugging purposes.
+  logout(): void {
     this.authService.logout();
     this.toastService.showSuccess('You have been logged out successfully.');
     this.router.navigate(['/']);
     this.updateAuthStatus();
     this.closeMobileMenu();
   }
-
-  onProfileClick() {
+  // Navigates to the profile page if logged in, otherwise redirects to login page.
+  onProfileClick(): void {
     if (this.isLoggedIn) {
       this.router.navigate(['/profile']);
     } else {
       this.router.navigate(['/login']);
     }
   }
-
+  // Checks if the user has admin privileges.
   isAdmin(): boolean {
     return this.userRole === 'ADMIN';
   }
-
+  // Checks if the user has agent privileges.
   isAgent(): boolean {
     return this.userRole === 'AGENT';
   }
-
+  // Checks if the user has customer privileges.
   isCustomer(): boolean {
     return this.userRole === 'CUSTOMER';
   }

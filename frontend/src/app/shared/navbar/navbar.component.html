@@ -40,7 +40,7 @@
       <ng-template #loggedInUser>
         <div class="user-menu">
           <div class="user-actions">
-            <a class="profile-link" (click)="onProfileClick()" aria-label="Profile">
+            <a class="profile-link" (click)="onProfileClick()" (keyup.enter)="onProfileClick()" (keyup.space)="onProfileClick()" tabindex="0" aria-label="Profile">
               <svg class="person-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="8" r="4"/>
                 <path d="M21 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
@@ -60,7 +60,7 @@
   </div>
   
   <!-- Mobile Menu Toggle -->
-  <div class="mobile-menu-toggle" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen">
+  <div class="mobile-menu-toggle" (click)="toggleMobileMenu()" (keyup.enter)="toggleMobileMenu()" (keyup.space)="toggleMobileMenu()" [class.active]="isMobileMenuOpen" tabindex="0" aria-label="Toggle mobile menu">
     <span></span>
     <span></span>
     <span></span>
@@ -103,7 +103,7 @@
       <ng-template #mobileLoggedInUser>
         <div class="user-menu">
           <div class="user-actions">
-            <a class="profile-link" (click)="onProfileClick(); closeMobileMenu()" aria-label="Profile">
+            <a class="profile-link" (click)="onProfileClick(); closeMobileMenu()" (keyup.enter)="onProfileClick(); closeMobileMenu()" (keyup.space)="onProfileClick(); closeMobileMenu()" tabindex="0" aria-label="Profile">
               <svg class="person-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="8" r="4"/>
                 <path d="M21 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>

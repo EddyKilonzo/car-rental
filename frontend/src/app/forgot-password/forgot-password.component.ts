@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,18 +13,16 @@ import { ToastService } from '../services/toast.service';
   styleUrls: ['./forgot-password.component.css']
 })
 export class ForgotPasswordComponent {
-  email: string = '';
-  isLoading: boolean = false;
-  resetCode: string = '';
-  newPassword: string = '';
-  confirmPassword: string = '';
-  step: 'email' | 'code' | 'password' = 'email';
+  private authService = inject(AuthService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
 
-  constructor(
-    private authService: AuthService,
-    private toastService: ToastService,
-    private router: Router
-  ) {}
+  email = '';
+  isLoading = false;
+  resetCode = '';
+  newPassword = '';
+  confirmPassword = '';
+  step: 'email' | 'code' | 'password' = 'email';
 
   onSubmitEmail(): void {
     if (!this.email) {
@@ -34,7 +32,7 @@ export class ForgotPasswordComponent {
 
     this.isLoading = true;
     this.authService.forgotPassword(this.email).subscribe({
-      next: (response) => {
+      next: () => {
         this.toastService.showSuccess('Reset code sent to your email');
         this.step = 'code';
         this.isLoading = false;
@@ -45,6 +43,10 @@ export class ForgotPasswordComponent {
       }
     });
   }
+  /**
+   * Handles the submission of the reset code.
+   * @returns void
+   */
 
   onSubmitCode(): void {
     if (!this.resetCode) {
@@ -54,7 +56,7 @@ export class ForgotPasswordComponent {
 
     this.isLoading = true;
     this.authService.verifyResetCode(this.email, this.resetCode).subscribe({
-      next: (response) => {
+      next: () => {
         this.toastService.showSuccess('Code verified successfully');
         this.step = 'password';
         this.isLoading = false;
@@ -65,6 +67,13 @@ export class ForgotPasswordComponent {
       }
     });
   }
+  /**
+   * Submits the new password and confirms it matches the confirmation field.
+   * Validates the password length and matches before proceeding.
+   * @returns void
+   * @throws Error if the new password and confirmation do not match, or if the password
+   * is less than 6 characters.
+   */
 
   onSubmitPassword(): void {
     if (!this.newPassword || !this.confirmPassword) {
@@ -84,7 +93,7 @@ export class ForgotPasswordComponent {
 
     this.isLoading = true;
     this.authService.resetPassword(this.email, this.resetCode, this.newPassword).subscribe({
-      next: (response) => {
+      next: () => {
         this.toastService.showSuccess('Password reset successfully');
         this.router.navigate(['/login']);
       },
@@ -94,6 +103,7 @@ export class ForgotPasswordComponent {
       }
     });
   }
+  /// Navigates back to the previous step in the forgot password flow.
 
   goBack(): void {
     if (this.step === 'code') {

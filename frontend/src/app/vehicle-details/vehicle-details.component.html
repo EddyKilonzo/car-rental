@@ -30,6 +30,16 @@
       <div class="detail-item"><span>Seats:</span> <span>{{ vehicle.seats }}</span></div>
       <div class="detail-item"><span>Doors:</span> <span>{{ vehicle.doors }}</span></div>
       <div class="detail-item"><span>Color:</span> <span>{{ vehicle.color }}</span></div>
+      <div class="detail-item owner-info" *ngIf="vehicle.user">
+        <span>Owner:</span>
+        <div class="owner-details">
+          <span class="owner-avatar">
+            <img *ngIf="vehicle.user.avatarUrl" [src]="vehicle.user.avatarUrl" alt="Owner Avatar" />
+            <span *ngIf="!vehicle.user.avatarUrl">{{ getInitials(vehicle.user.name) }}</span>
+          </span>
+          <span class="owner-name">{{ vehicle.user.name }}</span>
+        </div>
+      </div>
     </div>
     <div class="vehicle-actions">
       <button class="vehicle-btn" (click)="onBookClick()" [disabled]="!canBookVehicle() || vehicle.status !== 'AVAILABLE'">

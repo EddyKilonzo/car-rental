@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,6 +13,10 @@ import { ToastService } from '../services/toast.service';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private toastService = inject(ToastService);
+
   userData = {
     name: '',
     email: '',
@@ -23,11 +27,10 @@ export class SignupComponent {
   };
   isLoading = false;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private toastService: ToastService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   onSubmit() {
     // Validation

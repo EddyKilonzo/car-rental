@@ -13,6 +13,9 @@ export class MailerService {
   constructor(private configService: ConfigService) {
     this.initializeTransporter();
   }
+  /**
+   * Initializes the nodemailer transporter with configuration from environment variables.
+   */
 
   private initializeTransporter() {
     this.transporter = nodemailer.createTransport({
@@ -27,7 +30,12 @@ export class MailerService {
       },
     });
   }
-
+  /**
+   * Renders an EJS template with the provided data.
+   * @param templateName Name of the template file (without extension).
+   * @param data Data to be injected into the template.
+   * @returns Rendered HTML string.
+   */
   private renderTemplate(
     templateName: string,
     data: Record<string, any>,
@@ -75,6 +83,11 @@ export class MailerService {
       throw error;
     }
   }
+  /**
+   * Sends a welcome email to the user after registration.
+   * @param userData User information including name and email.
+   * @returns Promise resolving to the sent message info.
+   */
 
   async sendWelcomeEmail(userData: {
     name: string;
@@ -87,6 +100,11 @@ export class MailerService {
     });
     return this.sendEmail(userData.email, 'Welcome to CarRental! 🚗', html);
   }
+  /**
+   * Sends an agent application email to the applicant.
+   * @param applicationData Application data including name, email, application ID, and date.
+   * @returns Promise resolving to the sent message info.
+   */
 
   async sendAgentApplicationEmail(applicationData: {
     name: string;
@@ -106,7 +124,11 @@ export class MailerService {
       html,
     );
   }
-
+  /**
+   * Sends a response to the agent application.
+   * @param responseData Response data including name, email, status, and reason (if denied).
+   * @returns Promise resolving to the sent message info.
+   */
   async sendAgentApplicationResponse(responseData: {
     name: string;
     email: string;
@@ -126,7 +148,11 @@ export class MailerService {
         : 'Agent Application Update - CarRental';
     return this.sendEmail(responseData.email, subject, html);
   }
-
+  /**
+   * Sends a booking confirmation email to the customer.
+   * @param bookingData Booking information including customer details, booking ID, dates, vehicle details, and agent contact.
+   * @returns Promise resolving to the sent message info.
+   */
   async sendBookingConfirmationEmail(bookingData: {
     customerName: string;
     customerEmail: string;
@@ -170,7 +196,11 @@ export class MailerService {
       html,
     );
   }
-
+  /**
+   * Sends a password reset email with a reset code.
+   * @param emailData Email data including email address, user name, and reset code.
+   * @returns Promise resolving to the sent message info.
+   */
   async sendPasswordResetEmail(emailData: {
     email: string;
     name: string;

@@ -38,6 +38,10 @@ export class VehiclesService {
     private prisma: PrismaService,
     private mailerService: MailerService,
   ) {}
+  /**
+   * Get all available vehicles
+   * @returns List of available vehicles
+   */
 
   async getAllVehicles(): Promise<Vehicle[]> {
     try {
@@ -85,6 +89,11 @@ export class VehiclesService {
       );
     }
   }
+  /**
+   * Get a vehicle by its ID
+   * @param vehicleId ID of the vehicle to retrieve
+   * @returns The requested vehicle or throws a NotFoundException
+   */
 
   async getVehicleById(vehicleId: string): Promise<Vehicle> {
     try {
@@ -115,7 +124,11 @@ export class VehiclesService {
       );
     }
   }
-
+  /**
+   * Searches for vehicles based on the provided filters.
+   * @param filters Vehicle filters to apply.
+   * @returns List of vehicles matching the filters.
+   */
   async searchVehicles(filters: VehicleFilters): Promise<Vehicle[]> {
     try {
       const whereClause: {
@@ -201,7 +214,12 @@ export class VehiclesService {
       );
     }
   }
-
+  /**
+   * Create a booking for a user
+   * @param userId - ID of the user creating the booking
+   * @param bookingData - Data for the booking
+   * @returns Created booking
+   */
   async createBooking(
     userId: string,
     bookingData: CreateBookingDto,

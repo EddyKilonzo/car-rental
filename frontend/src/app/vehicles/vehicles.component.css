@@ -299,15 +299,42 @@
 
 .vehicle-badge {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 12px;
+  left: 12px;
   background: linear-gradient(135deg, #A11312, #8a0f0e);
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.vehicle-badge.top {
+  background: linear-gradient(135deg, #A11312, #8a0f0e);
+}
+
+.vehicle-badge.premium {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #1a1a1a;
+}
+
+.vehicle-badge.new {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+}
+
+.vehicle-badge.budget {
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  color: white;
+}
+
+.vehicle-badge.popular {
+  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  color: white;
 }
 
 .vehicle-overlay {
@@ -332,9 +359,30 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+.vehicle-info.minimal {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  width: 100%;
+}
+
+.vehicle-content {
+  margin-bottom: auto;
+}
+
+.vehicle-btn-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
 .vehicle-info.minimal h3 {
   font-size: 1.2rem;
-  margin: 0 0 0.3rem 0;
+  margin-bottom: 0.8rem;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .vehicle-ministats {
@@ -345,24 +393,75 @@
 }
 
 .vehicle-price {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(161, 19, 18, 0.9);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Removed vehicle seats section - simplified cards */
+/*
+.vehicle-seats {
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
   padding: 0.3rem 0.6rem;
   border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  backdrop-filter: blur(10px);
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+*/
+
+/* Removed vehicle features section - simplified cards */
+/*
+.vehicle-features {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.vehicle-btn-group {
-  display: flex;
-  gap: 0.5rem;
+.feature-tag {
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
+  padding: 0.2rem 0.4rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
+
+.feature-more {
+  background: rgba(161, 19, 18, 0.8);
+  color: white;
+  padding: 0.2rem 0.4rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.feature-more:hover {
+  background: rgba(161, 19, 18, 1);
+  transform: scale(1.05);
+}
+*/
 
 .vehicle-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.8rem;
   border: none;
   border-radius: 8px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -396,6 +495,21 @@
 .vehicle-btn.edit:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* Removed old delete button CSS - replaced with vehicle-delete-btn */
+/*
+.vehicle-btn.delete {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.vehicle-btn.delete:hover {
+  background: rgba(220, 53, 69, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+}
+*/
 
 /* Empty State */
 .empty-state {
@@ -594,7 +708,7 @@
   
   .vehicle-info.minimal h3 {
     font-size: 1rem;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.3rem;
   }
   
   .vehicle-ministats {
@@ -650,6 +764,53 @@
   .spinner {
     width: 32px;
     height: 32px;
+  }
+
+  .vehicle-performance-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+
+  .stat-card {
+    padding: 0.6rem;
+    min-height: 60px;
+    gap: 0.5rem;
+  }
+
+  .stat-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .stat-value {
+    font-size: 1rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .earnings-item {
+    padding: 0.5rem;
+  }
+
+  .earnings-value {
+    font-size: 1rem;
+  }
+
+  .earnings-label {
+    font-size: 0.7rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .earnings-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 }
 
@@ -754,5 +915,499 @@
   .vehicle-btn {
     padding: 0.5rem 0.8rem;
     font-size: 0.8rem;
+  }
+}
+
+/* Removed duplicate sections - simplified cards */
+/*
+.vehicle-ministats {
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.vehicle-price,
+.vehicle-seats {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.vehicle-features {
+  gap: 0.2rem;
+  margin-bottom: 0.3rem;
+}
+
+.feature-tag {
+  padding: 0.15rem 0.3rem;
+  font-size: 0.65rem;
+}
+
+.feature-more {
+  padding: 0.15rem 0.3rem;
+  font-size: 0.65rem;
+}
+*/
+
+.vehicle-bottom-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+}
+
+.vehicle-content {
+  margin-bottom: 0;
+}
+
+.vehicle-btn-group {
+  margin-top: 0;
+}
+
+.vehicle-delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+
+.vehicle-delete-btn:hover {
+  background: rgba(220, 53, 69, 0.4);
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(161, 19, 18, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #666;
+  backdrop-filter: blur(10px);
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(161, 19, 18, 0.3);
+  transform: translateY(-1px);
+}
+
+.tab-btn.active {
+  background: #A11312;
+  color: white;
+  border-color: #A11312;
+  box-shadow: 0 4px 12px rgba(161, 19, 18, 0.3);
+}
+
+.tab-btn i {
+  font-size: 1rem;
+}
+
+/* Performance Section */
+.performance-section {
+  padding: 0 1rem;
+}
+
+.performance-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(161, 19, 18, 0.08);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  min-height: 80px;
+}
+
+.stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.stat-card.primary {
+  border-left: 3px solid rgba(161, 19, 18, 0.6);
+}
+
+.stat-card.success {
+  border-left: 3px solid rgba(40, 167, 69, 0.6);
+}
+
+.stat-card.info {
+  border-left: 3px solid rgba(23, 162, 184, 0.6);
+}
+
+.stat-card.warning {
+  border-left: 3px solid rgba(255, 193, 7, 0.6);
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.stat-card.primary .stat-icon {
+  background: linear-gradient(135deg, rgba(161, 19, 18, 0.8), rgba(196, 30, 58, 0.8));
+}
+
+.stat-card.success .stat-icon {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.8), rgba(32, 201, 151, 0.8));
+}
+
+.stat-card.info .stat-icon {
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.8), rgba(111, 66, 193, 0.8));
+}
+
+.stat-card.warning .stat-icon {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.8), rgba(253, 126, 20, 0.8));
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.2rem 0;
+  font-family: 'Lufga', sans-serif;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Earnings Breakdown */
+.earnings-breakdown {
+  margin-bottom: 2rem;
+}
+
+.earnings-card {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(161, 19, 18, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.earnings-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Lufga', sans-serif;
+}
+
+.earnings-title i {
+  color: rgba(161, 19, 18, 0.8);
+}
+
+.earnings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.earnings-item {
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(161, 19, 18, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(161, 19, 18, 0.06);
+}
+
+.earnings-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+.earnings-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(161, 19, 18, 0.9);
+  font-family: 'Lufga', sans-serif;
+}
+
+/* Vehicle Performance Summary */
+.vehicle-performance-summary {
+  margin-top: 2rem;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Lufga', sans-serif;
+}
+
+.section-title i {
+  color: #A11312;
+}
+
+.vehicle-performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.vehicle-performance-card {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(161, 19, 18, 0.08);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.vehicle-performance-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.vehicle-performance-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(161, 19, 18, 0.08);
+}
+
+.vehicle-performance-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid rgba(161, 19, 18, 0.08);
+}
+
+.vehicle-performance-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.2rem 0;
+  font-family: 'Lufga', sans-serif;
+}
+
+.vehicle-year {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+}
+
+.vehicle-performance-total {
+  margin-left: auto;
+  text-align: right;
+}
+
+.total-amount {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(161, 19, 18, 0.9);
+  font-family: 'Lufga', sans-serif;
+}
+
+.total-label {
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 0.1rem;
+}
+
+.vehicle-performance-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.performance-stat {
+  text-align: center;
+  padding: 0.5rem;
+  background: rgba(161, 19, 18, 0.03);
+  border-radius: 6px;
+  border: 1px solid rgba(161, 19, 18, 0.06);
+}
+
+.stat-number {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(161, 19, 18, 0.9);
+  margin-bottom: 0.2rem;
+  font-family: 'Lufga', sans-serif;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tab-navigation {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .tab-btn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .earnings-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .vehicle-performance-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .vehicle-performance-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .vehicle-performance-total {
+    margin-left: 0;
+  }
+  
+  .vehicle-performance-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .stat-card {
+    padding: 0.75rem;
+    min-height: 70px;
+  }
+  
+  .stat-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+  
+  .stat-value {
+    font-size: 1.2rem;
+  }
+  
+  .earnings-card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .vehicle-performance-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+  
+  .stat-card {
+    padding: 0.6rem;
+    min-height: 60px;
+    gap: 0.5rem;
+  }
+  
+  .stat-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+  
+  .stat-value {
+    font-size: 1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+  }
+  
+  .earnings-item {
+    padding: 0.5rem;
+  }
+  
+  .earnings-value {
+    font-size: 1rem;
+  }
+  
+  .earnings-label {
+    font-size: 0.7rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .earnings-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 }

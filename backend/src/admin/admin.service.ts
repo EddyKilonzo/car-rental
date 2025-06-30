@@ -122,6 +122,14 @@ export class AdminService {
       );
     }
   }
+  /**
+   * Get all users with pagination and filtering
+   * @param page
+   * @param limit
+   * @param role
+   * @param search
+   * @returns
+   */
 
   async getAllUsers(
     page: number = 1,

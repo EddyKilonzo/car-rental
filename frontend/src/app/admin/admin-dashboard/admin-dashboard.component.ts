@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
@@ -43,13 +43,11 @@ interface SystemStats {
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
+  private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
+
   stats: SystemStats | null = null;
   isLoading = false;
-  
-  constructor(
-    private adminService: AdminService,
-    private toastService: ToastService
-  ) {}
   
   ngOnInit(): void {
     this.loadSystemStats();
@@ -69,6 +67,11 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
   }
+  /**
+   * Formats a currency amount.
+   * @param amount The amount to format.
+   * @returns The formatted currency string.
+   */
 
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('en-US', {

@@ -44,12 +44,13 @@
 }
 
 .users-count {
-  background: linear-gradient(135deg, #A11312, #8a0f0e);
-  color: white;
+  background: rgba(161, 19, 18, 0.1);
+  color: #A11312;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 600;
+  border: 1px solid rgba(161, 19, 18, 0.2);
 }
 
 .loading-state {
@@ -64,7 +65,7 @@
   width: 40px;
   height: 40px;
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #A11312;
+  border-top: 3px solid rgba(161, 19, 18, 0.6);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -209,18 +210,21 @@
 }
 
 .role-admin {
-  background: linear-gradient(135deg, #dc3545, #c82333);
-  color: white;
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.2);
 }
 
 .role-agent {
-  background: linear-gradient(135deg, #fd7e14, #e55a00);
-  color: white;
+  background: rgba(253, 126, 20, 0.1);
+  color: #fd7e14;
+  border: 1px solid rgba(253, 126, 20, 0.2);
 }
 
 .role-customer {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
-  color: white;
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.2);
 }
 
 .status-badge {
@@ -234,36 +238,15 @@
 }
 
 .status-active {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
-  color: white;
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.2);
 }
 
 .status-inactive {
-  background: linear-gradient(135deg, #6c757d, #545b62);
-  color: white;
-}
-
-.role-select {
-  padding: 0.5rem 0.8rem;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  background: white;
-  color: #495057;
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 100px;
-}
-
-.role-select:hover:not(:disabled) {
-  border-color: #A11312;
-  box-shadow: 0 2px 4px rgba(161, 19, 18, 0.1);
-}
-
-.role-select:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  background: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+  border: 1px solid rgba(108, 117, 125, 0.2);
 }
 
 .toggle-status-btn {
@@ -282,31 +265,35 @@
 }
 
 .activate-btn {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
-  color: white;
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.3);
 }
 
 .activate-btn:hover:not(:disabled) {
+  background: rgba(40, 167, 69, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
 }
 
 .deactivate-btn {
-  background: linear-gradient(135deg, #dc3545, #c82333);
-  color: white;
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.3);
 }
 
 .deactivate-btn:hover:not(:disabled) {
+  background: rgba(220, 53, 69, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
 }
 
 .delete-btn {
   padding: 0.5rem 0.8rem;
-  border: none;
+  border: 1px solid rgba(108, 117, 125, 0.3);
   border-radius: 8px;
-  background: linear-gradient(135deg, #6c757d, #545b62);
-  color: white;
+  background: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -319,8 +306,9 @@
 }
 
 .delete-btn:hover:not(:disabled) {
+  background: rgba(108, 117, 125, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+  box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
 }
 
 .toggle-status-btn:disabled,
@@ -445,29 +433,6 @@
   gap: 0.75rem;
 }
 
-.mobile-role-select {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 0.9rem;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  background: white;
-  color: #495057;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.mobile-role-select:hover:not(:disabled) {
-  border-color: #A11312;
-  box-shadow: 0 2px 4px rgba(161, 19, 18, 0.1);
-}
-
-.mobile-role-select:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .mobile-btn {
   width: 100%;
   padding: 0.75rem;
@@ -551,27 +516,32 @@
   }
   
   .user-card {
-    padding: 1.25rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
   }
   
   .user-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
   }
   
   .user-info {
-    width: 100%;
+    width: auto;
+    flex: 1;
   }
   
   .user-status {
-    align-self: flex-end;
+    align-self: flex-start;
   }
   
   .user-info-row {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: 0.5rem;
+    margin-bottom: 0.5rem;
   }
   
   .info-value {
@@ -581,10 +551,15 @@
   
   .mobile-action-buttons {
     gap: 0.5rem;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
   
   .mobile-btn {
-    padding: 0.875rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    min-width: auto;
+    flex: 1;
   }
 }
 
@@ -598,39 +573,76 @@
   }
   
   .users-card {
-    padding: 1rem;
+    padding: 0.75rem;
   }
   
   .user-card {
-    padding: 1rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .user-card-header {
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
   }
   
   .user-name {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   
   .user-email {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
   
   .info-label,
   .info-value {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
   
   .role-badge,
   .status-badge {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
   }
   
   .mobile-btn {
-    padding: 0.75rem;
-    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    min-width: 80px;
   }
   
-  .mobile-role-select {
-    padding: 0.75rem;
-    font-size: 0.85rem;
+  .mobile-action-buttons {
+    gap: 0.4rem;
   }
+}
+
+.demote-btn {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 90px;
+  justify-content: center;
+}
+
+.demote-btn:hover:not(:disabled) {
+  background: rgba(255, 193, 7, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.2);
+}
+
+.demote-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 } 

@@ -448,4 +448,16 @@
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
   }
+}
+
+.center-btn-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.center-btn-row .btn {
+  min-width: 200px;
 } 

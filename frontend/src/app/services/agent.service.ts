@@ -1,102 +1,245 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { map } from 'rxjs/operators';
+
+interface AgentResponse {
+  success: boolean;
+  data: unknown;
+  message?: string;
+}
+
+interface ApplicationStatus {
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'NOT_APPLIED';
+  message?: string;
+}
+
+interface Vehicle {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  vehicleType: string;
+  fuelType: string;
+  transmission: string;
+  seats: number;
+  doors: number;
+  color: string;
+  pricePerDay: number;
+  status: string;
+  isActive: boolean;
+  mainImageUrl?: string;
+  galleryImages?: string[];
+  interiorImages?: string[];
+  exteriorImages?: string[];
+}
+
+interface Booking {
+  id: string;
+  startDate: string;
+  endDate: string;
+  totalPrice: number;
+  status: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  vehicle: {
+    id: string;
+    make: string;
+    model: string;
+    year: number;
+    mainImageUrl?: string;
+  };
+}
+
+interface Review {
+  id: string;
+  rating: number;
+  comment?: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+  };
+  booking: {
+    id: string;
+    vehicle: {
+      id: string;
+      make: string;
+      model: string;
+      year: number;
+    };
+  };
+}
+
+interface EarningsStats {
+  totalEarnings: number;
+  monthlyEarnings: number;
+  weeklyEarnings: number;
+  totalBookings: number;
+  completedBookings: number;
+  averageRating: number;
+  totalReviews: number;
+}
+
+interface VehicleEarnings {
+  vehicleId: string;
+  vehicleName: string;
+  make: string;
+  model: string;
+  year: number;
+  mainImageUrl?: string;
+  totalEarnings: number;
+  totalBookings: number;
+  averageRating: number;
+  totalReviews: number;
+  lastBookingDate?: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AgentService {
-  private apiUrl = `${environment.apiUrl}/agent`;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private baseUrl = 'http://localhost:3000';
+
+  constructor() {}
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('accessToken');
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
   }
 
-  applyToBecomeAgent(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/apply`, {}, {
+  applyToBecomeAgent(): Observable<AgentResponse> {
+    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/applications`, {}, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  getApplicationStatus(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/application/status`, {
+  getApplicationStatus(): Observable<ApplicationStatus> {
+    return this.http.get<ApplicationStatus>(`${this.baseUrl}/agent/applications/status`, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  getAgentVehicles(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/vehicles`, {
+  getAgentVehicles(): Observable<Vehicle[]> {
+    return this.http.get<Vehicle[]>(`${this.baseUrl}/agent/vehicles`, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  uploadVehicleMainImage(file: File): Observable<any> {
+  uploadVehicleMainImage(file: File): Observable<AgentResponse> {
     const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post(`${this.apiUrl}/upload/vehicle/main-image`, formData, {
+    formData.append('image', file);
+    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/main-image`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  uploadVehicleGallery(files: File[]): Observable<any> {
+  uploadVehicleGallery(files: File[]): Observable<AgentResponse> {
     const formData = new FormData();
-    files.forEach(file => formData.append('files', file));
-    return this.http.post(`${this.apiUrl}/upload/vehicle/gallery`, formData, {
+    files.forEach((file, index) => {
+      formData.append(`images`, file);
+    });
+    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/gallery`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  uploadVehicleInterior(files: File[]): Observable<any> {
+  uploadVehicleInterior(files: File[]): Observable<AgentResponse> {
     const formData = new FormData();
-    files.forEach(file => formData.append('files', file));
-    return this.http.post(`${this.apiUrl}/upload/vehicle/interior`, formData, {
+    files.forEach((file, index) => {
+      formData.append(`images`, file);
+    });
+    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/interior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  uploadVehicleExterior(files: File[]): Observable<any> {
+  uploadVehicleExterior(files: File[]): Observable<AgentResponse> {
     const formData = new FormData();
-    files.forEach(file => formData.append('files', file));
-    return this.http.post(`${this.apiUrl}/upload/vehicle/exterior`, formData, {
+    files.forEach((file, index) => {
+      formData.append(`images`, file);
+    });
+    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/exterior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  uploadVehicleDocuments(files: File[]): Observable<any> {
+  uploadVehicleDocuments(files: File[]): Observable<AgentResponse> {
     const formData = new FormData();
-    files.forEach(file => formData.append('files', file));
-    return this.http.post(`${this.apiUrl}/upload/vehicle/documents`, formData, {
+    files.forEach((file, index) => {
+      formData.append(`documents`, file);
+    });
+    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/documents`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  getAgentBookings(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/bookings`, { headers: this.getAuthHeaders() });
+  getAgentBookings(): Observable<Booking[]> {
+    return this.http.get<{ success: boolean; data: Booking[] }>(`${this.baseUrl}/agent/bookings`, {
+      headers: this.getAuthHeaders(),
+    }).pipe(
+      map(response => response.data || [])
+    );
   }
 
-  getAgentReviews(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/reviews`, { headers: this.getAuthHeaders() });
+  getAgentReviews(): Observable<Review[]> {
+    return this.http.get<{ success: boolean; data: Review[] }>(`${this.baseUrl}/agent/reviews`, {
+      headers: this.getAuthHeaders(),
+    }).pipe(
+      map(response => response.data || [])
+    );
   }
 
-  approveBooking(bookingId: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/bookings/${bookingId}/approve`, {}, { headers: this.getAuthHeaders() });
+  approveBooking(bookingId: string): Observable<AgentResponse> {
+    return this.http.put<AgentResponse>(`${this.baseUrl}/agent/bookings/${bookingId}/approve`, {}, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
-  declineBooking(bookingId: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/bookings/${bookingId}/decline`, {}, { headers: this.getAuthHeaders() });
+  declineBooking(bookingId: string): Observable<AgentResponse> {
+    return this.http.put<AgentResponse>(`${this.baseUrl}/agent/bookings/${bookingId}/decline`, {}, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
-  markBookingAsActive(bookingId: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/bookings/${bookingId}/active`, {}, { headers: this.getAuthHeaders() });
+  markBookingAsActive(bookingId: string): Observable<AgentResponse> {
+    return this.http.put<AgentResponse>(`${this.baseUrl}/agent/bookings/${bookingId}/activate`, {}, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
-  markBookingAsCompleted(bookingId: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/bookings/${bookingId}/completed`, {}, { headers: this.getAuthHeaders() });
+  markBookingAsCompleted(bookingId: string): Observable<AgentResponse> {
+    return this.http.put<AgentResponse>(`${this.baseUrl}/agent/bookings/${bookingId}/complete`, {}, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  deleteVehicle(vehicleId: string): Observable<AgentResponse> {
+    return this.http.delete<AgentResponse>(`${this.baseUrl}/agent/vehicles/${vehicleId}`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  getAgentEarnings(): Observable<EarningsStats> {
+    return this.http.get<{ success: boolean; data: EarningsStats }>(`${this.baseUrl}/agent/earnings`, {
+      headers: this.getAuthHeaders(),
+    }).pipe(
+      map(response => response.data)
+    );
+  }
+
+  getVehicleEarnings(): Observable<VehicleEarnings[]> {
+    return this.http.get<{ success: boolean; data: VehicleEarnings[] }>(`${this.baseUrl}/agent/vehicles/earnings`, {
+      headers: this.getAuthHeaders(),
+    }).pipe(
+      map(response => response.data || [])
+    );
   }
 } 

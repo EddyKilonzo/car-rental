@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { ToastService } from '../../services/toast.service';
+import { AuthService } from '../../services/auth/auth.service';
 
 interface User {
   id: string;
@@ -24,30 +26,49 @@ interface User {
   styleUrls: ['./users-management.component.css']
 })
 export class UsersManagementComponent implements OnInit {
+  private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
+  private authService = inject(AuthService);
+
   users: User[] = [];
   isLoading = false;
   processingUserId: string | null = null;
 
-  constructor(
-    private adminService: AdminService,
-    private toastService: ToastService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit() {
+    // Check if user is logged in and is an admin
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+      this.toastService.showError('Access denied. Admin privileges required.');
+      // Redirect to login or home page
+      return;
+    }
+    
     this.loadUsers();
   }
 
   loadUsers() {
     this.isLoading = true;
+    console.log('Loading users...');
+    console.log('Current token:', localStorage.getItem('accessToken'));
+    
     this.adminService.getAllUsers().subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.users = response?.users || [];
+        console.log('Users API response:', response);
+        this.users = response.users || [];
+        console.log('Loaded users:', this.users);
       },
       error: (error) => {
         this.isLoading = false;
-        this.toastService.showError('Failed to load users.');
         console.error('Error loading users:', error);
+        console.error('Error status:', error.status);
+        console.error('Error message:', error.message);
+        this.toastService.showError('Failed to load users.');
       }
     });
   }
@@ -68,27 +89,7 @@ export class UsersManagementComponent implements OnInit {
     });
   }
 
-  updateUserRole(userId: string, newRole: string) {
-    this.processingUserId = userId;
-    this.adminService.updateUserRole(userId, newRole).subscribe({
-      next: (response) => {
-        this.processingUserId = null;
-        this.toastService.showSuccess(`User role updated to ${newRole} successfully!`);
-        this.loadUsers(); // Reload the list
-      },
-      error: (error) => {
-        this.processingUserId = null;
-        this.toastService.showError('Failed to update user role.');
-        console.error('Error updating user role:', error);
-      }
-    });
-  }
-
   deleteUser(userId: string, userName: string) {
-    if (!confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
-      return;
-    }
-
     this.processingUserId = userId;
     this.adminService.deleteUser(userId).subscribe({
       next: (response) => {
@@ -100,6 +101,22 @@ export class UsersManagementComponent implements OnInit {
         this.processingUserId = null;
         this.toastService.showError('Failed to delete user.');
         console.error('Error deleting user:', error);
+      }
+    });
+  }
+
+  demoteAgent(userId: string, userName: string) {
+    this.processingUserId = userId;
+    this.adminService.updateUserRole(userId, 'CUSTOMER').subscribe({
+      next: (response) => {
+        this.processingUserId = null;
+        this.toastService.showSuccess(`Agent "${userName}" has been demoted to Customer successfully!`);
+        this.loadUsers(); // Reload the list
+      },
+      error: (error) => {
+        this.processingUserId = null;
+        this.toastService.showError('Failed to demote agent.');
+        console.error('Error demoting agent:', error);
       }
     });
   }
@@ -124,10 +141,5 @@ export class UsersManagementComponent implements OnInit {
       month: 'short',
       day: 'numeric'
     });
-  }
-
-  getRoleOptions(currentRole: string): string[] {
-    const roles = ['CUSTOMER', 'AGENT', 'ADMIN'];
-    return roles.filter(role => role !== currentRole);
   }
 } 

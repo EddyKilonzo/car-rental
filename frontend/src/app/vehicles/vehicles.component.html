@@ -11,14 +11,31 @@
             <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
             Refresh
           </button>
+          <!-- Add Vehicle Button for Agents - only on My Vehicles page -->
+          <button *ngIf="isAgent && isMyVehiclesRoute" class="add-vehicle-btn" (click)="addNewVehicle()">
+            <i class="fas fa-plus"></i>
+            Add New Vehicle
+          </button>
         </div>
       </div>
       
-      <!-- Add Vehicle Button for Agents - only on My Vehicles page -->
-      <div *ngIf="isAgent && isMyVehiclesRoute" class="add-vehicle-section">
-        <button class="add-vehicle-btn" (click)="addNewVehicle()">
-          <i class="fas fa-plus"></i>
-          Add New Vehicle
+      <!-- Tab Navigation for My Vehicles -->
+      <div *ngIf="isAgent && isMyVehiclesRoute" class="tab-navigation">
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'vehicles'"
+          (click)="switchTab('vehicles')"
+        >
+          <i class="fas fa-car"></i>
+          My Vehicles
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'performance'"
+          (click)="switchTab('performance')"
+        >
+          <i class="fas fa-chart-line"></i>
+          Performance & Stats
         </button>
       </div>
     </div>
@@ -27,8 +44,8 @@
     <div *ngIf="!isMyVehiclesRoute && !isLoading" class="filters-section">
       <div class="filters-header">
         <h3><i class="fas fa-filter"></i> Filters</h3>
-        <button class="clear-filters-btn" (click)="clearFilters()" *ngIf="hasActiveFilters()">
-          <i class="fas fa-times"></i> Clear All
+        <button class="clear-filters-btn" (click)="clearFilters()">
+          <i class="fas fa-times"></i> Clear All Filters
         </button>
       </div>
       
@@ -104,23 +121,167 @@
       <p>Loading vehicles...</p>
     </div>
     
-    <!-- All Vehicles Section -->
-    <div *ngIf="!isLoading && filteredVehicles.length > 0" class="vehicles-section">
+    <!-- Vehicles Tab Content -->
+    <div *ngIf="activeTab === 'vehicles' && !isLoading && filteredVehicles.length > 0" class="vehicles-section">
       <div class="results-info">
         <p>Showing {{ filteredVehicles.length }} of {{ vehicles.length }} vehicles</p>
       </div>
       <div class="vehicles-grid">
         <div class="vehicle-card" *ngFor="let vehicle of filteredVehicles" [style.background-image]="'url(' + vehicle.mainImageUrl + ')'">
-          <div class="vehicle-badge top">Top Vehicle</div>
+          <div class="vehicle-badge" [class]="getVehicleBadge(vehicle)?.class" *ngIf="getVehicleBadge(vehicle)">
+            {{ getVehicleBadge(vehicle)?.text }}
+          </div>
+          
+          <!-- Delete Button for Agents - Top Right -->
+          <button 
+            *ngIf="isAgent && isMyVehiclesRoute" 
+            class="vehicle-delete-btn" 
+            (click)="deleteVehicle(vehicle.id, vehicle.make + ' ' + vehicle.model)"
+            title="Delete Vehicle"
+          >
+            <i class="fas fa-trash"></i>
+          </button>
+          
           <div class="vehicle-overlay minimal">
             <div class="vehicle-info minimal">
-              <h3>{{ vehicle.make }} {{ vehicle.model }}</h3>
-              <div class="vehicle-ministats">
-                <span class="vehicle-price"><i class="fas fa-money-bill-wave"></i> KSH {{ vehicle.pricePerDay }}/day</span>
+              <div class="vehicle-bottom-row">
+                <div class="vehicle-content">
+                  <h3>{{ vehicle.make }} {{ vehicle.model }}</h3>
+                  <div class="vehicle-ministats">
+                    <span class="vehicle-price"><i class="fas fa-money-bill-wave"></i> KSH {{ vehicle.pricePerDay }}/day</span>
+                  </div>
+                </div>
+                <div class="vehicle-btn-group">
+                  <button class="vehicle-btn minimal" (click)="viewVehicleDetails(vehicle.id)">View Details</button>
+                  <button *ngIf="isAgent && isMyVehiclesRoute" class="vehicle-btn minimal edit" (click)="editVehicle(vehicle.id)">Edit</button>
+                </div>
               </div>
-              <div class="vehicle-btn-group">
-                <button class="vehicle-btn minimal" (click)="viewVehicleDetails(vehicle.id)">View</button>
-                <button *ngIf="isAgent && isMyVehiclesRoute" class="vehicle-btn minimal edit" (click)="editVehicle(vehicle.id)">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Performance Tab Content -->
+    <div *ngIf="activeTab === 'performance' && isAgent && isMyVehiclesRoute" class="performance-section">
+      <div *ngIf="isLoadingEarnings" class="loading">
+        <div class="spinner"></div>
+        <p>Loading performance data...</p>
+      </div>
+      
+      <div *ngIf="!isLoadingEarnings" class="performance-content">
+        <!-- Overall Agent Stats Cards -->
+        <div class="stats-grid" *ngIf="agentStats">
+          <div class="stat-card primary">
+            <div class="stat-icon">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-content">
+              <h3 class="stat-value">KSH {{ agentStats.totalEarnings | number:'1.0-0' }}</h3>
+              <p class="stat-label">Total Earnings</p>
+            </div>
+          </div>
+
+          <div class="stat-card success">
+            <div class="stat-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+              <h3 class="stat-value">{{ agentStats.totalBookings }}</h3>
+              <p class="stat-label">Total Bookings</p>
+            </div>
+          </div>
+
+          <div class="stat-card info">
+            <div class="stat-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-content">
+              <h3 class="stat-value">{{ agentStats.averageRating.toFixed(1) }}</h3>
+              <p class="stat-label">Average Rating</p>
+            </div>
+          </div>
+
+          <div class="stat-card warning">
+            <div class="stat-icon">
+              <i class="fas fa-comments"></i>
+            </div>
+            <div class="stat-content">
+              <h3 class="stat-value">{{ agentStats.totalReviews }}</h3>
+              <p class="stat-label">Total Reviews</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Earnings Breakdown -->
+        <div class="earnings-breakdown" *ngIf="agentStats">
+          <div class="earnings-card">
+            <h3 class="earnings-title">
+              <i class="fas fa-chart-bar"></i>
+              Earnings Breakdown
+            </h3>
+            <div class="earnings-grid">
+              <div class="earnings-item">
+                <div class="earnings-label">This Month</div>
+                <div class="earnings-value">KSH {{ agentStats.monthlyEarnings | number:'1.0-0' }}</div>
+              </div>
+              <div class="earnings-item">
+                <div class="earnings-label">This Week</div>
+                <div class="earnings-value">KSH {{ agentStats.weeklyEarnings | number:'1.0-0' }}</div>
+              </div>
+              <div class="earnings-item">
+                <div class="earnings-label">Total Vehicles</div>
+                <div class="earnings-value">{{ vehicles.length }}</div>
+              </div>
+              <div class="earnings-item">
+                <div class="earnings-label">Avg. Price/Day</div>
+                <div class="earnings-value">KSH {{ getAveragePricePerDay() | number:'1.0-0' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle Performance Summary -->
+        <div class="vehicle-performance-summary" *ngIf="vehicles.length > 0">
+          <h3 class="section-title">
+            <i class="fas fa-car"></i>
+            Individual Vehicle Performance
+          </h3>
+          <div class="vehicle-performance-grid">
+            <div *ngFor="let vehicle of vehicles" class="vehicle-performance-card">
+              <div class="vehicle-performance-header">
+                <img 
+                  [src]="vehicle.mainImageUrl || 'assets/images/default-car.jpg'" 
+                  [alt]="vehicle.make + ' ' + vehicle.model"
+                  class="vehicle-performance-image"
+                  (error)="onImageError($event)"
+                >
+                <div class="vehicle-performance-info">
+                  <h4>{{ vehicle.make }} {{ vehicle.model }}</h4>
+                  <p class="vehicle-year">{{ vehicle.year }}</p>
+                </div>
+                <div class="vehicle-performance-total">
+                  <div class="total-amount">KSH {{ vehicle.pricePerDay }}/day</div>
+                  <div class="total-label">Daily Rate</div>
+                </div>
+              </div>
+              <div class="vehicle-performance-stats">
+                <div class="performance-stat">
+                  <div class="stat-number">{{ getVehicleEarnings(vehicle.id)?.totalBookings || 0 }}</div>
+                  <div class="stat-label">Bookings</div>
+                </div>
+                <div class="performance-stat">
+                  <div class="stat-number">{{ (getVehicleEarnings(vehicle.id)?.averageRating || 0).toFixed(1) }}</div>
+                  <div class="stat-label">Rating</div>
+                </div>
+                <div class="performance-stat">
+                  <div class="stat-number">{{ getVehicleEarnings(vehicle.id)?.totalReviews || 0 }}</div>
+                  <div class="stat-label">Reviews</div>
+                </div>
+                <div class="performance-stat">
+                  <div class="stat-number">KSH {{ getVehicleEarnings(vehicle.id)?.totalEarnings || 0 | number:'1.0-0' }}</div>
+                  <div class="stat-label">Earnings</div>
+                </div>
               </div>
             </div>
           </div>
@@ -129,18 +290,18 @@
     </div>
     
     <!-- Empty State -->
-    <div *ngIf="!isLoading && filteredVehicles.length === 0" class="empty-state">
+    <div *ngIf="!isLoading && ((activeTab === 'vehicles' && filteredVehicles.length === 0) || (activeTab === 'performance' && vehicles.length === 0))" class="empty-state">
       <div class="empty-icon">
         <i class="fas fa-car"></i>
       </div>
       <h3>No vehicles found</h3>
-      <p *ngIf="hasActiveFilters()">No vehicles match your current filters. Try adjusting your search criteria.</p>
-      <p *ngIf="!hasActiveFilters() && isAgent && isMyVehiclesRoute">You haven't added any vehicles yet. Start by adding your first vehicle to the platform.</p>
+      <p *ngIf="hasActiveFilters() && activeTab === 'vehicles'">No vehicles match your current filters. Try adjusting your search criteria.</p>
+      <p *ngIf="!hasActiveFilters() && isAgent && isMyVehiclesRoute && vehicles.length === 0">You haven't added any vehicles yet. Start by adding your first vehicle to the platform.</p>
       <p *ngIf="!hasActiveFilters() && !isMyVehiclesRoute">No vehicles found in the market. Check back later for new vehicle listings.</p>
-      <button *ngIf="hasActiveFilters()" class="clear-filters-btn" (click)="clearFilters()">
+      <button *ngIf="hasActiveFilters() && activeTab === 'vehicles'" class="clear-filters-btn" (click)="clearFilters()">
         <i class="fas fa-times"></i> Clear Filters
       </button>
-      <button *ngIf="!hasActiveFilters() && isAgent && isMyVehiclesRoute" class="add-vehicle-btn" (click)="addNewVehicle()">
+      <button *ngIf="!hasActiveFilters() && isAgent && isMyVehiclesRoute && vehicles.length === 0" class="add-vehicle-btn" (click)="addNewVehicle()">
         <i class="fas fa-plus"></i>
         Add Your First Vehicle
       </button>

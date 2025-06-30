@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -37,6 +37,19 @@ interface Vehicle {
   };
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+interface BookingResponse {
+  success: boolean;
+  data?: unknown;
+  message?: string;
+}
+
 @Component({
   selector: 'app-booking',
   standalone: true,
@@ -45,24 +58,24 @@ interface Vehicle {
   styleUrls: ['./booking.component.css']
 })
 export class BookingComponent implements OnInit {
+  private authService = inject(AuthService);
+  private vehicleService = inject(VehicleService);
+  private bookingService = inject(BookingService);
+  private toastService = inject(ToastService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+
   vehicle: Vehicle | null = null;
   bookingForm: FormGroup;
   isLoading = false;
   error = '';
-  currentUser: any = null;
+  currentUser: User | null = null;
   totalPrice = 0;
   totalDays = 0;
   minDate = new Date().toISOString().split('T')[0];
 
-  constructor(
-    private authService: AuthService,
-    private vehicleService: VehicleService,
-    private bookingService: BookingService,
-    private toastService: ToastService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private fb: FormBuilder
-  ) {
+  constructor() {
     this.bookingForm = this.fb.group({
       startDate: ['', [Validators.required]],
       endDate: ['', [Validators.required]],
@@ -95,8 +108,11 @@ export class BookingComponent implements OnInit {
     this.loadVehicleDetails();
     this.setupFormListeners();
   }
-
-  loadVehicleDetails() {
+  /**
+   * Loads vehicle details based on the vehicle ID from the route parameters.
+   * If the vehicle is not available for booking, sets an error message.
+   */
+  loadVehicleDetails(): void {
     const vehicleId = this.route.snapshot.paramMap.get('vehicleId');
     if (!vehicleId) {
       this.error = 'Vehicle ID not found';
@@ -121,8 +137,12 @@ export class BookingComponent implements OnInit {
       }
     });
   }
+  /**
+   * Sets up form listeners to calculate total price when dates change.
+   * Also validates the date inputs to ensure they are logical and within business rules.
+   */
 
-  setupFormListeners() {
+  setupFormListeners(): void {
     // Listen to date changes to calculate total price
     this.bookingForm.get('startDate')?.valueChanges.subscribe(() => {
       this.calculateTotalPrice();
@@ -132,8 +152,12 @@ export class BookingComponent implements OnInit {
       this.calculateTotalPrice();
     });
   }
+  /**
+   * Calculates the total price based on the selected start and end dates.
+   * If the dates are invalid or not selected, sets totalDays and totalPrice to zero.
+   */
 
-  calculateTotalPrice() {
+  calculateTotalPrice(): void {
     const startDate = this.bookingForm.get('startDate')?.value;
     const endDate = this.bookingForm.get('endDate')?.value;
 
@@ -151,7 +175,10 @@ export class BookingComponent implements OnInit {
       }
     }
   }
-
+  /**
+   * Validates the selected start and end dates to ensure they are logical and within business rules.
+   * Returns true if valid, false otherwise.
+   */
   validateDates(): boolean {
     const startDate = this.bookingForm.get('startDate')?.value;
     const endDate = this.bookingForm.get('endDate')?.value;
@@ -191,8 +218,11 @@ export class BookingComponent implements OnInit {
 
     return true;
   }
-
-  onSubmit() {
+  /**
+   * Submits the booking form after validation.
+   * If valid, sends the booking data to the server and handles the response.
+   */
+  onSubmit(): void {
     if (this.bookingForm.invalid) {
       this.toastService.showError('Please fill in all required fields');
       return;
@@ -213,9 +243,9 @@ export class BookingComponent implements OnInit {
       ...this.bookingForm.value,
       vehicleId: this.vehicle.id
     };
-
+    
     this.bookingService.createBooking(bookingData).subscribe({
-      next: (response: any) => {
+      next: (response: BookingResponse) => {
         if (response.success) {
           this.toastService.showSuccess('Booking created successfully! Please wait for agent approval.');
           this.router.navigate(['/my-bookings']);
@@ -233,18 +263,28 @@ export class BookingComponent implements OnInit {
       }
     });
   }
-
+  /**
+   * Navigates back to the vehicle details page.
+   */
   goBack(): void {
     this.router.navigate(['/vehicle-details', this.vehicle?.id]);
   }
-
+  /**
+   * Formats the price in Kenyan Shillings (KES) currency format.
+   * @param price The price to format.
+   * @returns Formatted price string.
+   */
   getFormattedPrice(price: number): string {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'KES'
     }).format(price);
   }
-
+  /**
+   * Formats a date string to a more readable format.
+   * @param date The date string to format.
+   * @returns Formatted date string.
+   */
   getFormattedDate(date: string): string {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -252,26 +292,39 @@ export class BookingComponent implements OnInit {
       day: 'numeric'
     });
   }
-
+  /**
+   * Returns a string representation of the calculation for display.
+   * If totalDays and vehicle are set, it returns a formatted string.
+   * Otherwise, it returns an empty string.
+   */
   getCalculationDisplay(): string {
     if (this.totalDays > 0 && this.vehicle) {
       return `${this.totalDays} × ${this.getFormattedPrice(this.vehicle.pricePerDay)}`;
     }
     return '';
   }
-
+  /**
+   * Returns a string representation of the total price for display.
+   * If totalDays is greater than zero, it returns the formatted price.
+   * Otherwise, it returns a message prompting the user to select dates.
+   */
   getTotalDisplay(): string {
     if (this.totalDays > 0) {
       return this.getFormattedPrice(this.totalPrice);
     }
     return 'Select dates to see total';
   }
-
-  onImageError(event: any): void {
-    console.error('Image failed to load:', event.target?.src);
+  /**
+   * Handles image loading errors by logging the error and setting a placeholder image.
+   * If the image is from Cloudinary, it logs potential issues.
+   * @param event The image error event.
+   */
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    console.error('Image failed to load:', target?.src);
     
-    if (event.target) {
-      const originalSrc = event.target.src;
+    if (target) {
+      const originalSrc = target.src;
       console.log('Original image source:', originalSrc);
       
       if (originalSrc && originalSrc.includes('cloudinary')) {
@@ -283,10 +336,13 @@ export class BookingComponent implements OnInit {
       }
       
       // Use a more reliable placeholder
-      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';
+      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';
     }
   }
-
+  /**
+   * Handles successful image loading by logging the image URL.
+   * @param imageUrl The URL of the loaded image.
+   */
   onImageLoad(imageUrl: string): void {
     console.log('Image loaded successfully:', imageUrl);
   }

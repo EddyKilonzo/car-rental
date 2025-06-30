@@ -28,32 +28,32 @@
           </thead>
           <tbody class="table-body">
             <tr *ngFor="let application of applications" class="table-row">
-              <td class="table-cell">{{ application.name }}</td>
-              <td class="table-cell">{{ application.email }}</td>
-              <td class="table-cell">{{ application.phone || 'Not provided' }}</td>
+              <td class="table-cell">{{ application.user.name }}</td>
+              <td class="table-cell">{{ application.user.email }}</td>
+              <td class="table-cell">Not provided</td>
               <td class="table-cell">{{ getFormattedDate(application.createdAt) }}</td>
               <td class="table-cell actions-cell">
                 <div class="action-buttons">
                   <button 
                     class="approve-btn" 
-                    (click)="approveApplication(application.id)"
-                    [disabled]="processingUserId === application.id"
+                    (click)="approveApplication(application.userId)"
+                    [disabled]="processingUserId === application.userId"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <polyline points="20,6 9,17 4,12"/>
                     </svg>
-                    {{ processingUserId === application.id ? 'Processing...' : 'Approve' }}
+                    {{ processingUserId === application.userId ? 'Processing...' : 'Approve' }}
                   </button>
                   <button 
                     class="reject-btn" 
-                    (click)="rejectApplication(application.id)"
-                    [disabled]="processingUserId === application.id"
+                    (click)="rejectApplication(application.userId)"
+                    [disabled]="processingUserId === application.userId"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <line x1="18" y1="6" x2="6" y2="18"/>
                       <line x1="6" y1="6" x2="18" y2="18"/>
                     </svg>
-                    {{ processingUserId === application.id ? 'Processing...' : 'Reject' }}
+                    {{ processingUserId === application.userId ? 'Processing...' : 'Reject' }}
                   </button>
                 </div>
               </td>

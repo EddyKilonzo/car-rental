@@ -44,88 +44,87 @@
 
       <div *ngIf="bookings.length > 0" class="bookings-grid">
         <div *ngFor="let booking of bookings" class="booking-card">
-          <div class="booking-header">
-            <div class="vehicle-info">
+          <div class="card-header">
+            <div class="vehicle-image">
               <img 
                 [src]="booking.vehicle.mainImageUrl || 'assets/images/default-car.jpg'" 
                 [alt]="booking.vehicle.make + ' ' + booking.vehicle.model"
-                class="vehicle-image"
                 (error)="onImageError($event)"
               >
-              <div class="vehicle-details">
-                <h3>{{ booking.vehicle.make }} {{ booking.vehicle.model }}</h3>
-                <p class="vehicle-year">{{ booking.vehicle.year }}</p>
-              </div>
             </div>
             <div class="status-badge" [class]="getStatusClass(booking.status)">
               {{ getStatusText(booking.status) }}
             </div>
           </div>
 
-          <div class="booking-details">
-            <div class="detail-group">
-              <div class="detail-label">Customer</div>
-              <div class="detail-value">{{ booking.user.name }}</div>
+          <div class="card-body">
+            <h3 class="vehicle-title">
+              {{ booking.vehicle.make }} {{ booking.vehicle.model }}
+            </h3>
+            <div class="vehicle-year">{{ booking.vehicle.year }}</div>
+            
+            <div class="booking-info">
+              <div class="info-row">
+                <div class="info-item">
+                  <i class="fas fa-user"></i>
+                  <span>{{ booking.user.name }}</span>
+                </div>
+                <div class="info-item price">
+                  <i class="fas fa-money-bill-wave"></i>
+                  <span>KSH {{ booking.totalPrice | number:'1.0-0' }}</span>
+                </div>
+              </div>
+              
+              <div class="info-row">
+                <div class="info-item">
+                  <i class="fas fa-calendar-plus"></i>
+                  <span>{{ getFormattedDate(booking.startDate) }}</span>
+                </div>
+                <div class="info-item">
+                  <i class="fas fa-calendar-minus"></i>
+                  <span>{{ getFormattedDate(booking.endDate) }}</span>
+                </div>
+              </div>
             </div>
-            <div class="detail-group">
-              <div class="detail-label">Rental Period</div>
-              <div class="detail-value">{{ getFormattedDate(booking.startDate) }} - {{ getFormattedDate(booking.endDate) }}</div>
-            </div>
-            <div class="detail-group">
-              <div class="detail-label">Total Price</div>
-              <div class="detail-value price">KSH {{ booking.totalPrice | number:'1.0-0' }}</div>
-            </div>
-            <div class="detail-group" *ngIf="booking.pickupLocation">
-              <div class="detail-label">Pickup Location</div>
-              <div class="detail-value">{{ booking.pickupLocation }}</div>
-            </div>
-            <div class="detail-group" *ngIf="booking.returnLocation">
-              <div class="detail-label">Return Location</div>
-              <div class="detail-value">{{ booking.returnLocation }}</div>
-            </div>
-            <div class="detail-group" *ngIf="booking.notes">
-              <div class="detail-label">Notes</div>
-              <div class="detail-value">{{ booking.notes }}</div>
-            </div>
-          </div>
 
-          <div class="booking-actions">
-            <button 
-              *ngIf="booking.status === 'PENDING'"
-              class="btn btn-success"
-              (click)="approveBooking(booking.id)"
-              [disabled]="isProcessing"
-            >
-              <i class="fas fa-check"></i>
-              Approve
-            </button>
-            <button 
-              *ngIf="booking.status === 'PENDING'"
-              class="btn btn-danger"
-              (click)="declineBooking(booking.id)"
-              [disabled]="isProcessing"
-            >
-              <i class="fas fa-times"></i>
-              Decline
-            </button>
-            <button 
-              *ngIf="booking.status === 'CONFIRMED'"
-              class="btn btn-primary"
-              (click)="markAsActive(booking.id)"
-              [disabled]="isProcessing"
-            >
-              <i class="fas fa-play"></i>
-              Start Rental
-            </button>
-            <button 
-              *ngIf="booking.status === 'ACTIVE'"
-              class="btn btn-secondary"
-              (click)="markAsCompleted(booking.id)"
-              [disabled]="isProcessing"
-            >
-              <i class="fas fa-flag-checkered"></i>
-              Complete
-            </button>
+            <div class="card-actions">
+              <button 
+                *ngIf="booking.status === 'PENDING'"
+                class="action-btn approve-btn"
+                (click)="approveBooking(booking.id)"
+                [disabled]="isProcessing"
+              >
+                <i class="fas fa-check"></i>
+                <span>Approve</span>
+              </button>
+              <button 
+                *ngIf="booking.status === 'PENDING'"
+                class="action-btn decline-btn"
+                (click)="declineBooking(booking.id)"
+                [disabled]="isProcessing"
+              >
+                <i class="fas fa-times"></i>
+                <span>Decline</span>
+              </button>
+              <button 
+                *ngIf="booking.status === 'CONFIRMED'"
+                class="action-btn start-btn"
+                (click)="markAsActive(booking.id)"
+                [disabled]="isProcessing"
+              >
+                <i class="fas fa-play"></i>
+                <span>Start</span>
+              </button>
+              <button 
+                *ngIf="booking.status === 'ACTIVE'"
+                class="action-btn complete-btn"
+                (click)="markAsCompleted(booking.id)"
+                [disabled]="isProcessing"
+              >
+                <i class="fas fa-flag-checkered"></i>
+                <span>Complete</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

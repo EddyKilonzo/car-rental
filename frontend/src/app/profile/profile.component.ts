@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -49,6 +49,13 @@ interface ProfileUpdateData {
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private uploadService = inject(UploadService);
+  private toastService = inject(ToastService);
+  private agentService = inject(AgentService);
+  router = inject(Router);
+
   currentUser: User | null = null;
   isEditing = false;
   isLoading = false;
@@ -76,22 +83,13 @@ export class ProfileComponent implements OnInit {
     country: ''
   };
 
-  profileCompletion: number = 0;
+  profileCompletion = 0;
   missingFields: string[] = [];
 
   // Add missing properties
   isUpdating = false;
   isCompleting = false;
   showCompleteProfileForm = false;
-
-  constructor(
-    private authService: AuthService,
-    private userService: UserService,
-    private uploadService: UploadService,
-    private toastService: ToastService,
-    private agentService: AgentService,
-    public router: Router
-  ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
@@ -237,7 +235,7 @@ export class ProfileComponent implements OnInit {
   }
 
   deactivateAccount() {
-    if (!this.currentUser || !confirm('Are you sure you want to deactivate your account? This action can be reversed by contacting support.')) {
+    if (!this.currentUser) {
       return;
     }
 
@@ -262,7 +260,7 @@ export class ProfileComponent implements OnInit {
   }
 
   deleteAccount() {
-    if (!this.currentUser || !confirm('Are you sure you want to permanently delete your account? This action cannot be undone and all your data will be lost.')) {
+    if (!this.currentUser) {
       return;
     }
 
@@ -330,7 +328,7 @@ export class ProfileComponent implements OnInit {
 
     this.isLoading = true;
     this.agentService.applyToBecomeAgent().subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading = false;
         this.agentApplicationPending = true;
         this.applicationStatus = 'PENDING';
@@ -352,8 +350,9 @@ export class ProfileComponent implements OnInit {
   }
 
   // Profile Image Upload Methods
-  onProfileImageSelected(event: any) {
-    const file = event.target.files[0];
+  onProfileImageSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
     if (file) {
       // Check file type
       if (!file.type.startsWith('image/')) {
@@ -374,8 +373,8 @@ export class ProfileComponent implements OnInit {
 
   createProfileImagePreview(file: File) {
     const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.profileImagePreview = e.target.result;
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      this.profileImagePreview = e.target?.result as string;
     };
     reader.readAsDataURL(file);
   }

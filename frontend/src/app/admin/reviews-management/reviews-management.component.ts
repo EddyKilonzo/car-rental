@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
@@ -26,11 +26,39 @@ interface Review {
   };
 }
 
+interface RatingDistribution {
+  rating: number;
+  count: number;
+}
+
 interface ReviewStats {
   totalReviews: number;
   averageRating: number;
-  ratingDistribution: any[];
-  recentReviews: any[];
+  ratingDistribution: RatingDistribution[];
+  recentReviews: Review[];
+}
+
+interface PaginationData {
+  pages: number;
+  total: number;
+}
+
+interface ReviewsResponse {
+  success: boolean;
+  data: {
+    reviews: Review[];
+    pagination: PaginationData;
+  };
+}
+
+interface ReviewStatsResponse {
+  success: boolean;
+  data: ReviewStats;
+}
+
+interface DeleteReviewResponse {
+  success: boolean;
+  message?: string;
 }
 
 @Component({
@@ -41,6 +69,9 @@ interface ReviewStats {
   styleUrls: ['./reviews-management.component.css']
 })
 export class ReviewsManagementComponent implements OnInit {
+  private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
+
   reviews: Review[] = [];
   reviewStats: ReviewStats | null = null;
   isLoading = false;
@@ -50,19 +81,14 @@ export class ReviewsManagementComponent implements OnInit {
   minRating?: number;
   maxRating?: number;
 
-  constructor(
-    private adminService: AdminService,
-    private toastService: ToastService
-  ) {}
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadReviewStats();
     this.loadReviews();
   }
 
-  loadReviewStats() {
+  loadReviewStats(): void {
     this.adminService.getReviewStats().subscribe({
-      next: (response: any) => {
+      next: (response: ReviewStatsResponse) => {
         if (response.success) {
           this.reviewStats = response.data;
         }
@@ -72,11 +98,15 @@ export class ReviewsManagementComponent implements OnInit {
       }
     });
   }
+  /**
+   * Loads all reviews with optional filters for rating range.
+   * Uses pagination to fetch reviews in chunks.
+   */
 
-  loadReviews() {
+  loadReviews(): void {
     this.isLoading = true;
     this.adminService.getAllReviews(this.currentPage, 10, this.minRating, this.maxRating).subscribe({
-      next: (response: any) => {
+      next: (response: ReviewsResponse) => {
         this.isLoading = false;
         if (response.success) {
           this.reviews = response.data.reviews || [];
@@ -94,19 +124,19 @@ export class ReviewsManagementComponent implements OnInit {
     });
   }
 
-  onFilterChange() {
+  onFilterChange(): void {
     this.currentPage = 1;
     this.loadReviews();
   }
 
-  clearFilters() {
+  clearFilters(): void {
     this.minRating = undefined;
     this.maxRating = undefined;
     this.currentPage = 1;
     this.loadReviews();
   }
 
-  onPageChange(page: number) {
+  onPageChange(page: number): void {
     this.currentPage = page;
     this.loadReviews();
   }
@@ -128,24 +158,27 @@ export class ReviewsManagementComponent implements OnInit {
   formatRating(rating: number): string {
     return rating.toFixed(1);
   }
+  /**
+   * 
+   * @param reviewId ID of the review to be deleted
+   * Deletes the review with the given ID and refreshes the review list and stats.
+   */
 
-  deleteReview(reviewId: string) {
-    if (confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
-      this.adminService.deleteReview(reviewId).subscribe({
-        next: (response: any) => {
-          if (response.success) {
-            this.toastService.showSuccess('Review deleted successfully');
-            this.loadReviews();
-            this.loadReviewStats(); // Refresh stats
-          } else {
-            this.toastService.showError('Failed to delete review');
-          }
-        },
-        error: (error) => {
+  deleteReview(reviewId: string): void {
+    this.adminService.deleteReview(reviewId).subscribe({
+      next: (response: DeleteReviewResponse) => {
+        if (response.success) {
+          this.toastService.showSuccess('Review deleted successfully');
+          this.loadReviews();
+          this.loadReviewStats(); // Refresh stats
+        } else {
           this.toastService.showError('Failed to delete review');
-          console.error('Error deleting review:', error);
         }
-      });
-    }
+      },
+      error: (error) => {
+        this.toastService.showError('Failed to delete review');
+        console.error('Error deleting review:', error);
+      }
+    });
   }
 } 

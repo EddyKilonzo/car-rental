@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
@@ -16,6 +16,11 @@ import { ToastService } from '../services/toast.service';
   styleUrls: ['./landing-page.component.css']
 })
 export class LandingPageComponent implements OnInit {
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private router = inject(Router);
+  private toastService = inject(ToastService);
+
   reviews = [
     {
       name: 'Jane Doe',
@@ -35,14 +40,7 @@ export class LandingPageComponent implements OnInit {
   ];
   currentReview = 0;
   showProfileBanner = false;
-  currentUser: any = null;
-
-  constructor(
-    private authService: AuthService,
-    private userService: UserService,
-    private router: Router,
-    private toastService: ToastService
-  ) {}
+  currentUser: { role: string; name?: string; phone?: string; address?: string; city?: string; state?: string; zipCode?: string; country?: string; } | null = null;
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
@@ -51,7 +49,7 @@ export class LandingPageComponent implements OnInit {
     }
   }
 
-  private checkProfileCompletion() {
+  private checkProfileCompletion(): void {
     this.userService.getProfile().subscribe({
       next: (response) => {
         if (response.success) {
@@ -79,19 +77,19 @@ export class LandingPageComponent implements OnInit {
     });
   }
 
-  completeProfile() {
+  completeProfile(): void {
     this.router.navigate(['/profile']);
   }
 
-  dismissBanner() {
+  dismissBanner(): void {
     this.showProfileBanner = false;
   }
 
-  prevReview() {
+  prevReview(): void {
     this.currentReview = (this.currentReview - 1 + this.reviews.length) % this.reviews.length;
   }
 
-  nextReview() {
+  nextReview(): void {
     this.currentReview = (this.currentReview + 1) % this.reviews.length;
   }
 }

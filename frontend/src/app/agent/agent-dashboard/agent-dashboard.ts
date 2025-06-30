@@ -1,20 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { AgentService } from '../../services/agent.service';
 import { ToastService } from '../../services/toast.service';
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+// Import interfaces from agent service to avoid conflicts
 interface Booking {
   id: string;
   startDate: string;
   endDate: string;
   totalPrice: number;
   status: string;
-  pickupLocation?: string;
-  returnLocation?: string;
-  notes?: string;
-  createdAt: string;
   user: {
     id: string;
     name: string;
@@ -25,7 +29,6 @@ interface Booking {
     make: string;
     model: string;
     year: number;
-    licensePlate: string;
     mainImageUrl?: string;
   };
 }
@@ -51,6 +54,49 @@ interface Review {
   };
 }
 
+interface Vehicle {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  mainImageUrl?: string;
+}
+
+interface AgentResponse {
+  success: boolean;
+  data: unknown;
+  message?: string;
+}
+
+interface BookingActionResponse {
+  success: boolean;
+  message?: string;
+}
+
+interface EarningsStats {
+  totalEarnings: number;
+  monthlyEarnings: number;
+  weeklyEarnings: number;
+  totalBookings: number;
+  completedBookings: number;
+  averageRating: number;
+  totalReviews: number;
+}
+
+interface VehicleEarnings {
+  vehicleId: string;
+  vehicleName: string;
+  make: string;
+  model: string;
+  year: number;
+  mainImageUrl?: string;
+  totalEarnings: number;
+  totalBookings: number;
+  averageRating: number;
+  totalReviews: number;
+  lastBookingDate?: string;
+}
+
 @Component({
   selector: 'app-agent-dashboard',
   standalone: true,
@@ -59,19 +105,17 @@ interface Review {
   styleUrls: ['./agent-dashboard.component.css']
 })
 export class AgentDashboardComponent implements OnInit {
+  private authService = inject(AuthService);
+  private agentService = inject(AgentService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
+
   bookings: Booking[] = [];
   reviews: Review[] = [];
   isLoading = false;
   isProcessing = false;
-  currentUser: any = null;
+  currentUser: User | null = null;
   activeTab: 'bookings' | 'reviews' = 'bookings';
-
-  constructor(
-    private authService: AuthService,
-    private agentService: AgentService,
-    private toastService: ToastService,
-    public router: Router
-  ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
@@ -90,7 +134,6 @@ export class AgentDashboardComponent implements OnInit {
     console.log('Agent user:', this.currentUser);
     this.loadBookings();
     this.loadReviews();
-    this.loadAgentVehicles();
   }
 
   loadBookings() {
@@ -98,18 +141,12 @@ export class AgentDashboardComponent implements OnInit {
     console.log('Loading agent bookings...');
     
     this.agentService.getAgentBookings().subscribe({
-      next: (response: any) => {
-        console.log('Agent bookings response:', response);
+      next: (bookings: Booking[]) => {
+        console.log('Agent bookings loaded:', bookings.length);
         this.isLoading = false;
-        if (response.success) {
-          this.bookings = response.data || [];
-          console.log('Bookings loaded:', this.bookings);
-        } else {
-          this.toastService.showError('Failed to load bookings');
-          console.error('Failed to load bookings:', response);
-        }
+        this.bookings = bookings;
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         this.isLoading = false;
         this.toastService.showError('Failed to load bookings');
         console.error('Error loading bookings:', error);
@@ -119,29 +156,12 @@ export class AgentDashboardComponent implements OnInit {
 
   loadReviews() {
     this.agentService.getAgentReviews().subscribe({
-      next: (response: any) => {
-        if (response.success) {
-          this.reviews = response.data || [];
-        } else {
-          console.error('Failed to load reviews');
-        }
+      next: (reviews: Review[]) => {
+        console.log('Agent reviews loaded:', reviews.length);
+        this.reviews = reviews;
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         console.error('Error loading reviews:', error);
-      }
-    });
-  }
-
-  loadAgentVehicles() {
-    this.agentService.getAgentVehicles().subscribe({
-      next: (response: any) => {
-        console.log('Agent vehicles response:', response);
-        if (response.success) {
-          console.log('Agent has vehicles:', response.data?.length || 0);
-        }
-      },
-      error: (error: any) => {
-        console.error('Error loading agent vehicles:', error);
       }
     });
   }
@@ -150,7 +170,7 @@ export class AgentDashboardComponent implements OnInit {
     this.isProcessing = true;
     
     this.agentService.approveBooking(bookingId).subscribe({
-      next: (response: any) => {
+      next: (response: BookingActionResponse) => {
         this.isProcessing = false;
         if (response.success) {
           this.toastService.showSuccess('Booking approved successfully');
@@ -159,7 +179,7 @@ export class AgentDashboardComponent implements OnInit {
           this.toastService.showError('Failed to approve booking');
         }
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         this.isProcessing = false;
         this.toastService.showError('Failed to approve booking');
         console.error('Error approving booking:', error);
@@ -168,33 +188,31 @@ export class AgentDashboardComponent implements OnInit {
   }
 
   declineBooking(bookingId: string) {
-    if (confirm('Are you sure you want to decline this booking?')) {
-      this.isProcessing = true;
-      
-      this.agentService.declineBooking(bookingId).subscribe({
-        next: (response: any) => {
-          this.isProcessing = false;
-          if (response.success) {
-            this.toastService.showSuccess('Booking declined successfully');
-            this.loadBookings();
-          } else {
-            this.toastService.showError('Failed to decline booking');
-          }
-        },
-        error: (error: any) => {
-          this.isProcessing = false;
+    this.isProcessing = true;
+    
+    this.agentService.declineBooking(bookingId).subscribe({
+      next: (response: BookingActionResponse) => {
+        this.isProcessing = false;
+        if (response.success) {
+          this.toastService.showSuccess('Booking declined successfully');
+          this.loadBookings();
+        } else {
           this.toastService.showError('Failed to decline booking');
-          console.error('Error declining booking:', error);
         }
-      });
-    }
+      },
+      error: (error: unknown) => {
+        this.isProcessing = false;
+        this.toastService.showError('Failed to decline booking');
+        console.error('Error declining booking:', error);
+      }
+    });
   }
 
   markAsActive(bookingId: string) {
     this.isProcessing = true;
     
     this.agentService.markBookingAsActive(bookingId).subscribe({
-      next: (response: any) => {
+      next: (response: BookingActionResponse) => {
         this.isProcessing = false;
         if (response.success) {
           this.toastService.showSuccess('Rental started successfully');
@@ -203,7 +221,7 @@ export class AgentDashboardComponent implements OnInit {
           this.toastService.showError('Failed to start rental');
         }
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         this.isProcessing = false;
         this.toastService.showError('Failed to start rental');
         console.error('Error starting rental:', error);
@@ -215,7 +233,7 @@ export class AgentDashboardComponent implements OnInit {
     this.isProcessing = true;
     
     this.agentService.markBookingAsCompleted(bookingId).subscribe({
-      next: (response: any) => {
+      next: (response: BookingActionResponse) => {
         this.isProcessing = false;
         if (response.success) {
           this.toastService.showSuccess('Rental completed successfully');
@@ -225,7 +243,7 @@ export class AgentDashboardComponent implements OnInit {
           this.toastService.showError('Failed to complete rental');
         }
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         this.isProcessing = false;
         this.toastService.showError('Failed to complete rental');
         console.error('Error completing rental:', error);
@@ -263,7 +281,7 @@ export class AgentDashboardComponent implements OnInit {
     });
   }
 
-  onImageError(event: any): void {
+  onImageError(event: Event): void {
     const target = event.target as HTMLImageElement;
     if (target) {
       target.src = 'assets/images/default-car.jpg';

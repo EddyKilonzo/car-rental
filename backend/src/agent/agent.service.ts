@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { MailerService } from '../mailer/mailer.service';
 import { VehiclesService } from '../vehicles/vehicles.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
-import { User, Vehicle, Booking, Review } from '@prisma/client';
+import { User, Vehicle } from '@prisma/client';
 
 @Injectable()
 export class AgentService {
@@ -1045,7 +1045,9 @@ export class AgentService {
         message: 'Booking marked as completed successfully',
       };
     } catch (error) {
-      console.error(`Error in markBookingAsCompleted: ${error.message}`);
+      console.error(
+        `Error in markBookingAsCompleted: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
       throw new Error(
         `Failed to mark booking as completed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );

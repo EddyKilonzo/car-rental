@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -15,18 +15,16 @@ import { ToastService } from '../services/toast.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private router = inject(Router);
+  private toastService = inject(ToastService);
+
   credentials = {
     email: '',
     password: ''
   };
   isLoading = false;
-
-  constructor(
-    private authService: AuthService,
-    private userService: UserService,
-    private router: Router,
-    private toastService: ToastService
-  ) {}
 
   onSubmit() {
     if (!this.credentials.email || !this.credentials.password) {
