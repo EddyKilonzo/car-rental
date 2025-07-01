@@ -1,5 +1,4 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { Express } from 'express';
 
@@ -207,10 +206,20 @@ export class CloudinaryService {
     uploadType: CarRentalUploadType,
     customOptions?: Record<string, unknown>,
   ): Promise<CloudinaryUploadResult> {
+    console.log('CloudinaryService: Starting upload for type:', uploadType);
+    console.log('CloudinaryService: File details:', {
+      originalname: file.originalname,
+      size: file.size,
+      mimetype: file.mimetype,
+      bufferLength: file.buffer?.length,
+    });
+
     const config = this.getUploadConfig(uploadType);
+    console.log('CloudinaryService: Upload config:', config);
 
     // Check file
     this.validateFile(file, config);
+    console.log('CloudinaryService: File validation passed');
 
     return new Promise<CloudinaryUploadResult>((resolve, reject) => {
       // Determine resource type based on upload type
@@ -232,15 +241,20 @@ export class CloudinaryService {
         ...(customOptions || {}),
       };
 
+      console.log('CloudinaryService: Upload options:', uploadOptions);
+      console.log('CloudinaryService: Starting upload stream...');
+
       cloudinary.uploader
         .upload_stream(
           uploadOptions,
           (error, result: UploadApiResponse | undefined) => {
             if (error) {
+              console.error('CloudinaryService: Upload error:', error);
               reject(
                 new BadRequestException(`Upload failed: ${error.message}`),
               );
             } else if (result) {
+              console.log('CloudinaryService: Upload successful:', result);
               // Transform UploadApiResponse to CloudinaryUploadResult
               const uploadResult: CloudinaryUploadResult = {
                 public_id: result.public_id,
@@ -255,8 +269,12 @@ export class CloudinaryService {
                 height: result.height,
                 folder: config.folder,
               };
+              console.log('CloudinaryService: Returning result:', uploadResult);
               resolve(uploadResult);
             } else {
+              console.error(
+                'CloudinaryService: No result returned from upload',
+              );
               reject(
                 new BadRequestException('Upload failed: No result returned'),
               );

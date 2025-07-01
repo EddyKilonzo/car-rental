@@ -36,16 +36,20 @@ export class LoginComponent {
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
         this.isLoading = false;
-        if (response.success) {
+        if (response.success && response.data) {
           // Store the token and user data
           localStorage.setItem('accessToken', response.data.accessToken);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-          
-          this.toastService.showSuccess('Login successful! Welcome back.');
-          
-          // Check if profile is complete for customers
-          if (response.data.user.role === 'CUSTOMER') {
-            this.checkProfileCompletion();
+          if (response.data.user) {
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            
+            this.toastService.showSuccess('Login successful! Welcome back.');
+            
+            // Check if profile is complete for customers
+            if (response.data.user.role === 'CUSTOMER') {
+              this.checkProfileCompletion();
+            } else {
+              this.router.navigate(['/']);
+            }
           } else {
             this.router.navigate(['/']);
           }

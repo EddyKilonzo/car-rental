@@ -14,6 +14,9 @@ interface Vehicle {
   make: string;
   model: string;
   year: number;
+  licensePlate: string;
+  vin: string;
+  mileage: number;
   vehicleType: string;
   fuelType: string;
   transmission: string;
@@ -165,8 +168,8 @@ export class VehiclesComponent implements OnInit, OnDestroy {
   checkRoute() {
     this.isMyVehiclesRoute = this.router.url.includes('/my-vehicles');
   }
-
-  loadVehicles() {
+  // Load vehicles based on user role and route
+  loadVehicles(): void {
     this.isLoading = true;
 
     if (this.isMyVehiclesRoute) {
@@ -190,8 +193,8 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       });
     }
   }
-
-  loadAgentVehicles() {
+  // Load agent's vehicles for "My Vehicles" route
+  loadAgentVehicles(): void {
     this.agentService.getAgentVehicles().subscribe({
       next: (response: unknown) => {
         // Backend returns vehicles array directly, not wrapped in data property
@@ -203,6 +206,9 @@ export class VehiclesComponent implements OnInit, OnDestroy {
             make: vehicle.make,
             model: vehicle.model,
             year: vehicle.year,
+            licensePlate: vehicle.licensePlate,
+            vin: vehicle.vin,
+            mileage: vehicle.mileage,
             vehicleType: vehicle.vehicleType,
             fuelType: vehicle.fuelType,
             transmission: vehicle.transmission,
@@ -245,8 +251,8 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  applyFilters() {
+  // Apply filters to the vehicles list
+  applyFilters(): void {
     this.filteredVehicles = this.vehicles.filter(vehicle => {
       // Search filter
       if (this.filters.search) {
@@ -278,8 +284,8 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       return true;
     });
   }
-
-  clearFilters() {
+  // Clear all filters
+  clearFilters(): void {
     this.filters = {
       search: '',
       vehicleType: '',
@@ -289,7 +295,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     };
     this.applyFilters();
   }
-
+  // Check if there are any active filters
   hasActiveFilters(): boolean {
     return !!(this.filters.search || 
               this.filters.vehicleType || 
@@ -297,11 +303,11 @@ export class VehiclesComponent implements OnInit, OnDestroy {
               this.filters.minPrice || 
               this.filters.maxPrice);
   }
-
+  // View vehicle details
   viewVehicleDetails(vehicleId: string) {
     this.router.navigate(['/vehicles', vehicleId]);
   }
-
+  // Book a vehicle
   bookVehicle(vehicleId: string) {
     if (this.isAdmin) {
       this.toastService.showError('Admins cannot book vehicles. Please use a customer account.');
@@ -314,17 +320,17 @@ export class VehiclesComponent implements OnInit, OnDestroy {
       this.router.navigate(['/vehicle-details', vehicleId]);
     }
   }
-
-  addNewVehicle() {
+  // Add a new vehicle (only for agents)
+  addNewVehicle(): void {
     if (this.isAgent) {
       this.router.navigate(['/vehicle-form']);
     }
   }
-
+  // Check if the user can book a vehicle
   canBookVehicle(): boolean {
     return !this.isAdmin && !this.isAgent && !!this.currentUser;
   }
-
+  // Get the text for the booking button based on user role
   getBookingButtonText(): string {
     if (this.isAdmin) {
       return 'Admin Access';
@@ -389,7 +395,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
         console.error('- Cloudinary service issues');
       }
       
-      // Use a more reliable placeholder
+      // placeholder image as fallback
       target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
     }
   }
@@ -421,19 +427,19 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     }
   }
 
-  onBookNow(vehicle: Vehicle) {
+  onBookNow(vehicle: Vehicle): void {
     if (!this.currentUser) {
       this.router.navigate(['/login']);
       return;
     }
 
     if (this.isAdmin) {
-      this.toastService.showError('Admins cannot book vehicles. Please use a customer account.');
+      this.toastService.showError('Admins cannot book vehicles.');
       return;
     }
 
     if (this.isAgent) {
-      this.toastService.showError('Agents cannot book vehicles. You can only post and manage vehicles.');
+      this.toastService.showError('Agents cannot book vehicles.');
       return;
     }
 
@@ -441,13 +447,13 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     this.router.navigate(['/vehicle-details', vehicle.id]);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
   }
 
-  refreshVehicles() {
+  refreshVehicles(): void {
     this.loadVehicles();
   }
 
@@ -496,7 +502,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  loadVehicleEarnings() {
+  loadVehicleEarnings(): void {
     console.log('loadVehicleEarnings called');
     this.isLoadingEarnings = true;
     
@@ -531,7 +537,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     });
   }
 
-  calculateRealEarningsFromBookings(bookings: Booking[], reviews: Review[]) {
+  calculateRealEarningsFromBookings(bookings: Booking[], reviews: Review[]): void {
     console.log('Calculating real earnings from bookings...');
     
     // Calculate overall stats
@@ -578,7 +584,7 @@ export class VehiclesComponent implements OnInit, OnDestroy {
     console.log('Real earnings calculated:', this.agentStats);
   }
 
-  calculateVehicleEarnings(bookings: Booking[], reviews: Review[]) {
+  calculateVehicleEarnings(bookings: Booking[], reviews: Review[]): void {
     const vehicleEarningsMap = new Map<string, VehicleEarnings>();
     
     // Initialize vehicle earnings for all vehicles

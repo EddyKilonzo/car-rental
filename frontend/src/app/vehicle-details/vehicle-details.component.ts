@@ -11,6 +11,9 @@ interface Vehicle {
   make: string;
   model: string;
   year: number;
+  licensePlate: string;
+  vin: string;
+  mileage: number;
   vehicleType: string;
   fuelType: string;
   transmission: string;
@@ -67,8 +70,6 @@ export class VehicleDetailsComponent implements OnInit {
   isAgent = false;
   currentUser: User | null = null;
 
-  constructor() {}
-
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
     this.isAdmin = this.currentUser?.role === 'ADMIN';
@@ -101,7 +102,7 @@ export class VehicleDetailsComponent implements OnInit {
             console.log('Valid URL:', url.href);
             console.log('URL protocol:', url.protocol);
             console.log('URL hostname:', url.hostname);
-          } catch (e) {
+          } catch {
             console.error('Invalid URL format:', response.mainImageUrl);
           }
         }
@@ -124,7 +125,7 @@ export class VehicleDetailsComponent implements OnInit {
       next: (response) => {
         this.vehicleReviews = response;
       },
-      error: (error) => {
+      error: () => {
         this.vehicleReviews = [];
       }
     });

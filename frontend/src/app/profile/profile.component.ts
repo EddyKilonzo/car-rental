@@ -7,27 +7,9 @@ import { UserService } from '../services/user.service';
 import { UploadService } from '../services/upload.service';
 import { ToastService } from '../services/toast.service';
 import { AgentService } from '../services/agent.service';
+import { User } from '../shared/types/user.types';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  phone?: string | null;
-  role: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  licenseNumber?: string | null;
-  dateOfBirth?: string | null;
-  address?: string | null;
-  city?: string | null;
-  state?: string | null;
-  zipCode?: string | null;
-  country?: string | null;
-  isVerified?: boolean;
-  profileImageUrl?: string | null;
-  licenseDocumentUrl?: string | null;
-}
+
 
 interface ProfileUpdateData {
   name?: string | null;
@@ -393,35 +375,13 @@ export class ProfileComponent implements OnInit {
       
       // The backend endpoint already updates the user profile with the image URL
       // We just need to update the local user data
-      if (uploadResult && uploadResult.user) {
-        console.log('Updating user with response data:', uploadResult.user);
-        this.currentUser = uploadResult.user;
+      if (uploadResult && uploadResult.url) {
+        console.log('Profile image uploaded successfully:', uploadResult.url);
+        // Reload user profile to get updated data
+        this.loadUserProfile();
         this.toastService.showSuccess('Profile image uploaded successfully!');
         this.selectedProfileImage = null;
         this.profileImagePreview = null;
-      } else if (uploadResult && uploadResult.uploadResult && uploadResult.uploadResult.secure_url) {
-        // Fallback: manually update profile if the response doesn't include user data
-        console.log('Using fallback method with image URL:', uploadResult.uploadResult.secure_url);
-        const imageUrl = uploadResult.uploadResult.secure_url;
-        if (this.currentUser) {
-          this.userService.updateProfile({ profileImageUrl: imageUrl }).subscribe({
-            next: (response) => {
-              if (response.success) {
-                this.currentUser = response.data;
-                this.toastService.showSuccess('Profile image uploaded successfully!');
-                this.selectedProfileImage = null;
-                this.profileImagePreview = null;
-              } else {
-                console.error('Profile update response not successful:', response);
-                this.toastService.showError('Image uploaded but failed to update profile. Please try again.');
-              }
-            },
-            error: (error) => {
-              console.error('Failed to update profile with image URL:', error);
-              this.toastService.showError('Image uploaded but failed to update profile. Please try again.');
-            }
-          });
-        }
       } else {
         console.error('Unexpected upload result structure:', uploadResult);
         this.toastService.showError('Image uploaded but response format is unexpected. Please try again.');

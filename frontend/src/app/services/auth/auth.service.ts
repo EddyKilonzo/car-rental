@@ -1,19 +1,28 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { User, AuthResponse } from '../../shared/types/user.types';
+
+interface RegisterData {
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+}
+
+interface LoginData {
+  email: string;
+  password: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private http = inject(HttpClient);
-
-  private baseUrl = 'http://localhost:3000';
-
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {}
+  private baseUrl = environment.apiUrl;
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('accessToken');
@@ -22,27 +31,27 @@ export class AuthService {
     });
   }
 
-  register(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/register`, data);
+  register(data: RegisterData): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, data);
   }
 
-  login(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/login`, data);
+  login(data: LoginData): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, data);
   }
 
-  forgotPassword(email: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/forgot-password`, { email });
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/auth/forgot-password`, { email });
   }
 
-  verifyResetCode(email: string, resetCode: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/verify-reset-code`, { email, resetCode });
+  verifyResetCode(email: string, resetCode: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/auth/verify-reset-code`, { email, resetCode });
   }
 
-  resetPassword(email: string, resetCode: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/reset-password`, { email, resetCode, newPassword });
+  resetPassword(email: string, resetCode: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/auth/reset-password`, { email, resetCode, newPassword });
   }
 
-  getCurrentUser(): any {
+  getCurrentUser(): User | null {
     const userStr = localStorage.getItem('user');
     if (userStr) {
       try {
@@ -55,7 +64,7 @@ export class AuthService {
     return null;
   }
 
-  updateCurrentUser(user: any): void {
+  updateCurrentUser(user: User): void {
     localStorage.setItem('user', JSON.stringify(user));
   }
 

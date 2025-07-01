@@ -222,7 +222,13 @@
       <div class="form-section">
         <h3>Vehicle Image</h3>
         <div class="image-upload-container">
-          <div class="upload-area" (click)="fileInput.click()">
+          <div class="upload-area" 
+               (click)="fileInput.click()" 
+               (keyup.enter)="fileInput.click()" 
+               (keyup.space)="fileInput.click()"
+               tabindex="0"
+               role="button"
+               aria-label="Upload vehicle image">
             <div *ngIf="!previewUrl" class="upload-placeholder">
               <i class="icon-upload"></i>
               <p>Click to upload vehicle image</p>

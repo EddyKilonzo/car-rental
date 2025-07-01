@@ -63,11 +63,6 @@ export class UserService {
 
   private baseUrl = 'http://localhost:3000';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {}
-
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('accessToken');
     return new HttpHeaders({

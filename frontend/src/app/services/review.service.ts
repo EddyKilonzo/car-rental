@@ -44,8 +44,6 @@ export class ReviewService {
 
   private baseUrl = 'http://localhost:3000';
 
-  constructor() {}
-
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('accessToken');
     return new HttpHeaders({

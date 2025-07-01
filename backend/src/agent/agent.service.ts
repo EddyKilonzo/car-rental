@@ -262,6 +262,8 @@ export class AgentService {
     }>;
   }> {
     try {
+      console.log('Getting pending agent applications...');
+
       // Get all users with pending applications
       const applications = await this.prisma.agentApplication.findMany({
         where: {
@@ -280,7 +282,9 @@ export class AgentService {
         },
       });
 
-      return {
+      console.log(`Found ${applications.length} pending applications`);
+
+      const result = {
         applications: applications.map((app) => ({
           id: app.id,
           userId: app.userId,
@@ -295,7 +299,11 @@ export class AgentService {
           },
         })),
       };
+
+      console.log('Returning applications:', result);
+      return result;
     } catch (error) {
+      console.error('Error in getPendingAgentApplications:', error);
       if (error instanceof Error) {
         throw new Error(
           `Failed to get pending agent applications: ${error.message}`,

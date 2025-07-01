@@ -50,8 +50,6 @@ export class BookingService {
 
   private baseUrl = 'http://localhost:3000';
 
-  constructor() {}
-
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('accessToken');
     return new HttpHeaders({
@@ -83,7 +81,7 @@ export class BookingService {
     });
   }
 
-  getAgentBookings(status: string = 'PENDING'): Observable<Booking[]> {
+  getAgentBookings(status = 'PENDING'): Observable<Booking[]> {
     // Fetch bookings for agent's vehicles by status (default: PENDING)
     return this.http.get<Booking[]>(`${this.baseUrl}/vehicles/bookings/status/${status}`, {
       headers: this.getAuthHeaders(),

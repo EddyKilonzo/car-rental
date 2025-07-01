@@ -8,6 +8,41 @@ import { VehicleService } from '../services/vehicle.service';
 import { AgentService } from '../services/agent.service';
 import { ToastService } from '../services/toast.service';
 
+// Import Vehicle interface from VehicleService
+interface Vehicle {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  licensePlate: string;
+  vin: string;
+  mileage: number;
+  vehicleType: string;
+  fuelType: string;
+  transmission: string;
+  seats: number;
+  doors: number;
+  color: string;
+  pricePerDay: number;
+  pricePerWeek?: number;
+  pricePerMonth?: number;
+  status: string;
+  isActive: boolean;
+  description?: string;
+  features?: string[];
+  mainImageUrl?: string;
+  galleryImages?: string[];
+  interiorImages?: string[];
+  exteriorImages?: string[];
+  userId: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    avatarUrl?: string;
+  };
+}
+
 interface VehicleForm {
   make: string;
   model: string;
@@ -44,7 +79,7 @@ export class VehicleFormComponent implements OnInit {
   private toastService = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-
+  // Vehicle form model
   vehicleForm: VehicleForm = {
     make: '',
     model: '',
@@ -62,7 +97,7 @@ export class VehicleFormComponent implements OnInit {
     description: '',
     features: []
   };
-
+  // State variables
   isAgent = false;
   isLoading = false;
   selectedFile: File | null = null;
@@ -71,15 +106,12 @@ export class VehicleFormComponent implements OnInit {
   vehicleId: string | null = null;
   currentImageUrl: string | null = null;
   newFeature = '';
-
+  // Dropdown options
   vehicleTypes = ['SEDAN', 'SUV', 'HATCHBACK', 'COUPE', 'CONVERTIBLE', 'VAN', 'TRUCK', 'LUXURY'];
   fuelTypes = ['PETROL', 'DIESEL', 'ELECTRIC', 'HYBRID', 'LPG'];
   transmissionTypes = ['MANUAL', 'AUTOMATIC'];
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
-  constructor() {}
 
   ngOnInit() {
     const currentUser = this.authService.getCurrentUser();
@@ -98,11 +130,14 @@ export class VehicleFormComponent implements OnInit {
       }
     });
   }
-
-  loadVehicleData(id: string) {
+  /**
+   * Loads vehicle data for editing if in edit mode.
+   * @param id The ID of the vehicle to load.
+   */
+  loadVehicleData(id: string): void {
     this.isLoading = true;
     this.vehicleService.getVehicleById(id).subscribe({
-      next: (vehicle: any) => {
+      next: (vehicle: Vehicle) => {
         this.vehicleForm = {
           make: vehicle.make,
           model: vehicle.model,
@@ -119,7 +154,7 @@ export class VehicleFormComponent implements OnInit {
           pricePerDay: vehicle.pricePerDay,
           pricePerWeek: vehicle.pricePerWeek,
           pricePerMonth: vehicle.pricePerMonth,
-          description: vehicle.description,
+          description: vehicle.description || '',
           features: vehicle.features || []
         };
         this.currentImageUrl = vehicle.mainImageUrl || null;
@@ -132,35 +167,47 @@ export class VehicleFormComponent implements OnInit {
       }
     });
   }
-
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
+  /**
+   * Handles file selection for the vehicle image.
+   * @param event The file input change event.
+   */
+  onFileSelected(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
     if (file) {
       this.selectedFile = file;
       this.createPreview(file);
     }
   }
-
-  createPreview(file: File) {
+  /**
+   * Creates a preview URL for the selected file.
+   * @param file The selected file.
+   */
+  createPreview(file: File): void {
     const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.previewUrl = e.target.result;
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      this.previewUrl = e.target?.result as string;
     };
     reader.readAsDataURL(file);
   }
-
-  addFeature() {
+  /**
+   * Removes the selected file and clears the preview.
+   */
+  addFeature(): void {
     if (this.newFeature && this.newFeature.trim()) {
       this.vehicleForm.features.push(this.newFeature.trim());
       this.newFeature = ''; // Clear the input after adding
     }
   }
-
-  removeFeature(index: number) {
+  /**
+   * Removes a feature from the vehicle form.
+   * @param index The index of the feature to remove.
+   */
+  removeFeature(index: number): void {
     this.vehicleForm.features.splice(index, 1);
   }
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     if (!this.isAgent) {
       this.toastService.showError('Only agents can add vehicles.');
       return;
@@ -182,14 +229,15 @@ export class VehicleFormComponent implements OnInit {
           const uploadResult = await this.uploadService.uploadVehicleMainImage(this.selectedFile).toPromise();
           console.log('Raw upload result:', uploadResult);
           console.log('Upload result type:', typeof uploadResult);
-          console.log('Upload result keys:', Object.keys(uploadResult));
-          console.log('Upload result.uploadResult:', uploadResult.uploadResult);
-          console.log('Upload result.secure_url:', uploadResult.secure_url);
           
-          // Fix: Extract URL from the correct nested structure
-          imageUrl = uploadResult.uploadResult?.secure_url || uploadResult.secure_url || '';
-          console.log('Extracted image URL:', imageUrl);
-          console.log('Image upload successful:', uploadResult);
+          if (uploadResult) {
+            console.log('Upload result keys:', Object.keys(uploadResult));
+            
+            // Extract URL from the correct structure
+            imageUrl = uploadResult.url || '';
+            console.log('Extracted image URL:', imageUrl);
+            console.log('Image upload successful:', uploadResult);
+          }
           
           if (!imageUrl) {
             throw new Error('No image URL received from upload');
@@ -197,9 +245,9 @@ export class VehicleFormComponent implements OnInit {
         } catch (uploadError) {
           console.error('Image upload failed:', uploadError);
           console.error('Upload error details:', {
-            message: (uploadError as any)?.message,
-            status: (uploadError as any)?.status,
-            error: (uploadError as any)?.error
+            message: (uploadError as Error)?.message,
+            status: (uploadError as { status?: number })?.status,
+            error: (uploadError as { error?: unknown })?.error
           });
           imageUrl = this.currentImageUrl || '';
           this.toastService.showWarning('Image upload failed. Vehicle will be updated without new image.');
@@ -230,7 +278,7 @@ export class VehicleFormComponent implements OnInit {
         pricePerMonth: this.vehicleForm.pricePerMonth ? Number(this.vehicleForm.pricePerMonth) : undefined,
         description: this.vehicleForm.description,
         features: this.vehicleForm.features,
-        mainImageUrl: imageUrl || null
+        mainImageUrl: imageUrl || undefined
       };
 
       console.log('Sending vehicle data:', vehicleData);
@@ -275,6 +323,10 @@ export class VehicleFormComponent implements OnInit {
     }
   }
 
+  /**
+   * Validates the vehicle form fields.
+   * @returns {boolean} True if the form is valid, false otherwise.
+   */
   validateForm(): boolean {
     console.log('Validating form with values:', this.vehicleForm);
     

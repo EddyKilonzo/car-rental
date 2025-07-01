@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
 import { UserService } from '../services/user.service';
 import { ToastService } from '../services/toast.service';
+import { User } from '../shared/types/user.types';
 
 @Component({
   selector: 'app-landing-page',
@@ -40,7 +41,7 @@ export class LandingPageComponent implements OnInit {
   ];
   currentReview = 0;
   showProfileBanner = false;
-  currentUser: { role: string; name?: string; phone?: string; address?: string; city?: string; state?: string; zipCode?: string; country?: string; } | null = null;
+  currentUser: User | null = null;
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();

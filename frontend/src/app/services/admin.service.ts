@@ -51,6 +51,9 @@ interface Vehicle {
   make: string;
   model: string;
   year: number;
+  licensePlate: string;
+  vin: string;
+  mileage: number;
   vehicleType: string;
   fuelType: string;
   transmission: string;
@@ -124,7 +127,7 @@ interface ReviewStatsResponse {
   data: {
     totalReviews: number;
     averageRating: number;
-    ratingDistribution: Array<{ rating: number; count: number }>;
+    ratingDistribution: { rating: number; count: number }[];
     recentReviews: Review[];
   };
 }
@@ -136,8 +139,6 @@ export class AdminService {
   private http = inject(HttpClient);
 
   private baseUrl = 'http://localhost:3000';
-
-  constructor() {}
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('accessToken');
@@ -152,8 +153,8 @@ export class AdminService {
     });
   }
 
-  getAllUsers(): Observable<{ users: User[]; pagination: any }> {
-    return this.http.get<{ users: User[]; pagination: any }>(`${this.baseUrl}/admin/users`, {
+  getAllUsers(): Observable<{ users: User[]; pagination: PaginationData }> {
+    return this.http.get<{ users: User[]; pagination: PaginationData }>(`${this.baseUrl}/admin/users`, {
       headers: this.getAuthHeaders(),
     });
   }
@@ -166,8 +167,12 @@ export class AdminService {
 
   getPendingAgentApplications(): Observable<AdminResponse<{ applications: AgentApplication[] }>> {
     console.log('AdminService: Making request to get pending agent applications');
+    console.log('AdminService: Base URL:', this.baseUrl);
+    console.log('AdminService: Auth headers:', this.getAuthHeaders());
     
-    return this.http.get<AdminResponse<{ applications: AgentApplication[] }>>(`${this.baseUrl}/agent/applications/pending`);
+    return this.http.get<AdminResponse<{ applications: AgentApplication[] }>>(`${this.baseUrl}/agent/applications/pending`, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
   approveAgent(userId: string): Observable<AdminResponse<unknown>> {
@@ -200,7 +205,7 @@ export class AdminService {
     });
   }
 
-  getAllReviews(page: number = 1, limit: number = 10, minRating?: number, maxRating?: number): Observable<ReviewsResponse> {
+  getAllReviews(page = 1, limit = 10, minRating?: number, maxRating?: number): Observable<ReviewsResponse> {
     let url = `${this.baseUrl}/admin/reviews?page=${page}&limit=${limit}`;
     if (minRating !== undefined) url += `&minRating=${minRating}`;
     if (maxRating !== undefined) url += `&maxRating=${maxRating}`;

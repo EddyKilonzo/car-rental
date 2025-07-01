@@ -6,11 +6,6 @@ import { Observable } from 'rxjs';
 export class AuthGuard implements CanActivate {
   private router = inject(Router);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {}
-
   canActivate(): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
     const token = localStorage.getItem('accessToken');
     if (token) {

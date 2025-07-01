@@ -7,6 +7,9 @@ interface Vehicle {
   make: string;
   model: string;
   year: number;
+  licensePlate: string;
+  vin: string;
+  mileage: number;
   vehicleType: string;
   fuelType: string;
   transmission: string;
@@ -52,6 +55,9 @@ interface CreateVehicleData {
   make: string;
   model: string;
   year: number;
+  licensePlate: string;
+  vin: string;
+  mileage: number;
   vehicleType: string;
   fuelType: string;
   transmission: string;

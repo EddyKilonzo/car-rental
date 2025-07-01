@@ -98,9 +98,12 @@ export class AgentController {
   @Roles(UserRole.ADMIN)
   async getPendingApplications() {
     try {
+      console.log('Controller: Getting pending applications...');
       const data = await this.agentService.getPendingAgentApplications();
+      console.log('Controller: Returning data:', data);
       return { success: true, data };
     } catch (error) {
+      console.error('Controller: Error getting pending applications:', error);
       throw new HttpException(
         error instanceof Error ? error.message : 'Unknown error',
         HttpStatus.BAD_REQUEST,

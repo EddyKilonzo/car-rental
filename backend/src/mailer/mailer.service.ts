@@ -229,7 +229,7 @@ export class MailerService {
       // Test Welcome Email
       await this.sendWelcomeEmail({
         name: 'Eddy Max',
-        email: 'eddymax3715@gmail.com'
+        email: 'eddymax3715@gmail.com',
       });
       console.log('✅ Welcome email sent successfully!');
 
@@ -250,7 +250,7 @@ export class MailerService {
         fuelType: 'Petrol',
         agentName: 'John Doe',
         agentEmail: 'john.doe@example.com',
-        agentPhone: '+254 700 000 000'
+        agentPhone: '+254 700 000 000',
       });
       console.log('✅ Booking confirmed email sent successfully!');
 
@@ -259,7 +259,7 @@ export class MailerService {
         name: 'Eddy Max',
         email: 'eddymax3715@gmail.com',
         applicationId: 'APP-123',
-        applicationDate: '2025-01-15'
+        applicationDate: '2025-01-15',
       });
       console.log('✅ Agent application email sent successfully!');
 
@@ -267,7 +267,7 @@ export class MailerService {
       await this.sendAgentApplicationResponse({
         name: 'Eddy Max',
         email: 'eddymax3715@gmail.com',
-        status: 'Approved'
+        status: 'Approved',
       });
       console.log('✅ Agent response approved email sent successfully!');
 
@@ -276,7 +276,7 @@ export class MailerService {
         name: 'Eddy Max',
         email: 'eddymax3715@gmail.com',
         status: 'Denied',
-        reason: 'Insufficient documentation provided'
+        reason: 'Insufficient documentation provided',
       });
       console.log('✅ Agent response denied email sent successfully!');
 
@@ -284,13 +284,12 @@ export class MailerService {
       await this.sendPasswordResetEmail({
         name: 'Eddy Max',
         email: 'eddymax3715@gmail.com',
-        resetCode: '123456'
+        resetCode: '123456',
       });
       console.log('✅ Password reset email sent successfully!');
 
       console.log('\n🎉 All test emails sent successfully!');
       console.log('📧 Check your email: eddymax3715@gmail.com');
-
     } catch (error) {
       console.error('\n💥 Error sending test emails:', error);
       throw error;

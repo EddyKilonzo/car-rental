@@ -141,15 +141,22 @@ export class UploadController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<CloudinaryUploadResult> {
     try {
+      console.log('Upload request received for user:', req.user.id);
+      console.log('File received:', file?.originalname, 'Size:', file?.size);
+
       if (!file) {
         throw new BadRequestException('No file provided');
       }
 
-      return await this.cloudinaryService.uploadFile(
+      const result = await this.cloudinaryService.uploadFile(
         file,
         CarRentalUploadType.VEHICLE_MAIN,
       );
+
+      console.log('Upload successful:', result);
+      return result;
     } catch (error) {
+      console.error('Upload error:', error);
       throw new HttpException(
         error instanceof Error ? error.message : 'Upload failed',
         HttpStatus.BAD_REQUEST,

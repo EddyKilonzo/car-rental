@@ -6,12 +6,16 @@ import { AuthService } from '../services/auth/auth.service';
 import { VehicleService } from '../services/vehicle.service';
 import { BookingService } from '../services/booking.service';
 import { ToastService } from '../services/toast.service';
+import { User } from '../shared/types/user.types';
 
 interface Vehicle {
   id: string;
   make: string;
   model: string;
   year: number;
+  licensePlate: string;
+  vin: string;
+  mileage: number;
   vehicleType: string;
   fuelType: string;
   transmission: string;
@@ -37,12 +41,7 @@ interface Vehicle {
   };
 }
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
+
 
 interface BookingResponse {
   success: boolean;

@@ -50,7 +50,7 @@
             <p class="user-email">{{ currentUser.email }}</p>
             <div class="user-meta">
               <span class="role-badge">{{ getRoleDisplayName(currentUser.role) }}</span>
-              <span class="member-since">Member since {{ getMemberSince(currentUser.createdAt) }}</span>
+              <span class="member-since">Member since {{ currentUser.createdAt ? getMemberSince(currentUser.createdAt) : 'Unknown' }}</span>
             </div>
           </div>
         </div>

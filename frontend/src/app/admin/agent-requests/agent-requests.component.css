@@ -174,6 +174,37 @@
   font-style: italic;
 }
 
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.retry-btn {
+  background: #A11312;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retry-btn:hover {
+  background: #8a0f0e;
+}
+
 @media (max-width: 768px) {
   .agent-requests {
     padding: 100px 10px 20px;

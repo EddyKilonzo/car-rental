@@ -54,47 +54,9 @@ interface Review {
   };
 }
 
-interface Vehicle {
-  id: string;
-  make: string;
-  model: string;
-  year: number;
-  mainImageUrl?: string;
-}
-
-interface AgentResponse {
-  success: boolean;
-  data: unknown;
-  message?: string;
-}
-
 interface BookingActionResponse {
   success: boolean;
   message?: string;
-}
-
-interface EarningsStats {
-  totalEarnings: number;
-  monthlyEarnings: number;
-  weeklyEarnings: number;
-  totalBookings: number;
-  completedBookings: number;
-  averageRating: number;
-  totalReviews: number;
-}
-
-interface VehicleEarnings {
-  vehicleId: string;
-  vehicleName: string;
-  make: string;
-  model: string;
-  year: number;
-  mainImageUrl?: string;
-  totalEarnings: number;
-  totalBookings: number;
-  averageRating: number;
-  totalReviews: number;
-  lastBookingDate?: string;
 }
 
 @Component({
@@ -118,7 +80,7 @@ export class AgentDashboardComponent implements OnInit {
   activeTab: 'bookings' | 'reviews' = 'bookings';
 
   ngOnInit() {
-    this.currentUser = this.authService.getCurrentUser();
+    this.currentUser = this.authService.getCurrentUser() as User | null;
     
     if (!this.currentUser) {
       this.router.navigate(['/login']);

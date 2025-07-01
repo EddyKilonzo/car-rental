@@ -27,28 +27,23 @@ export class SignupComponent {
   };
   isLoading = false;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {}
-
   onSubmit() {
     // Validation
     if (!this.userData.name || !this.userData.email || !this.userData.password || !this.userData.confirmPassword) {
       this.toastService.showError('Please fill in all required fields.');
       return;
     }
-
+    // Check if passwords match and meet length requirements
     if (this.userData.password !== this.userData.confirmPassword) {
       this.toastService.showError('Passwords do not match. Please try again.');
       return;
     }
-
+    // Check password length
     if (this.userData.password.length < 6) {
       this.toastService.showError('Password must be at least 6 characters long.');
       return;
     }
-
+    // Validate email format
     if (!this.isValidEmail(this.userData.email)) {
       this.toastService.showError('Please enter a valid email address.');
       return;
@@ -58,11 +53,12 @@ export class SignupComponent {
 
     // Remove confirmPassword before sending to API
     const { confirmPassword, ...signupData } = this.userData;
-
+    void confirmPassword;
+    // Call the registration service
     this.authService.register(signupData).subscribe({
       next: (response) => {
         this.isLoading = false;
-        if (response.success) {
+        if (response.success && response.data) {
           this.toastService.showSuccess('Account created successfully! Welcome to our car rental service.');
           this.router.navigate(['/login']);
         } else {
@@ -84,7 +80,7 @@ export class SignupComponent {
       }
     });
   }
-
+  // Helper function to validate email format
   private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);

@@ -1,23 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth/auth.service';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  role: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  isVerified?: boolean;
-  profileImageUrl?: string | null;
-}
+import type { User } from '../../shared/types/user.types';
 
 @Component({
   selector: 'app-users-management',
@@ -37,13 +24,8 @@ export class UsersManagementComponent implements OnInit {
   processingUserId: string | null = null;
   
   // Filter properties
-  nameFilter: string = '';
-  roleFilter: string = '';
-
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {}
+  nameFilter = '';
+  roleFilter = '';
 
   ngOnInit() {
     // Check if user is logged in and is an admin
@@ -102,10 +84,10 @@ export class UsersManagementComponent implements OnInit {
     return this.nameFilter.trim() !== '' || this.roleFilter !== '';
   }
 
-  toggleUserStatus(userId: string, currentStatus: boolean) {
+  toggleUserStatus(userId: string, currentStatus: boolean | undefined) {
     this.processingUserId = userId;
     this.adminService.toggleUserStatus(userId).subscribe({
-      next: (response) => {
+      next: () => {
         this.processingUserId = null;
         this.toastService.showSuccess(`User ${currentStatus ? 'deactivated' : 'activated'} successfully!`);
         this.loadUsers(); // Reload the list
@@ -121,9 +103,9 @@ export class UsersManagementComponent implements OnInit {
   deleteUser(userId: string, userName: string) {
     this.processingUserId = userId;
     this.adminService.deleteUser(userId).subscribe({
-      next: (response) => {
+      next: () => {
         this.processingUserId = null;
-        this.toastService.showSuccess('User deleted successfully!');
+        this.toastService.showSuccess(`User "${userName}" deleted successfully!`);
         this.loadUsers(); // Reload the list
       },
       error: (error) => {
@@ -137,7 +119,7 @@ export class UsersManagementComponent implements OnInit {
   demoteAgent(userId: string, userName: string) {
     this.processingUserId = userId;
     this.adminService.updateUserRole(userId, 'CUSTOMER').subscribe({
-      next: (response) => {
+      next: () => {
         this.processingUserId = null;
         this.toastService.showSuccess(`Agent "${userName}" has been demoted to Customer successfully!`);
         this.loadUsers(); // Reload the list
@@ -159,11 +141,12 @@ export class UsersManagementComponent implements OnInit {
     }
   }
 
-  getStatusDisplayName(isActive: boolean): string {
+  getStatusDisplayName(isActive: boolean | undefined): string {
     return isActive ? 'Active' : 'Inactive';
   }
 
-  getFormattedDate(dateString: string): string {
+  getFormattedDate(dateString: string | undefined): string {
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',

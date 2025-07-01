@@ -19,6 +19,9 @@ interface Vehicle {
   make: string;
   model: string;
   year: number;
+  licensePlate: string;
+  vin: string;
+  mileage: number;
   vehicleType: string;
   fuelType: string;
   transmission: string;
@@ -102,6 +105,9 @@ interface CreateVehicleData {
   make: string;
   model: string;
   year: number;
+  licensePlate: string;
+  vin: string;
+  mileage: number;
   vehicleType: string;
   fuelType: string;
   transmission: string;
@@ -113,6 +119,7 @@ interface CreateVehicleData {
   pricePerMonth?: number;
   description?: string;
   features?: string[];
+  mainImageUrl?: string | null;
 }
 
 @Injectable({
@@ -122,8 +129,6 @@ export class AgentService {
   private http = inject(HttpClient);
 
   private baseUrl = 'http://localhost:3000';
-
-  constructor() {}
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('accessToken');
@@ -164,48 +169,48 @@ export class AgentService {
 
   uploadVehicleMainImage(file: File): Observable<AgentResponse> {
     const formData = new FormData();
-    formData.append('image', file);
-    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/main-image`, formData, {
+    formData.append('file', file);
+    return this.http.post<AgentResponse>(`${this.baseUrl}/upload/vehicle/main-image`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
   uploadVehicleGallery(files: File[]): Observable<AgentResponse> {
     const formData = new FormData();
-    files.forEach((file, index) => {
-      formData.append(`images`, file);
+    files.forEach((file) => {
+      formData.append(`files`, file);
     });
-    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/gallery`, formData, {
+    return this.http.post<AgentResponse>(`${this.baseUrl}/upload/vehicle/gallery`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
   uploadVehicleInterior(files: File[]): Observable<AgentResponse> {
     const formData = new FormData();
-    files.forEach((file, index) => {
-      formData.append(`images`, file);
+    files.forEach((file) => {
+      formData.append(`files`, file);
     });
-    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/interior`, formData, {
+    return this.http.post<AgentResponse>(`${this.baseUrl}/upload/vehicle/interior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
   uploadVehicleExterior(files: File[]): Observable<AgentResponse> {
     const formData = new FormData();
-    files.forEach((file, index) => {
-      formData.append(`images`, file);
+    files.forEach((file) => {
+      formData.append(`files`, file);
     });
-    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/exterior`, formData, {
+    return this.http.post<AgentResponse>(`${this.baseUrl}/upload/vehicle/exterior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
   uploadVehicleDocuments(files: File[]): Observable<AgentResponse> {
     const formData = new FormData();
-    files.forEach((file, index) => {
-      formData.append(`documents`, file);
+    files.forEach((file) => {
+      formData.append(`files`, file);
     });
-    return this.http.post<AgentResponse>(`${this.baseUrl}/agent/vehicles/upload/documents`, formData, {
+    return this.http.post<AgentResponse>(`${this.baseUrl}/upload/vehicle/documents`, formData, {
       headers: this.getAuthHeaders(),
     });
   }

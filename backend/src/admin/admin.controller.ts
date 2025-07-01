@@ -27,13 +27,6 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole, VehicleStatus } from '@prisma/client';
 import { MailerService } from '../mailer/mailer.service';
 
-interface RequestWithUser extends Request {
-  user: {
-    id: string;
-    role: string;
-  };
-}
-
 @ApiTags('Admin Dashboard')
 @ApiBearerAuth()
 @Controller('admin')
@@ -382,7 +375,9 @@ export class AdminController {
   }
 
   @Post('send-email')
-  @ApiOperation({ summary: 'Send all email templates for testing (Admin only)' })
+  @ApiOperation({
+    summary: 'Send all email templates for testing (Admin only)',
+  })
   @ApiResponse({ status: 200, description: 'Email sent successfully' })
   @ApiResponse({
     status: 403,

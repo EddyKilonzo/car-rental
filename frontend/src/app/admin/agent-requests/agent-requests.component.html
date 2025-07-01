@@ -14,8 +14,14 @@
         <p>Loading agent applications...</p>
       </div>
       
+      <!-- Error State -->
+      <div *ngIf="error && !isLoading" class="error-state">
+        <p class="error-message">{{ error }}</p>
+        <button class="retry-btn" (click)="loadAgentApplications()">Retry</button>
+      </div>
+      
       <!-- Applications Table -->
-      <div *ngIf="!isLoading" class="table-container">
+      <div *ngIf="!isLoading && !error" class="table-container">
         <table class="requests-table">
           <thead class="table-header">
             <tr>

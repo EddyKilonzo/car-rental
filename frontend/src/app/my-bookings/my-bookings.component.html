@@ -33,6 +33,9 @@
         class="tab-btn" 
         [class.active]="activeTab === 'bookings'"
         (click)="activeTab = 'bookings'"
+        (keyup.enter)="activeTab = 'bookings'"
+        (keyup.space)="activeTab = 'bookings'"
+        tabindex="0"
       >
         <i class="fas fa-calendar-alt"></i>
         Bookings ({{ bookings.length }})
@@ -41,6 +44,9 @@
         class="tab-btn" 
         [class.active]="activeTab === 'reviews'"
         (click)="activeTab = 'reviews'"
+        (keyup.enter)="activeTab = 'reviews'"
+        (keyup.space)="activeTab = 'reviews'"
+        tabindex="0"
       >
         <i class="fas fa-star"></i>
         Reviews ({{ getBookingsWithReviews().length }})
@@ -175,8 +181,8 @@
 </div>
 
 <!-- Review Form Modal -->
-<div *ngIf="showReviewForm" class="modal-overlay" (click)="closeReviewForm()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+<div *ngIf="showReviewForm" class="modal-overlay" (click)="closeReviewForm()" (keyup.escape)="closeReviewForm()" tabindex="0">
+  <div class="modal-content" (click)="$event.stopPropagation()" (keyup.escape)="closeReviewForm()" tabindex="0">
     <app-review-form
       [bookingId]="selectedBooking?.id || ''"
       [vehicleName]="(selectedBooking?.vehicle?.make || '') + ' ' + (selectedBooking?.vehicle?.model || '')"

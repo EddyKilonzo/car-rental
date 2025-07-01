@@ -6,17 +6,25 @@
 
   <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()" class="review-form">
     <div class="rating-section">
-      <label class="rating-label">Rating</label>
-      <div class="star-rating">
-        <i 
+      <label class="rating-label" for="star-rating">Rating</label>
+      <div class="star-rating" id="star-rating" role="radiogroup" aria-label="Rating">
+        <button
           *ngFor="let star of [1,2,3,4,5]; let i = index" 
-          class="fas fa-star star"
+          type="button"
+          class="star-btn"
           [class.filled]="i < reviewForm.get('rating')?.value"
           [class.hover]="i < hoverRating"
           (click)="setRating(star)"
+          (keyup.enter)="setRating(star)"
+          (keyup.space)="setRating(star)"
           (mouseenter)="hoverRating = star"
           (mouseleave)="hoverRating = 0"
-        ></i>
+          [attr.aria-label]="'Rate ' + star + ' stars'"
+          [attr.aria-checked]="reviewForm.get('rating')?.value === star"
+          tabindex="0"
+        >
+          <i class="fas fa-star star"></i>
+        </button>
       </div>
       <div class="rating-text" *ngIf="reviewForm.get('rating')?.value">
         {{ getRatingText(reviewForm.get('rating')?.value) }}

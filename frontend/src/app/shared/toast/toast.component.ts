@@ -16,11 +16,6 @@ export class ToastComponent implements OnInit, OnDestroy {
   toasts: Toast[] = [];
   private subscription: Subscription = new Subscription();
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {}
-
   ngOnInit() {
     this.subscription = this.toastService.getToasts().subscribe(toasts => {
       this.toasts = toasts;

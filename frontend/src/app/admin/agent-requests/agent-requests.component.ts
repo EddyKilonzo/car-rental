@@ -32,12 +32,18 @@ export class AgentRequestsComponent implements OnInit {
   processingUserId: string | null = null;
   error: string | null = null;
 
+  constructor() {
+    console.log('AgentRequestsComponent: Constructor called');
+  }
+
   ngOnInit() {
+    console.log('AgentRequestsComponent: ngOnInit called');
     this.loadAgentApplications();
   }
 
   loadAgentApplications() {
     this.isLoading = true;
+    this.error = null;
     console.log('Loading agent applications...');
     this.adminService.getPendingAgentApplications().subscribe({
       next: (response) => {
@@ -54,7 +60,7 @@ export class AgentRequestsComponent implements OnInit {
       error: (error) => {
         console.error('Error in loadAgentApplications:', error);
         this.isLoading = false;
-        this.error = 'Failed to load agent applications';
+        this.error = error.error?.message || error.message || 'Failed to load agent applications';
         console.error('Error loading agent applications:', error);
       }
     });
