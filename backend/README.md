@@ -97,4 +97,54 @@ npm run start:prod
 ## 📱 API Access
 
 - Development: `http://localhost:3000`
-- Production: Configure in environment variables
+
+
+## Installation
+
+```bash
+npm install
+```
+
+## Running the app
+
+```bash
+# development (balanced logging - endpoints, connections, no queries)
+npm run start:dev
+
+# production mode
+npm run start:prod
+
+# quiet mode (reduced logging)
+npm run start:quiet
+
+# minimal mode (only errors)
+npm run start:minimal
+
+# debug mode (full logging including Prisma queries)
+npm run start:debug
+```
+
+## Reducing Terminal Noise
+
+The backend includes extensive logging for debugging purposes. To reduce terminal noise:
+
+1. **Use balanced mode**: Run `npm run start:dev` for useful logs without query noise
+2. **Use quiet mode**: Run `npm run start:quiet` for minimal logging
+3. **Use minimal mode**: Run `npm run start:minimal` for errors only
+4. **Environment variables**: Set `NODE_ENV=production` to reduce development logs
+5. **Prisma logging**: Control Prisma query logging with `PRISMA_LOG` environment variable:
+   - `PRISMA_LOG=info,warn,error` - Database connections + errors (default)
+   - `PRISMA_LOG=query,info,warn,error` - Full logging including queries
+   - `PRISMA_LOG=error` - Only errors
+
+## API Documentation
+
+Once the server is running, visit `http://localhost:3000/api` for Swagger documentation.
+
+## Database
+
+This project uses Prisma as the ORM. Make sure to:
+
+1. Set up your database connection in `.env`
+2. Run migrations: `npx prisma migrate dev`
+3. Generate Prisma client: `npx prisma generate`

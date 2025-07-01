@@ -41,26 +41,46 @@
 
         <div class="form-group">
           <label for="password">Password *</label>
-          <input 
-            id="password" 
-            type="password" 
-            placeholder="Create a password"
-            [(ngModel)]="userData.password"
-            name="password"
-            required
-          />
+          <div class="password-input-container">
+            <input 
+              id="password" 
+              [type]="showPassword ? 'text' : 'password'" 
+              placeholder="Create a password"
+              [(ngModel)]="userData.password"
+              name="password"
+              required
+            />
+            <button 
+              type="button" 
+              class="password-toggle-btn" 
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+            </button>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="confirmPassword">Confirm Password *</label>
-          <input 
-            id="confirmPassword" 
-            type="password" 
-            placeholder="Confirm your password"
-            [(ngModel)]="userData.confirmPassword"
-            name="confirmPassword"
-            required
-          />
+          <div class="password-input-container">
+            <input 
+              id="confirmPassword" 
+              [type]="showConfirmPassword ? 'text' : 'password'" 
+              placeholder="Confirm your password"
+              [(ngModel)]="userData.confirmPassword"
+              name="confirmPassword"
+              required
+            />
+            <button 
+              type="button" 
+              class="password-toggle-btn" 
+              (click)="toggleConfirmPasswordVisibility()"
+              [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'"
+            >
+              <i class="fas" [class.fa-eye]="!showConfirmPassword" [class.fa-eye-slash]="showConfirmPassword"></i>
+            </button>
+          </div>
         </div>
 
         <button type="submit" class="signup-btn" [disabled]="isLoading">

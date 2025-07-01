@@ -6,6 +6,28 @@ interface UploadResponse {
   message: string;
   url?: string;
   urls?: string[];
+  uploadResult?: {
+    secure_url: string;
+    public_id: string;
+    width?: number;
+    height?: number;
+  };
+  user?: any;
+}
+
+// Direct Cloudinary response for vehicle uploads
+interface CloudinaryUploadResult {
+  public_id: string;
+  secure_url: string;
+  url: string;
+  original_filename: string;
+  bytes: number;
+  format: string;
+  resource_type: string;
+  created_at: string;
+  width?: number;
+  height?: number;
+  folder: string;
 }
 
 interface LicenseUrlsResponse {
@@ -45,57 +67,57 @@ export class UploadService {
     });
   }
 
-  // Vehicle Image Uploads
-  uploadVehicleMainImage(file: File): Observable<UploadResponse> {
+  // Vehicle Image Uploads - these return CloudinaryUploadResult directly
+  uploadVehicleMainImage(file: File): Observable<CloudinaryUploadResult> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<UploadResponse>(`${this.baseUrl}/upload/vehicle/main-image`, formData, {
+    return this.http.post<CloudinaryUploadResult>(`${this.baseUrl}/upload/vehicle/main-image`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  uploadVehicleGalleryImages(files: File[]): Observable<UploadResponse> {
+  uploadVehicleGalleryImages(files: File[]): Observable<CloudinaryUploadResult[]> {
     const formData = new FormData();
     files.forEach((file) => {
       formData.append('files', file);
     });
-    return this.http.post<UploadResponse>(`${this.baseUrl}/upload/vehicle/gallery`, formData, {
+    return this.http.post<CloudinaryUploadResult[]>(`${this.baseUrl}/upload/vehicle/gallery`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  uploadVehicleInteriorImages(files: File[]): Observable<UploadResponse> {
+  uploadVehicleInteriorImages(files: File[]): Observable<CloudinaryUploadResult[]> {
     const formData = new FormData();
     files.forEach((file) => {
       formData.append('files', file);
     });
-    return this.http.post<UploadResponse>(`${this.baseUrl}/upload/vehicle/interior`, formData, {
+    return this.http.post<CloudinaryUploadResult[]>(`${this.baseUrl}/upload/vehicle/interior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  uploadVehicleExteriorImages(files: File[]): Observable<UploadResponse> {
+  uploadVehicleExteriorImages(files: File[]): Observable<CloudinaryUploadResult[]> {
     const formData = new FormData();
     files.forEach((file) => {
       formData.append('files', file);
     });
-    return this.http.post<UploadResponse>(`${this.baseUrl}/upload/vehicle/exterior`, formData, {
+    return this.http.post<CloudinaryUploadResult[]>(`${this.baseUrl}/upload/vehicle/exterior`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
-  uploadVehicleDocuments(files: File[]): Observable<UploadResponse> {
+  uploadVehicleDocuments(files: File[]): Observable<CloudinaryUploadResult[]> {
     const formData = new FormData();
     files.forEach((file) => {
       formData.append('files', file);
     });
-    return this.http.post<UploadResponse>(`${this.baseUrl}/upload/vehicle/documents`, formData, {
+    return this.http.post<CloudinaryUploadResult[]>(`${this.baseUrl}/upload/vehicle/documents`, formData, {
       headers: this.getAuthHeaders(),
     });
   }
 
   // Legacy method for backward compatibility
-  uploadVehicleImage(file: File): Observable<UploadResponse> {
+  uploadVehicleImage(file: File): Observable<CloudinaryUploadResult> {
     return this.uploadVehicleMainImage(file);
   }
 

@@ -15,9 +15,22 @@ export class PrismaService
   private static isConnected = false;
 
   constructor() {
+    // Configure logging based on environment and custom settings
+    const logLevels = PrismaService.getLogLevels();
+    
     super({
-      log: ['query', 'info', 'warn', 'error'],
+      log: logLevels,
     });
+  }
+
+  private static getLogLevels(): Array<'query' | 'info' | 'warn' | 'error'> {
+    // Check for custom PRISMA_LOG environment variable
+    if (process.env.PRISMA_LOG) {
+      return process.env.PRISMA_LOG.split(',') as Array<'query' | 'info' | 'warn' | 'error'>;
+    }
+    
+    // Default behavior: keep info logs for connections, but no query logs
+    return ['info', 'warn', 'error'];
   }
 
   async onModuleInit() {

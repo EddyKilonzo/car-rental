@@ -1,10 +1,13 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // Create app with balanced logging - keep useful info but reduce noise
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log'], // Keep errors, warnings, and general logs
+  });
 
   app.enableCors({
     origin: process.env.CORS_ORIGIN || '*',
@@ -55,7 +58,12 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  
+  // Clean startup message
+  console.log(`🚀 Car Rental API running on port ${port}`);
+  console.log(`📚 Swagger docs available at http://localhost:${port}/api`);
 }
 bootstrap().catch((error) => {
   console.error('Application failed to start:', error);

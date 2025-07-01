@@ -25,6 +25,7 @@ export class LoginComponent {
     password: ''
   };
   isLoading = false;
+  showPassword = false;
 
   onSubmit() {
     if (!this.credentials.email || !this.credentials.password) {
@@ -108,5 +109,9 @@ export class LoginComponent {
         this.router.navigate(['/']);
       }
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 }

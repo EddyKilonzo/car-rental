@@ -26,6 +26,8 @@ export class SignupComponent {
     role: 'CUSTOMER'
   };
   isLoading = false;
+  showPassword = false;
+  showConfirmPassword = false;
 
   onSubmit() {
     // Validation
@@ -84,5 +86,13 @@ export class SignupComponent {
   private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 }

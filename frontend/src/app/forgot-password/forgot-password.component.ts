@@ -23,6 +23,8 @@ export class ForgotPasswordComponent {
   newPassword = '';
   confirmPassword = '';
   step: 'email' | 'code' | 'password' = 'email';
+  showNewPassword = false;
+  showConfirmPassword = false;
 
   onSubmitEmail(): void {
     if (!this.email) {
@@ -114,5 +116,13 @@ export class ForgotPasswordComponent {
       this.newPassword = '';
       this.confirmPassword = '';
     }
+  }
+
+  toggleNewPasswordVisibility(): void {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 } 

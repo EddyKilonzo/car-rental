@@ -262,8 +262,6 @@ export class AgentService {
     }>;
   }> {
     try {
-      console.log('Getting pending agent applications...');
-
       // Get all users with pending applications
       const applications = await this.prisma.agentApplication.findMany({
         where: {
@@ -282,8 +280,6 @@ export class AgentService {
         },
       });
 
-      console.log(`Found ${applications.length} pending applications`);
-
       const result = {
         applications: applications.map((app) => ({
           id: app.id,
@@ -300,7 +296,6 @@ export class AgentService {
         })),
       };
 
-      console.log('Returning applications:', result);
       return result;
     } catch (error) {
       console.error('Error in getPendingAgentApplications:', error);
@@ -462,10 +457,6 @@ export class AgentService {
     vehicleData: CreateVehicleDto,
   ): Promise<Vehicle> {
     try {
-      console.log('Received vehicle data:', vehicleData);
-      console.log('mainImageUrl value:', vehicleData.mainImageUrl);
-      console.log('mainImageUrl type:', typeof vehicleData.mainImageUrl);
-
       // check if user exists and is an agent
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -510,9 +501,6 @@ export class AgentService {
           features: vehicleData.features || [],
         },
       });
-
-      console.log('Created vehicle:', createdVehicle);
-      console.log('Created vehicle mainImageUrl:', createdVehicle.mainImageUrl);
 
       return createdVehicle;
     } catch (error) {
@@ -735,8 +723,6 @@ export class AgentService {
    */
   async getAgentBookings(userId: string) {
     try {
-      console.log(`=== GETTING BOOKINGS FOR AGENT ${userId} ===`);
-
       const bookings = await this.prisma.booking.findMany({
         where: {
           vehicle: {
@@ -765,14 +751,6 @@ export class AgentService {
         },
         orderBy: { createdAt: 'desc' },
       });
-
-      console.log(`Found ${bookings.length} bookings for agent`);
-      bookings.forEach((booking) => {
-        console.log(
-          `Booking ${booking.id}: ${booking.vehicle.make} ${booking.vehicle.model} - Status: ${booking.status}, Vehicle Status: ${booking.vehicle.status}`,
-        );
-      });
-      console.log(`=== END AGENT BOOKINGS ===`);
 
       return {
         success: true,
@@ -1006,8 +984,6 @@ export class AgentService {
    */
   async markBookingAsCompleted(userId: string, bookingId: string) {
     try {
-      console.log(`=== MARKING BOOKING ${bookingId} AS COMPLETED ===`);
-
       // Check if booking exists and belongs to agent's vehicle
       const booking = await this.prisma.booking.findFirst({
         where: {
@@ -1024,13 +1000,6 @@ export class AgentService {
       if (!booking) {
         throw new Error('Booking not found or access denied');
       }
-
-      console.log(
-        `Found booking: ${booking.id}, vehicle: ${booking.vehicleId}, current status: ${booking.status}`,
-      );
-      console.log(
-        `Vehicle details: ${booking.vehicle.make} ${booking.vehicle.model}, current status: ${booking.vehicle.status}, isActive: ${booking.vehicle.isActive}`,
-      );
 
       if (booking.status !== 'ACTIVE') {
         throw new Error('Can only complete active bookings');
@@ -1058,8 +1027,6 @@ export class AgentService {
         },
       });
 
-      console.log(`Booking status updated to: ${updatedBooking.status}`);
-
       // Update vehicle status back to AVAILABLE and ensure it's active
       const updatedVehicle = await this.prisma.vehicle.update({
         where: { id: booking.vehicleId },
@@ -1069,19 +1036,12 @@ export class AgentService {
         },
       });
 
-      console.log(
-        `Updated vehicle ${booking.vehicleId} status to ${updatedVehicle.status} and isActive to ${updatedVehicle.isActive}`,
-      );
-
       return {
         success: true,
         data: updatedBooking,
         message: 'Booking marked as completed successfully',
       };
     } catch (error) {
-      console.error(
-        `Error in markBookingAsCompleted: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
       throw new Error(
         `Failed to mark booking as completed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );

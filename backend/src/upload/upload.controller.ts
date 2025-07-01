@@ -49,30 +49,20 @@ export class UploadController {
    * Check if agent is approved for vehicle uploads
    */
   private async checkAgentApproval(userId: string): Promise<void> {
-    console.log('Checking agent approval for user ID:', userId);
-
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
       select: { role: true, isVerified: true },
     });
 
-    console.log('User found:', user);
-
     if (!user) {
-      console.log('User not found');
       throw new ForbiddenException('User not found');
     }
 
-    console.log('User role:', user.role, 'isVerified:', user.isVerified);
-
     if (user.role === UserRole.AGENT && !user.isVerified) {
-      console.log('Agent is not verified, throwing error');
       throw new ForbiddenException(
         'Agent must be approved before uploading vehicle images',
       );
     }
-
-    console.log('Agent approval check passed');
   }
 
   @Post('profile-photo')
@@ -141,9 +131,6 @@ export class UploadController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<CloudinaryUploadResult> {
     try {
-      console.log('Upload request received for user:', req.user.id);
-      console.log('File received:', file?.originalname, 'Size:', file?.size);
-
       if (!file) {
         throw new BadRequestException('No file provided');
       }
@@ -153,10 +140,8 @@ export class UploadController {
         CarRentalUploadType.VEHICLE_MAIN,
       );
 
-      console.log('Upload successful:', result);
       return result;
     } catch (error) {
-      console.error('Upload error:', error);
       throw new HttpException(
         error instanceof Error ? error.message : 'Upload failed',
         HttpStatus.BAD_REQUEST,

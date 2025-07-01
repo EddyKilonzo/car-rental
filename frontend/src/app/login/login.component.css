@@ -80,7 +80,8 @@ label {
 }
 
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="text"] {
   width: 100%;
   padding: 0.8rem 1rem;
   border: 1px solid #e1e5e9;
@@ -93,16 +94,91 @@ input[type="password"] {
 }
 
 input[type="email"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="text"]:focus {
   border: 2px solid #A11312;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(161, 19, 18, 0.1);
 }
 
 input[type="email"]::placeholder,
-input[type="password"]::placeholder {
+input[type="password"]::placeholder,
+input[type="text"]::placeholder {
   color: #999;
   font-size: 0.9rem;
+}
+
+/* Password toggle styles */
+.password-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.password-toggle-btn:hover {
+  color: #A11312;
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+  color: #A11312;
+}
+
+.password-toggle-btn:active {
+  outline: none;
+  color: #A11312;
+  transform: translateY(-50%);
+}
+
+.password-toggle-btn:focus-visible {
+  outline: none;
+}
+
+.password-toggle-btn:visited {
+  color: #666;
+}
+
+.password-toggle-btn:link {
+  color: #666;
+}
+
+.password-toggle-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.password-input-container input[type="password"],
+.password-input-container input[type="text"] {
+  padding-right: 45px;
+  width: 100%;
+  border: 1px solid #e1e5e9;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  outline: none;
+  padding: 0.8rem 1rem;
 }
 
 .login-options {

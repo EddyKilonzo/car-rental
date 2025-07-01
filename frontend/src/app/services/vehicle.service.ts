@@ -85,15 +85,15 @@ export class VehicleService {
       Authorization: `Bearer ${token}`,
     });
   }
-
+  // Get vehicle by ID
   getVehicleById(vehicleId: string): Observable<Vehicle> {
     return this.http.get<Vehicle>(`${this.baseUrl}/vehicles/${vehicleId}`);
   }
-
+  // Get all vehicles
   getAllVehicles(): Observable<Vehicle[]> {
     return this.http.get<Vehicle[]>(`${this.baseUrl}/vehicles`);
   }
-
+  // Search vehicles with optional parameters
   searchVehicles(params: SearchParams): Observable<VehicleResponse> {
     const queryParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
@@ -105,13 +105,13 @@ export class VehicleService {
     return this.http.get<VehicleResponse>(`${this.baseUrl}/vehicles/search?${queryParams.toString()}`);
   }
 
-  // Agent methods for managing vehicles
+  // Agent methods for creating vehicles
   createVehicle(vehicleData: CreateVehicleData): Observable<VehicleResponse> {
     return this.http.post<VehicleResponse>(`${this.baseUrl}/vehicles`, vehicleData, {
       headers: this.getAuthHeaders(),
     });
   }
-
+  //updateVehicle method to update vehicle details
   updateVehicle(vehicleId: string, vehicleData: Partial<CreateVehicleData>): Observable<VehicleResponse> {
     return this.http.put<VehicleResponse>(`${this.baseUrl}/vehicles/${vehicleId}`, vehicleData, {
       headers: this.getAuthHeaders(),

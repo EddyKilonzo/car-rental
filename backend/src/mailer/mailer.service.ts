@@ -74,9 +74,6 @@ export class MailerService {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result = await this.transporter.sendMail(mailOptions);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      console.log('Email sent successfully:', result.messageId);
-
       return result;
     } catch (error: unknown) {
       console.error('Error sending email:', error);
@@ -223,15 +220,12 @@ export class MailerService {
    * @returns Promise resolving to the sent message info.
    */
   async sendAllEmailTemplates(): Promise<void> {
-    console.log('🚀 Starting to send all email templates...\n');
-
     try {
       // Test Welcome Email
       await this.sendWelcomeEmail({
         name: 'Eddy Max',
         email: 'eddymax3715@gmail.com',
       });
-      console.log('✅ Welcome email sent successfully!');
 
       // Test Booking Confirmed Email
       await this.sendBookingConfirmationEmail({
@@ -252,7 +246,6 @@ export class MailerService {
         agentEmail: 'john.doe@example.com',
         agentPhone: '+254 700 000 000',
       });
-      console.log('✅ Booking confirmed email sent successfully!');
 
       // Test Agent Application Email
       await this.sendAgentApplicationEmail({
@@ -261,7 +254,6 @@ export class MailerService {
         applicationId: 'APP-123',
         applicationDate: '2025-01-15',
       });
-      console.log('✅ Agent application email sent successfully!');
 
       // Test Agent Response Approved Email
       await this.sendAgentApplicationResponse({
@@ -269,7 +261,6 @@ export class MailerService {
         email: 'eddymax3715@gmail.com',
         status: 'Approved',
       });
-      console.log('✅ Agent response approved email sent successfully!');
 
       // Test Agent Response Denied Email
       await this.sendAgentApplicationResponse({
@@ -278,7 +269,6 @@ export class MailerService {
         status: 'Denied',
         reason: 'Insufficient documentation provided',
       });
-      console.log('✅ Agent response denied email sent successfully!');
 
       // Test Password Reset Email
       await this.sendPasswordResetEmail({
@@ -286,10 +276,6 @@ export class MailerService {
         email: 'eddymax3715@gmail.com',
         resetCode: '123456',
       });
-      console.log('✅ Password reset email sent successfully!');
-
-      console.log('\n🎉 All test emails sent successfully!');
-      console.log('📧 Check your email: eddymax3715@gmail.com');
     } catch (error) {
       console.error('\n💥 Error sending test emails:', error);
       throw error;

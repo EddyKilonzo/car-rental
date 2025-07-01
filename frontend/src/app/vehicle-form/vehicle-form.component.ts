@@ -233,8 +233,8 @@ export class VehicleFormComponent implements OnInit {
           if (uploadResult) {
             console.log('Upload result keys:', Object.keys(uploadResult));
             
-            // Extract URL from the correct structure
-            imageUrl = uploadResult.url || '';
+            // Extract URL from the correct structure (CloudinaryUploadResult)
+            imageUrl = uploadResult.secure_url || '';
             console.log('Extracted image URL:', imageUrl);
             console.log('Image upload successful:', uploadResult);
           }

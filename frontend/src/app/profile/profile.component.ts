@@ -375,8 +375,8 @@ export class ProfileComponent implements OnInit {
       
       // The backend endpoint already updates the user profile with the image URL
       // We just need to update the local user data
-      if (uploadResult && uploadResult.url) {
-        console.log('Profile image uploaded successfully:', uploadResult.url);
+      if (uploadResult && uploadResult.uploadResult && uploadResult.uploadResult.secure_url) {
+        console.log('Profile image uploaded successfully:', uploadResult.uploadResult.secure_url);
         // Reload user profile to get updated data
         this.loadUserProfile();
         this.toastService.showSuccess('Profile image uploaded successfully!');

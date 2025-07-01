@@ -62,12 +62,7 @@ export class VehiclesService {
         },
       });
 
-      console.log('getAllVehicles - Found vehicles:', allVehicles.length);
-      allVehicles.forEach((vehicle) => {
-        console.log(
-          `Vehicle ${vehicle.id}: ${vehicle.make} ${vehicle.model} - Status: ${vehicle.status}, isActive: ${vehicle.isActive}`,
-        );
-      });
+
 
       return allVehicles;
     } catch (error) {
