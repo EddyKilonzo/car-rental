@@ -30,20 +30,7 @@ npm install
 npm start
 ```
 
-## 📋 Environment Variables
 
-Create `.env` in backend folder:
-```env
-DATABASE_URL="postgresql://username:password@localhost:5432/car_rental_db"
-JWT_SECRET="your-jwt-secret"
-MAIL_HOST="smtp.gmail.com"
-MAIL_USER="your-email@gmail.com"
-MAIL_PASSWORD="your-app-password"
-CLOUDINARY_CLOUD_NAME="your-cloud-name"
-CLOUDINARY_API_KEY="your-api-key"
-CLOUDINARY_API_SECRET="your-api-secret"
-FRONTEND_URL="http://localhost:4200"
-```
 
 ## 🔐 User Roles
 
